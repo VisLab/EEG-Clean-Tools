@@ -9,7 +9,7 @@ lineFrequencies = [60, 120,  180, 212, 240];
 referenceChannels = 1:64;
 reReferencedChannels = 1:70;
 %% Run the pipeline
-for k = 1:18
+for k = 3%1:18
     thisName = sprintf('%s_%02d', basename, k);
     fname = [indir filesep thisName '.set'];
     EEG = pop_loadset(fname);
@@ -17,7 +17,7 @@ for k = 1:18
     fprintf('Computation times (seconds): %g high pass, %g line noise, %g reference \n', ...
              computationTimes.highPass, computationTimes.lineNoise, ...
              computationTimes.reference);
-    fname = [outdir filesep thisName '.set'];
-    save(fname, 'EEG', '-mat', '-v7.3');
+%     fname = [outdir filesep thisName '.set'];
+%     save(fname, 'EEG', '-mat', '-v7.3');
 end
 

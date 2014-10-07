@@ -144,6 +144,7 @@ noisyChannelResults = struct('noisyChannels', [], ...
 	   'ransacBadWindowFraction', []);
 %% Method 1: Compute the SNR (based on Christian Kothe's clean_channels)
 % Note: RANSAC uses the filtered values X of the data
+tic
 if srate > 100
     % Remove signal content above 50Hz
     B = design_fir(100,[2*[0 45 50]/srate 1],[1 1 0 0]);
@@ -162,7 +163,7 @@ else
     zscoreHFNoiseTemp = zeros(numberChannels, 1);
     noisyChannelResults.badChannelsFromHFNoise = [];
 end
-
+toc
 % Remap the channels to original numbering for the zscoreHFNoise
 noisyChannelResults.zscoreHFNoise(referenceChannels) = zscoreHFNoiseTemp;
 
@@ -171,11 +172,12 @@ channelCorrelations = ones(WCorrelation, numberChannels);
 noiseLevels = zeros(WCorrelation, numberChannels);
 channelDeviations = zeros(WCorrelation, numberChannels);
 n = length(correlationWindow);
-xWin = reshape(X(1:n*WCorrelation, :)', numberChannels, n, WCorrelation);
-dataWin = reshape(data(1:n*WCorrelation, :)', numberChannels, n, WCorrelation);
-parfor k = 1:WCorrelation % Ignore last two time windows to stay in range
-    eegPortion = squeeze(xWin(:, :, k))';
-    dataPortion = squeeze(dataWin(:, :, k))';
+m = length(correlationChannels);
+XWin = reshape(X(1:n*WCorrelation, :)', m, n, WCorrelation);
+dataWin = reshape(data(1:n*WCorrelation, :)', m, n, WCorrelation);
+for k = 1:WCorrelation % Ignore last two time windows to stay in range
+    eegPortion = squeeze(Xwin(:, :, k))'
+    dataPortion = data(correlationOffsets(k) + correlationWindow, :);
     windowCorrelation = corrcoef(eegPortion);
     abs_corr = abs(windowCorrelation - diag(diag(windowCorrelation)));
     channelCorrelations(k, :)  = quantile(abs_corr, 0.98);
@@ -194,7 +196,7 @@ fractionBadCorrelationWindows = mean(thresholdedCorrelations, 2);
 badChannelsFromCorrelation = find(fractionBadCorrelationWindows > badTimeThreshold);
 noisyChannelResults.badChannelsFromCorrelation = badChannelsFromCorrelation(:)';
 noisyChannelResults.medianMaxCorrelation =  median(noisyChannelResults.maximumCorrelations, 2);
-
+toc
 %% Method 3: Unusually high or low amplitude (using robust std)
 channel_sd =  0.7413 *iqr(data);
 
@@ -212,7 +214,7 @@ noisyChannelResults.robustChannelDeviation(referenceChannels) = ...
 badChannelsFromDeviation = ...
     find(abs(noisyChannelResults.robustChannelDeviation) > robustDeviationThreshold);
 noisyChannelResults.badChannelsFromDeviation = badChannelsFromDeviation(:)';
-
+toc
 %% Bad so far by amplitude and correlation (take these out before doing ransac)
 noisyChannels = union(noisyChannelResults.badChannelsFromDeviation, ...
     noisyChannelResults.badChannelsFromCorrelation);
@@ -279,7 +281,7 @@ flagged = noisyChannelResults.ransacCorrelations < ransacCorrelationThreshold;
 badChannelsFromRansac = find(sum(flagged, 2)*ransacFrames > ransacUnbrokenTime)';
 noisyChannelResults.badChannelsFromRansac = badChannelsFromRansac(:)';
 noisyChannelResults.ransacBadWindowFraction = sum(flagged, 2)/size(flagged, 2);
-
+toc
 % Combine bad channels detected from all methods
 noisyChannels = union(noisyChannels, ...
     union(noisyChannelResults.badChannelsFromRansac, noisyChannelResults.badChannelsFromHFNoise));
