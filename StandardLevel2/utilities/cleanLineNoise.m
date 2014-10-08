@@ -81,14 +81,15 @@ Nwin = round(lineNoise.Fs*lineNoise.taperWindowSize); % number of samples in win
 lineNoise.tapers = checkTapers(lineNoise.taperTemplate, Nwin, lineNoise.Fs); 
 
 %% Perform the calculation for each channel separately
-lineNoise.iterationCounts = zeros(length(lineNoise.lineNoiseChannels), ...
-                                  length(lineNoise.lineFrequencies));
 data = double(signal.data);
 data1 = zeros(size(data));
-parfor ch = lineNoise.lineNoiseChannels
+chans = sort(lineNoise.lineNoiseChannels);
+parfor ch = chans
     data1(ch, :) = removeLinesMovingWindow(squeeze(data(ch, :)), lineNoise);
 end
 signal.data = data1;
+clear data;
+clear data1;
 
 
 

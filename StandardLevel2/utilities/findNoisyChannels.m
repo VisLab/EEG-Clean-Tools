@@ -184,6 +184,8 @@ parfor k = 1:WCorrelation % Ignore last two time windows to stay in range
     channelStdStd =  0.7413 * iqr(channelStd);
     channelDeviations(k, :) = (channelStd - median(channelStd)) / channelStdStd;
 end;
+clear xWin;
+clear dataWin;
 noisyChannelResults.maximumCorrelations(referenceChannels, :) = channelCorrelations';
 noisyChannelResults.noiseLevels(referenceChannels, :) = noiseLevels';
 noisyChannelResults.channelDeviations(referenceChannels, :) = channelDeviations';
