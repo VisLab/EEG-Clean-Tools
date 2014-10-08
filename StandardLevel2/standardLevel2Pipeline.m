@@ -20,17 +20,32 @@ if isfield(EEG.etc, 'noisyParameters')
     warning('EEG.etc.noisyParameters already exists and will be cleared\n')
 end
 EEG.etc.noisyParameters = struct('name', thisName, 'version', getStandardLevel2Version);
-computationTimes = struct('highPass', 0, 'lineNoise', 0, 'reference', 0);
+
 %% Part I: High pass filter
-fprintf('\nHigh pass filtering\n');
+fprintf('High pass filtering\n');
 tic
 highPass = struct('highPassChannels',  highPassChannels, ...
                   'highPassCutoff', 1);
 [EEG, EEG.etc.noisyParameters.highPass] = highPassFilter(EEG, highPass);
 computationTimes.highPass = toc;
 
-%% Part II: Remove line noise
-fprintf('\n\nLine noise removal\n');
+%% Part II: Resampling
+fprintf('Resampling\n');
+tic
+originalFrequency = EEG.srate;
+resampleFrequency = 512;
+if EEG.srate <= resampleFrequency  
+    resampleFrequency = EEG.srate;
+else
+    EEG = pop_resample(EEG, resampleFrequency);
+end
+EEG.etc.noisyParameters.resampling = ...
+             struct('originalFrequency', originalFrequency, ...
+                    'resampledFrequency', resampleFrequency);
+computationTimes.resampling = toc;
+
+%% Part III: Remove line noise
+fprintf('Line noise removal\n');
 tic
 lineNoise = struct('Fs', EEG.srate, 'lineFrequencies', lineFrequencies, ...
                    'lineNoiseChannels', rereferencedChannels);
@@ -38,15 +53,15 @@ lineNoise = struct('Fs', EEG.srate, 'lineFrequencies', lineFrequencies, ...
 EEG.etc.noisyParameters.lineNoise = lineNoise;
 computationTimes.lineNoise = toc;
 clear lineNoise;
-%% Part III: Remove a robust reference
-fprintf('\nRobust reference removal\n');
+%% Part IV: Remove a robust reference
+fprintf('Robust reference removal\n');
 tic
 reference = struct('srate', EEG.srate, ...
     'referenceChannels', referenceChannels, ...
     'rereferencedChannels', rereferencedChannels, ...
     'channelLocations', EEG.chanlocs, 'channelInformation', EEG.chaninfo);
-[EEG,reference] = robustReference(EEG, reference);
- EEG.etc.noisyParameters.reference = reference;
- clear reference;
+[EEG, reference] = robustReference(EEG, reference);
+EEG.etc.noisyParameters.reference = reference;
+clear reference;
 computationTimes.reference = toc;
 
