@@ -48,7 +48,8 @@ computationTimes.resampling = toc;
 fprintf('Line noise removal\n');
 tic
 lineNoise = struct('Fs', EEG.srate, 'lineFrequencies', lineFrequencies, ...
-                   'lineNoiseChannels', rereferencedChannels);
+                   'lineNoiseChannels', rereferencedChannels, ...
+                   'fPassBand', fPassBand);
 [EEG, lineNoise] = cleanLineNoise(EEG, lineNoise); 
 EEG.etc.noisyParameters.lineNoise = lineNoise;
 computationTimes.lineNoise = toc;
