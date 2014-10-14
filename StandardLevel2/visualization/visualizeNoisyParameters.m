@@ -1,10 +1,10 @@
 function [] = visualizeNoisyParameters(noisyParameters, msg, EEG)
 fprintf('\nVisualization: %s...\n', msg);
-tname = '';
-channels = [];
-[tname, channels]  = visualizeHighPass(tname, channels);
-[tname, channels]  = visualizeLineNoise(tname, channels);
-[tname, channels]  = visualizeRereferenced(tname, channels);
+numbersPerRow = 25;
+indent = '\t';
+visualizeHighPass();
+visualizeLineNoise();
+visualizeReferenced();
 if ~exist('EEG', 'var')
     return;
 end
@@ -20,7 +20,8 @@ if strcmp(tname, 'reference')
         reference.referenceChannels, noisyParameters.name, ' Final interpolation');
 end
 
-    function [tname, channels] = visualizeHighPass(tname, channels)
+%%
+    function visualizeHighPass()
         if ~isfield(noisyParameters, 'highPass')
             fprintf('Signal wasn''t high pass filtered\n');
             return;
@@ -30,15 +31,12 @@ end
             noisyParameters.version.HighPass);
         fprintf('\tHigh pass cutoff: %g Hz\n', highPass.highPassCutoff);
         fprintf('\tFilter command: %s\n', highPass.filterCommand);
-        fprintf('\tHigh pass filtered channels: [ ');
-        fprintf('%d ', highPass.highPassChannels);
-        fprintf(']\n');
-        tname = 'high pass';
-        channels = noisyParameters.highPass.highPassChannels;
+        printList(highPass.highPassChannels, ...
+            'High pass filtered channels', numbersPerRow, indent);
     end
 
 %% Visualize the spectra after high-pass filtering
-    function [tname, channels] = visualizeLineNoise(tname, channels)
+    function visualizeLineNoise()
         if ~isfield(noisyParameters, 'lineNoise')
             fprintf('Signal didn''t have line noise removed\n');
             return;
@@ -47,10 +45,9 @@ end
         fprintf('\nLine noise removal %s\n', ...
             noisyParameters.version.LineNoise);
         fprintf('\tSampling frequency Fs: %g Hz\n', lineNoise.Fs);
-        fprintf('\tLine frequencies: [ ');
-        fprintf('%d ', lineNoise.lineNoiseChannels);
-        fprintf(']\n');
-        
+        printList(lineNoise.lineFrequencies, ...
+            'Line noise frequencies', numbersPerRow, indent);
+ 
         fprintf('\tMaximum number of iterations: %d\n', ...
             lineNoise.maximumIterations);
         fprintf('\tp-value for significant frequencies: %g\n', lineNoise.p);
@@ -67,13 +64,14 @@ end
             lineNoise.fPassBand);
         fprintf('\tSpectral smoothing factor tau: %d\n', lineNoise.tau);
         fprintf('\tTaper template: [ %g, %g, %g ]\n', lineNoise.taperTemplate);
-        tname = 'lineNoise';
-        channels = noisyParameters.lineNoise.lineNoiseChannels;
+        printList(lineNoise.lineNoiseChannels, ...
+            'Line noise channels', numbersPerRow, indent);
     end
 
-    function [tname, channels] = visualizeRereferenced(tname, channels)
+%% Visualize reference parameters
+    function visualizeReferenced()
         if ~isfield(noisyParameters, 'reference')
-            fprintf('Signal wasn''t rereferenced\n');
+            fprintf('Signal wasn''t referenced\n');
             return;
         end
         reference = noisyParameters.reference;
@@ -81,14 +79,7 @@ end
             noisyParameters.version.Reference);
         fprintf('\tSampling rate: %g Hz\n', reference.srate);
         
-        fprintf('\tReference channels: [ ');
-        fprintf('%d ', reference.referenceChannels);
-        fprintf(']\n');
-        
-        fprintf('\tRereferenced channels: [ ');
-        fprintf('%d ', reference.rereferencedChannels);
-        fprintf(']\n');
-        
+
         fprintf('\tNoisy channel detection parameters:\n');
         fprintf('\t\tRobust deviation threshold (z score): %g\n', ...
             reference.robustDeviationThreshold);
@@ -112,7 +103,11 @@ end
             reference.ransacWindowSeconds);
         fprintf('\t\tDo ransac after removing bad channels by other methods: %g\n', ...
             reference.doRansacAfterBadRemoval);
-        
+        printList(reference.referenceChannels, 'Reference channels', ...
+            numbersPerRow, indent);
+        printList(reference.rereferencedChannels, 'Rereferenced channels', ...
+            numbersPerRow, indent);
+  
         fprintf('\tNoisy channels before referencing: [ ');
         fprintf('%g ', reference.noisyChannelOriginal.noisyChannels);
         fprintf(']\n');
@@ -134,8 +129,6 @@ end
         fprintf('\t\tBad by Ransac criteria: [');
         fprintf('%g ', reference.noisyChannelResults.badChannelsFromRansac);
         fprintf(']\n');
-        tname = 'reference';
-        channels = noisyParameters.reference.referenceChannels;
     end
 
     function makeSpectrum(tString, channels)

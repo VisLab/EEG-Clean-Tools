@@ -57,8 +57,6 @@
                 mex.message]);
         end
         
-        %     plotScalpMap(, chanlocs, 'cubic', ...
-        %     true, [0.75, 0.75, 0.75], [0 0 0]);
         
         % Plot the median correlation among windows by channel
         try
@@ -75,7 +73,7 @@
                 mex.message]);
         end
         
-        % Plot the fraction of ransac unbroken windows after interpolation
+        % Plot the fraction of bad ransac windows
         try
             flagged_frac = results.ransacBadWindowFraction(referenceChannels);
             tString = ['Fraction of ransac windows with low correlation (' msg '): ' dname];
@@ -90,65 +88,4 @@
                 mex.message]);
         end
         
-        if isfield(results, 'interpolatedChannels') && ~isempty(results.interpolatedChannels)
-            % Plot the robust channel deviation after interpolation
-            tString = ['Robust channel deviation (' msg '): ' dname];
-            figure('Name', tString)
-            try
-                amplitude = results.robustChannelDeviationAfterInterpolation(referenceChannels);
-                topoplot(amplitude, echans, 'style', 'map', ...
-                    'electrodes', 'ptslabels','chaninfo',chaninfo);
-                title(tString, 'Interpreter', 'none')
-                colorbar
-            catch mex
-                warning(['Robust channel deviation ' dname ' topoplot failed: ' ...
-                    mex.message]);
-            end
-            
-            % Plot the high frequency noise after interpolation
-            try
-                hfNoise = results.zscoreHFNoiseAfterInterpoation(referenceChannels);
-                tString = ['Noise z-score(' msg '): ' dname];
-                figure('Name', tString)
-                topoplot(hfNoise, echans, 'style', 'map', ...
-                    'electrodes', 'ptslabels', 'chaninfo', chaninfo);
-                title(tString, 'Interpreter', 'none')
-                colorbar
-            catch mex
-                warning(['Znoise ' dname ' topoplot failed: ' ...
-                    mex.message]);
-            end
-            
-            % Plot the median max correlation after interpolation
-            try
-                chancor = results.medianMaxCorrelationAfterInterpolation(referenceChannels);
-                tString = ['Median max correlation(' msg '): ' dname];
-                figure('Name', tString)
-                topoplot(chancor, echans, 'style', 'map', ...
-                    'electrodes', 'ptslabels','chaninfo',chaninfo, ...
-                    'maplimits', [0.4, 1]);
-                title(tString, 'Interpreter', 'none')
-                colorbar
-            catch mex
-                warning(['Median correlation after interpolation ' ...
-                    dname ' topoplot failed: ' ...
-                    mex.message]);
-            end
-            
-            % Plot the fraction of ransac unbroken windows after interpolation
-            try
-                flagged_frac = results.ransacBadWindowFractionAfterInterpolation(referenceChannels);
-                tString = ['Bad ransac windows (' msg '): ' dname];
-                figure('Name', tString)
-                topoplot(flagged_frac, echans, 'style', 'map', ...
-                    'electrodes', 'ptslabels','chaninfo',chaninfo, ...
-                    'maplimits', [0.0, 1]);
-                title(tString, 'Interpreter', 'none')
-                colorbar
-            catch mex
-                warning(['Ransac correlation after interpolation ' ...
-                    dname ' topoplot failed: ' ...
-                    mex.message]);
-            end
-        end
     end

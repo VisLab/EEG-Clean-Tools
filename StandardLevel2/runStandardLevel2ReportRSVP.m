@@ -2,9 +2,9 @@
 datadir = 'N:\\ARLAnalysis\\RSVPStandardLevel2';
 htmlbase = 'N:\\ARLAnalysis\\RSVPStandardLevel2Reports';
 basename = 'rsvp';
-publishReport = 1;
+publishReport = 0;
 %% Run the pipeline
-for k = [1:7, 9:15]
+for k = 3%[1:7, 9:15]
     thisFile = sprintf('%s_%02d', basename, k);
     fname = [datadir filesep thisFile '.set'];
     load(fname, '-mat');
