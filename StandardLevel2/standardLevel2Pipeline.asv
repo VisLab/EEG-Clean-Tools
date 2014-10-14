@@ -30,16 +30,7 @@ computationTimes.highPass = toc;
 %% Part II: Resampling
 fprintf('Resampling\n');
 tic
-originalFrequency = EEG.srate;
-resampleFrequency = 512;
-if EEG.srate <= resampleFrequency  
-    resampleFrequency = EEG.srate;
-else
-    EEG = pop_resample(EEG, resampleFrequency);
-end
-EEG.etc.noisyParameters.resampling = ...
-             struct('originalFrequency', originalFrequency, ...
-                    'resampledFrequency', resampleFrequency);
+
 computationTimes.resampling = toc;
 
 %% Part III: Remove line noise
