@@ -256,9 +256,9 @@ if findNoisyOut.ransacUnbrokenTime < 0
     error('find_noisyChannels:BadUnbrokenParameter', ...
         'ransacUnbrokenTime must be greater than 0');
 elseif findNoisyOut.ransacUnbrokenTime < 1
-    findNoisyOut.ransacUnbrokenTime = signalSize*findNoisyOut.ransacUnbrokenTime;
+    ransacUnbrokenFrames = signalSize*findNoisyOut.ransacUnbrokenTime;
 else
-    findNoisyOut.ransacUnbrokenTime = srate*findNoisyOut.ransacUnbrokenTime;
+    ransacUnbrokenFrames = srate*findNoisyOut.ransacUnbrokenTime;
 end
 
 
@@ -298,7 +298,7 @@ clear Xwin;
 findNoisyOut.ransacCorrelations(ransacChannels, :) = ransacCorrelationsT;
 flagged = findNoisyOut.ransacCorrelations < findNoisyOut.ransacCorrelationThreshold;
 badChannelsFromRansac = ...
-    find(sum(flagged, 2)*ransacFrames > findNoisyOut.ransacUnbrokenTime)';
+    find(sum(flagged, 2)*ransacFrames > ransacUnbrokenFrames)';
 findNoisyOut.badChannelsFromRansac = badChannelsFromRansac(:)';
 findNoisyOut.ransacBadWindowFraction = sum(flagged, 2)/size(flagged, 2);
 

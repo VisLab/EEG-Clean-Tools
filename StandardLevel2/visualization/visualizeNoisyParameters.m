@@ -1,7 +1,6 @@
 function [] = visualizeNoisyParameters(noisyParameters, msg, EEG)
 fprintf('\nVisualization: %s...\n', msg);
 numbersPerRow = 25;
-indent = '\t';
 visualizeHighPass();
 visualizeLineNoise();
 visualizeReferenced();
@@ -9,13 +8,14 @@ if ~exist('EEG', 'var')
     return;
 end
 
-tString = [EEG.etc.noisyParameters.name ' : ' tname];
+channels = noisyParameters.reference.referenceChannels;
+tString = EEG.etc.noisyParameters.name;
 makeSpectrum(tString, channels);
-if strcmp(tname, 'reference')
-    showNoisyChannels(reference.noisyChannelOriginal, ...
+if isfield(noisyParameters, 'reference')
+    showNoisyChannels(reference.noisyOutOriginal, ...
         reference.channelLocations, reference.channelInformation, ...
         reference.referenceChannels, noisyParameters.name, 'Before referencing');
-    showNoisyChannels(reference.noisyChannelResults, ...
+    showNoisyChannels(reference.noisyOut, ...
         reference.channelLocations, reference.channelInformation, ...
         reference.referenceChannels, noisyParameters.name, ' Final interpolation');
 end
@@ -30,9 +30,9 @@ end
         fprintf('\nHigh pass filtering %s\n', ...
             noisyParameters.version.HighPass);
         fprintf('\tHigh pass cutoff: %g Hz\n', highPass.highPassCutoff);
-        fprintf('\tFilter command: %s\n', highPass.filterCommand);
+        fprintf('\tFilter command: %s\n', highPass.highPassFilterCommand);
         printList(highPass.highPassChannels, ...
-            'High pass filtered channels', numbersPerRow, indent);
+            'High pass filtered channels', numbersPerRow);
     end
 
 %% Visualize the spectra after high-pass filtering
@@ -46,7 +46,7 @@ end
             noisyParameters.version.LineNoise);
         fprintf('\tSampling frequency Fs: %g Hz\n', lineNoise.Fs);
         printList(lineNoise.lineFrequencies, ...
-            'Line noise frequencies', numbersPerRow, indent);
+            'Line noise frequencies', numbersPerRow);
  
         fprintf('\tMaximum number of iterations: %d\n', ...
             lineNoise.maximumIterations);
@@ -65,7 +65,7 @@ end
         fprintf('\tSpectral smoothing factor tau: %d\n', lineNoise.tau);
         fprintf('\tTaper template: [ %g, %g, %g ]\n', lineNoise.taperTemplate);
         printList(lineNoise.lineNoiseChannels, ...
-            'Line noise channels', numbersPerRow, indent);
+            'Line noise channels', numbersPerRow);
     end
 
 %% Visualize reference parameters
@@ -77,57 +77,55 @@ end
         reference = noisyParameters.reference;
         fprintf('\nRereferencing %s\n', ...
             noisyParameters.version.Reference);
-        fprintf('\tSampling rate: %g Hz\n', reference.srate);
+        fprintf('\tSampling rate: %g Hz\n', reference.noisyOut.srate);
         
 
         fprintf('\tNoisy channel detection parameters:\n');
         fprintf('\t\tRobust deviation threshold (z score): %g\n', ...
-            reference.robustDeviationThreshold);
+            reference.noisyOut.robustDeviationThreshold);
         fprintf('\t\tHigh frequency noise threshold (ratio): %g\n', ...
-            reference.highFrequencyNoiseThreshold);
+            reference.noisyOut.highFrequencyNoiseThreshold);
         fprintf('\t\tCorrelation window size (in seconds): %g\n', ...
-            reference.correlationWindowSeconds);
+            reference.noisyOut.correlationWindowSeconds);
         fprintf('\t\tCorrelation threshold (with any channel): %g\n', ...
-            reference.correlationThreshold);
+            reference.noisyOut.correlationThreshold);
         fprintf('\t\tBad correlation threshold (fraction of time with low correlation): %g\n', ...
-            reference.badTimeThreshold);
+            reference.noisyOut.badTimeThreshold);
         fprintf('\t\tRansac sample size (number channels to use for interpolated estimate): %g\n', ...
-            reference.ransacSampleSize);
+            reference.noisyOut.ransacSampleSize);
         fprintf('\t\tRansac channel fraction (used to get the sample size): %g\n', ...
-            reference.ransacChannelFraction);
+            reference.noisyOut.ransacChannelFraction);
         fprintf('\t\tRansacCorrelationThreshold: %g\n', ...
-            reference.ransacCorrelationThreshold);
+            reference.noisyOut.ransacCorrelationThreshold);
         fprintf('\t\tRansacUnbrokenTime (in seconds): %g\n', ...
-            reference.ransacUnbrokenTime);
+            reference.noisyOut.ransacUnbrokenTime);
         fprintf('\t\tRansacWindowSeconds (in seconds): %g\n', ...
-            reference.ransacWindowSeconds);
-        fprintf('\t\tDo ransac after removing bad channels by other methods: %g\n', ...
-            reference.doRansacAfterBadRemoval);
+            reference.noisyOut.ransacWindowSeconds);
         printList(reference.referenceChannels, 'Reference channels', ...
-            numbersPerRow, indent);
+            numbersPerRow);
         printList(reference.rereferencedChannels, 'Rereferenced channels', ...
-            numbersPerRow, indent);
+            numbersPerRow);
   
         fprintf('\tNoisy channels before referencing: [ ');
-        fprintf('%g ', reference.noisyChannelOriginal.noisyChannels);
+        fprintf('%g ', reference.noisyOutOriginal.noisyChannels);
         fprintf(']\n');
         fprintf('\tNoisy channels interpolated after referencing: [ ');
         fprintf('%g ', reference.interpolatedChannels);
         fprintf(']\n');
         fprintf('\tRemaining noisy channels: [ ');
-        fprintf('%g ', reference.noisyChannelResults.noisyChannels);
+        fprintf('%g ', reference.noisyOut.noisyChannels);
         fprintf(']\n');
         fprintf('\t\tBad by max correlation criteria: [');
-        fprintf('%g ', reference.noisyChannelResults.badChannelsFromCorrelation);
+        fprintf('%g ', reference.noisyOut.badChannelsFromCorrelation);
         fprintf(']\n');
         fprintf('\t\tBad by large deviation criteria: [');
-        fprintf('%g ', reference.noisyChannelResults.badChannelsFromDeviation);
+        fprintf('%g ', reference.noisyOut.badChannelsFromDeviation);
         fprintf(']\n');
         fprintf('\t\tBad by high frequency noise (low SNR) criteria: [');
-        fprintf('%g ', reference.noisyChannelResults.badChannelsFromHFNoise);
+        fprintf('%g ', reference.noisyOut.badChannelsFromHFNoise);
         fprintf(']\n');
         fprintf('\t\tBad by Ransac criteria: [');
-        fprintf('%g ', reference.noisyChannelResults.badChannelsFromRansac);
+        fprintf('%g ', reference.noisyOut.badChannelsFromRansac);
         fprintf(']\n');
     end
 
