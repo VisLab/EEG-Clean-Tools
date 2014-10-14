@@ -27,7 +27,7 @@ elseif nargin < 2
 end
 resampleOut = struct('resampleFrequency', [], 'originalFrequency', EEG.srate);
 resampleOut.resampleFrequency =  ...
-    getStructureParameters(resampleIn, 'resampleFrequencys', 512);
+    getStructureParameters(resampleIn, 'resampleFrequencies', 512);
 
 %% Resample the EEG data
 if resampleOut.originalFrequency <= resampleOut.resampleFrequency  

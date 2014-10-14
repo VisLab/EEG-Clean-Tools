@@ -42,7 +42,7 @@ elseif size(signal.data, 3) ~= 1
 elseif size(signal.data, 2) < 2
     error('cleanLineNoise:NoData', 'signal data must have multiple points');
 elseif ~exist('lineNoiseIn', 'var') || isempty(lineNoiseIn)
-    lineNoiseIn = struct();
+    lineNoise = struct();
 elseif isempty(lineNoiseIn) || ~isstruct(lineNoiseIn)
     error('cleanLineNoise:NoData', 'second argument must be a structure')
 end
@@ -62,31 +62,31 @@ lineNoiseOut.pad = getStructureParameters(lineNoiseIn, 'pad', 0);  % Pad of 2 is
 lineNoiseOut.fPassBand = getStructureParameters(lineNoiseIn, 'fPassBand', [45, lineNoiseOut.Fs/2]);                                           
 lineNoiseOut.maximumIterations = getStructureParameters(lineNoiseIn, 'maximumIterations', 10);
 if any(lineNoiseOut.lineNoiseChannels > size(signal.data, 1))
-    error('cleanLineNoise:Invalidchannels', ...
+    error('clean_line:Invalidchannels', ...
         'Channels are not present in the dataset');
 end
 
 %% Remove line frequencies that are greater than Nyquist frequencies
-tooLarge = lineNoiseOut.lineFrequencies >= lineNoiseOut.Fs/2;
+tooLarge = lineNoise.lineFrequencies >= lineNoise.Fs/2;
 if any(tooLarge)
     warning('cleanLineNoise:LineFrequenciesTooLarge', ...
         'Eliminating frequencies greater than half the sampling rate');
-    lineNoiseOut.lineFrequencies(tooLarge) = [];
-    lineNoiseOut.lineFrequencies = squeeze(lineNoiseOut.lineFrequencies);
+    lineNoise.lineFrequencies(tooLarge) = [];
+    lineNoise.lineFrequencies = squeeze(lineNoise.lineFrequencies);
 end
 
 %% Set up multi-taper parameters
-hbw = lineNoiseOut.taperBandWidth/2;   % half-bandwidth
-lineNoiseOut.taperTemplate = [hbw, lineNoiseOut.taperWindowSize, 1];
-Nwin = round(lineNoiseOut.Fs*lineNoiseOut.taperWindowSize); % number of samples in window
-lineNoiseOut.tapers = checkTapers(lineNoiseOut.taperTemplate, Nwin, lineNoiseOut.Fs); 
+hbw = lineNoise.taperBandWidth/2;   % half-bandwidth
+lineNoise.taperTemplate = [hbw, lineNoise.taperWindowSize, 1];
+Nwin = round(lineNoise.Fs*lineNoise.taperWindowSize); % number of samples in window
+lineNoise.tapers = checkTapers(lineNoise.taperTemplate, Nwin, lineNoise.Fs); 
 
 %% Perform the calculation for each channel separately
 data = double(signal.data);
 data1 = zeros(size(data));
-chans = sort(lineNoiseOut.lineNoiseChannels);
+chans = sort(lineNoise.lineNoiseChannels);
 parfor ch = chans
-    data1(ch, :) = removeLinesMovingWindow(squeeze(data(ch, :)), lineNoiseOut);
+    data1(ch, :) = removeLinesMovingWindow(squeeze(data(ch, :)), lineNoise);
 end
 signal.data = data1;
 clear data;
