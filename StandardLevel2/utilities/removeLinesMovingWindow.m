@@ -29,8 +29,8 @@ if nargin < 2
     error('removeLinesMovingWindow:NotEnoughArguments', ...
         'Need data and window parameters');
 end;
-[~, Fs] = getStructureParameters(lineNoise, 'Fs');
-[~, tau] = getStructureParameters(lineNoise, 'tau');
+Fs = getStructureParameters(lineNoise, 'Fs');
+tau = getStructureParameters(lineNoise, 'tau');
 
 % Window,overlap and frequency information
 data = change_row_to_column(data);

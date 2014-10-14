@@ -27,8 +27,8 @@ function [datafit, f0Significant]= ...
 data = change_row_to_column(data);
 N = size(data, 1);
 
-[~, fscanbw] = getStructureParameters(lineNoise, 'fScanBandWidth');
-[~, Fs] = getStructureParameters(lineNoise, 'Fs');
+fscanbw = getStructureParameters(lineNoise, 'fScanBandWidth');
+Fs = getStructureParameters(lineNoise, 'Fs');
 
 [Fval, A, f, sig] = testSignificantFrequencies(data, lineNoise);
 datafit = zeros(N, 1);

@@ -36,22 +36,12 @@ computationTimes.resampling = toc;
 %% Part III: Remove line noise
 fprintf('Line noise removal\n');
 tic
-lineNoise = struct('Fs', EEG.srate, 'lineFrequencies', lineFrequencies, ...
-                   'lineNoiseChannels', rereferencedChannels, ...
-                   'fPassBand', fPassBand);
-[EEG, lineNoise] = cleanLineNoise(EEG, lineNoise); 
-EEG.etc.noisyParameters.lineNoise = lineNoise;
+[EEG, EEG.etc.noisyParameters.lineNoise] = cleanLineNoise(EEG, params);
 computationTimes.lineNoise = toc;
-clear lineNoise;
+
 %% Part IV: Remove a robust reference
 fprintf('Robust reference removal\n');
 tic
-reference = struct('srate', EEG.srate, ...
-    'referenceChannels', referenceChannels, ...
-    'rereferencedChannels', rereferencedChannels, ...
-    'channelLocations', EEG.chanlocs, 'channelInformation', EEG.chaninfo);
-[EEG, reference] = robustReference(EEG, reference);
-EEG.etc.noisyParameters.reference = reference;
-clear reference;
+[EEG, EEG.etc.noisyParameters.reference] = robustReference(EEG, params);
 computationTimes.reference = toc;
 

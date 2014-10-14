@@ -49,7 +49,7 @@ end
 
 %% Set the defaults to appropriate values
 lineNoiseOut = struct();
-lineNoiseOut.Fs = getSignalParameters(lineNoiseIn, 'Fs', signal, 'Fs', 1);
+lineNoiseOut.Fs = getStructureParameters(lineNoiseIn, 'Fs', signal.srate);
 lineNoiseOut.lineNoiseChannels = getStructureParameters(lineNoiseIn, 'lineNoiseChannels', 1:size(signal.data, 1));
 lineNoiseOut.lineFrequencies = getStructureParameters(lineNoiseIn, 'lineFrequencies', [60, 120, 180]);
 lineNoiseOut.p = getStructureParameters(lineNoiseIn, 'p', 0.01);
@@ -59,7 +59,7 @@ lineNoiseOut.taperWindowSize = getStructureParameters(lineNoiseIn, 'taperWindowS
 lineNoiseOut.taperWindowStep = getStructureParameters(lineNoiseIn, 'taperWindowStep', 1);
 lineNoiseOut.tau = getStructureParameters(lineNoiseIn, 'tau', 100);
 lineNoiseOut.pad = getStructureParameters(lineNoiseIn, 'pad', 0);  % Pad of 2 is slower but gives better results
-lineNoiseOut.fPassBand = getStructureParameters(lineNoiseIn, 'fPassBand', [45, lineNoiseOut.Fs/2]);                                           
+lineNoiseOut.fPassBand = getStructureParameters(lineNoiseIn, 'fPassBand', [45, (lineNoiseOut.Fs)/2]);                                           
 lineNoiseOut.maximumIterations = getStructureParameters(lineNoiseIn, 'maximumIterations', 10);
 if any(lineNoiseOut.lineNoiseChannels > size(signal.data, 1))
     error('cleanLineNoise:Invalidchannels', ...

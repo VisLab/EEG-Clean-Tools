@@ -32,10 +32,10 @@ if size(data, 2) ~= 1;
         'Data must beunivariate time series'); 
 end
 %% Extract argument values
-[~, win] = getStructureParameters(lineNoise, 'taperWindowSize', 4);
-[~, Fs] = getStructureParameters(lineNoise, 'Fs', 1);
-[~, pad] = getStructureParameters(lineNoise, 'pad', 0);
-[~, fpass] = getStructureParameters(lineNoise, 'fPassBand', [0 lineNoise.Fs/2]);
+win = getStructureParameters(lineNoise, 'taperWindowSize', 4);
+Fs = getStructureParameters(lineNoise, 'Fs', 1);
+pad = getStructureParameters(lineNoise, 'pad', 0);
+fpass = getStructureParameters(lineNoise, 'fPassBand', [0 lineNoise.Fs/2]);
 
 %% Create the segmented data for the calculation of the spectrum
 N = size(data, 1); % length of segmented data

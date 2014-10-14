@@ -31,14 +31,14 @@ elseif nargin < 2
     error('testSignificantFrequencies:NoParameters', ...
           'Must provide a lineNoise parameter structure as second argument'); 
 end
-[~, pad] = getStructureParameters(lineNoise, 'pad');
-[~, Fs] = getStructureParameters(lineNoise, 'Fs');
-[~, fpass] = getStructureParameters(lineNoise, 'fPassBand');
+pad = getStructureParameters(lineNoise, 'pad');
+Fs = getStructureParameters(lineNoise, 'Fs');
+fpass = getStructureParameters(lineNoise, 'fPassBand');
 
 data = change_row_to_column(data);
 C = size(data, 2);
-[~, p] = getStructureParameters(lineNoise, 'p', 0.01);
-[~, tapers] = getStructureParameters(lineNoise, 'tapers'); % Calculate the actual tapers
+p = getStructureParameters(lineNoise, 'p', 0.01);
+tapers = getStructureParameters(lineNoise, 'tapers'); % Calculate the actual tapers
 if isempty(tapers)
     error('testSignificantFrequencies:NoTapers', ...
           'Must provide a tapers field in the lineNoise parameter structure');  

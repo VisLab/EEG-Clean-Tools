@@ -28,18 +28,18 @@ referenceOut.channelInformation = getStructureParameters(referenceIn, ...
 referenceOut.averageReferenceWithNoisyChannels = ...
                 mean(signal.data(referenceOut.referenceChannels, :), 1);
 
-referenceOut.noisyOutOriginal = findNoisyChannels(signal, referenceOut); 
+referenceOut.findNoisyOutOriginal = findNoisyChannels(signal, referenceOut); 
 
 %% Now remove the huber mean and find the channels that are still noisy
 [signalTmp, referenceOut.huberMean] = ...
                   removeHuberMean(signal, referenceOut.referenceChannels);
-noisyOutHuber = findNoisyChannels(signalTmp, referenceOut); 
+findNoisyOutHuber = findNoisyChannels(signalTmp, referenceOut); 
 
 %% Construct new EEG with interpolated channels to find better average reference
 signalTmp.data = signalTmp.data(referenceOut.referenceChannels, :);
 signalTmp.chanlocs = signalTmp.chanlocs(referenceOut.referenceChannels);
 signalTmp.nbchan = length(referenceOut.referenceChannels);
-noisyChannels = noisyOutHuber.noisyChannels;
+noisyChannels = findNoisyOutHuber.noisyChannels;
 if ~isempty(noisyChannels)
     channelMask = false(1, size(signal.data, 1));
     channelMask(noisyChannels) = true;
@@ -53,11 +53,11 @@ clear signalTmp;
 %% Now remove reference from filtered signal and interpolate bad channels
 signal = removeReference(signal, referenceOut.averageReference, ...
                          referenceOut.rereferencedChannels);
-noisyOut = findNoisyChannels(signal, referenceIn); 
-referenceOut.interpolatedChannels = noisyOut.noisyChannels;
+referenceOut = findNoisyChannels(signal, referenceIn); 
+referenceOut.interpolatedChannels = referenceOut.noisyChannelResults.noisyChannels;
 if ~isempty(referenceOut.interpolatedChannels)  
     sourceChannels = setdiff(referenceOut.referenceChannels, referenceOut.interpolatedChannels);
     signal = interpolateChannels(signal, referenceOut.interpolatedChannels, sourceChannels);
-    noisyOut = findNoisyChannels(signal, referenceOut); 
+    referenceOut = findNoisyChannels(signal, referenceIn); 
 end
-referenceOut.noisyOut = noisyOut;
+
