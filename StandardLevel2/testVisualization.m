@@ -37,12 +37,12 @@ xlabel('Seconds')
 ylabel(verticalLabel);
 legend('Before referencing', 'After referencing', ...
       'Location', 'SouthOutside', 'Orientation', 'Horizontal' )
-title(tString);
+title(tString, 'Interpreter', 'None');
 
 %% Compare channels with robust deviation before and after references
 beforeDeviation = sum(beforeRef.channelDeviations >= reference.robustDeviationThreshold);
 afterDeviation = sum(afterRef.channelDeviations >= reference.robustDeviationThreshold);
-tString = ['Noise threshold ' noisyParameters.name]; 
+tString = ['Robust deviation ' noisyParameters.name]; 
 figure('Name', tString)
 hold on
 timeScale = (0:length(beforeDeviation)-1)*reference.correlationWindowSeconds;
