@@ -7,10 +7,11 @@ basename = 'vep';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% Parameters that must be preset
-lineFrequencies = [60, 120,  180, 212, 240];
-referenceChannels = 1:64;
-rereferencedChannels = 1:70;
-highPassChannels = 1:70;
+params = struct();
+params.lineFrequencies = [60, 120,  180, 212, 240];
+params.referenceChannels = 1:64;
+params.rereferencedChannels = 1:70;
+params.highPassChannels = 1:70;
 
 %% Run the pipeline
 for k = 3%1:18

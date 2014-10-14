@@ -1,4 +1,4 @@
-function [EEG, highPassOut] = highPassFilter(EEG, highPassIn)
+function [EEG, resampleOut] = resampleEEG(EEG, resampleIn)
 % Perform a high-pass filter using EEGLAB pop_eegfiltnew FIR filter
 %
 % EEG = highPassFilter(EEG)
@@ -42,4 +42,13 @@ EEG1temp.nbchan = length(EEG1.chanlocs);
     pop_eegfiltnew(EEG1, highPassOut.highPassCutoff, []);
 EEG.data(highPassOut.highPassChannels, :) = EEG1.data;
 
-
+originalFrequency = EEG.srate;
+resampleFrequency = 512;
+if EEG.srate <= resampleFrequency  
+    resampleFrequency = EEG.srate;
+else
+    EEG = pop_resample(EEG, resampleFrequency);
+end
+EEG.etc.noisyParameters.resampling = ...
+             struct('originalFrequency', originalFrequency, ...
+                    'resampledFrequency', resampleFrequency);
