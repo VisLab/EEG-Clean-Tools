@@ -172,13 +172,17 @@ if findNoisyOut.srate > 100
         X(:,k) = filtfilt_fast(B, 1, data(:, k)); end
     % Determine z-scored level of EM noise-to-signal ratio for each channel
     noisiness = mad(data- X, 1)./mad(X, 1);
-    zscoreHFNoiseTemp = (noisiness - median(noisiness)) ./ (mad(noisiness, 1)*1.4826);
+    medianNoisiness = median(noisiness);
+    sdNoisiness = mad(noisiness, 1)*1.4826;
+    zscoreHFNoiseTemp = (noisiness - medianNoisiness) ./ sdNoisiness;
     noiseMask = zscoreHFNoiseTemp > findNoisyOut.highFrequencyNoiseThreshold;
     % Remap channels to original numbering
     badChannelsFromHFNoise  = referenceChannels(noiseMask);
     findNoisyOut.badChannelsFromHFNoise = badChannelsFromHFNoise(:)';
 else
     X = data;
+    medianNoisiness = 0;
+    sdNoisiness = 1;
     zscoreHFNoiseTemp = zeros(numberChannels, 1);
     findNoisyOut.badChannelsFromHFNoise = [];
 end
@@ -200,6 +204,7 @@ parfor k = 1:WCorrelation % Ignore last two time windows to stay in range
     abs_corr = abs(windowCorrelation - diag(diag(windowCorrelation)));
     channelCorrelations(k, :)  = quantile(abs_corr, 0.98);
     noiseLevels(k, :) = mad(dataPortion - eegPortion, 1)./mad(eegPortion, 1);
+    noiseLevels(k, :) = (noiseLevels(k, :) - medianNoisiness)./sdNoisiness;
     channelStd =  0.7413 *iqr(dataPortion);
     channelStdStd =  0.7413 * iqr(channelStd);
     channelDeviations(k, :) = (channelStd - median(channelStd)) / channelStdStd;
@@ -307,7 +312,6 @@ noisyChannels = union(noisyChannels, ...
     union(findNoisyOut.badChannelsFromRansac, findNoisyOut.badChannelsFromHFNoise));
 findNoisyOut.noisyChannels = noisyChannels;
 findNoisyOut.medianMaxCorrelation =  median(findNoisyOut.maximumCorrelations, 2);
-findNoisyOut.noisyChannelResults = findNoisyOut;
 
 %% Helper functions for findNoisyChannels
 function P = calc_projector(locs, numberSamples, subsetSize)
