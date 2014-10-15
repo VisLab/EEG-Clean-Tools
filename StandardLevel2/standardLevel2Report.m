@@ -20,5 +20,5 @@ visualizeNoisyParameters(EEG.etc.noisyParameters, ...
 %                  'msg', 'After referencing');             
 % compareChannelIndicators(report1, report2);
 
-%% Now look at the difference between the mean and noisy mean
+
 
