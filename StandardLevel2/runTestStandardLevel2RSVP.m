@@ -17,7 +17,7 @@ params.highPassChannels = 1:256;
 params.lineNoiseChannels = 1:256;
 params.fPassBand = [16, 256];
 %% Run the pipeline
-for k = [1:7, 9:15]
+for k = 14:15%[1:7, 9:15]
     thisName = sprintf('%s_%02d', basename, k);
     fname = [indir filesep thisName '.set'];
     EEG = pop_loadset(fname);
