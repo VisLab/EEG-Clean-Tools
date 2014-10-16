@@ -14,8 +14,9 @@ params.rereferencedChannels = 1:70;
 params.highPassChannels = 1:70;
 params.lineNoiseChannels = 1:70;
 %% Run the pipeline
-for k = 1:18
+for k = 1%:18
     thisName = sprintf('%s_%02d', basename, k);
+    params.name = thisName;
     fname = [indir filesep thisName '.set'];
     EEG = pop_loadset(fname);
     computationTimes= struct('highPass', 0, 'resampling', 0, 'lineNoise', 0, 'reference', 0);
