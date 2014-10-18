@@ -31,7 +31,7 @@ if ~isfield(params, 'name')
     params.name = ['EEG' EEG.filename];
 end
 EEG.etc.noisyParameters = struct('name', params.name, 'version', getStandardLevel2Version);
-
+computationTimes= struct('highPass', 0, 'resampling', 0, 'lineNoise', 0, 'reference', 0);
 %% Part I: High pass filter
 fprintf('High pass filtering\n');
 tic

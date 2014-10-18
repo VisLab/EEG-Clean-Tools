@@ -19,8 +19,8 @@ for k = 1%:18
     params.name = thisName;
     fname = [indir filesep thisName '.set'];
     EEG = pop_loadset(fname);
-    computationTimes= struct('highPass', 0, 'resampling', 0, 'lineNoise', 0, 'reference', 0);
-    standardLevel2Pipeline;
+    
+    [EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
     fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
              computationTimes.highPass, computationTimes.resampling, ...
              computationTimes.lineNoise, computationTimes.reference);
