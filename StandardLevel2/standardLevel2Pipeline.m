@@ -1,4 +1,4 @@
-%function [EEG, computationTimes] = standardLevel2Pipeline(EEG, params)
+function [EEG, computationTimes] = standardLevel2Pipeline(EEG, params)
 
 %% Standard level 2 pipeline 
 % This assumes the following have been set:
