@@ -78,10 +78,10 @@ for iteration = 1:lineNoise.maximumIterations
         tIndex = (dBReduction(fidx) < 0)';
         f0(tIndex | ~f0Mask) = [];
         fidx(tIndex | ~f0Mask) = [];
+        initialSpectrum = cleanedSpectrum;
     end
     if isempty(f0)
         break;
-    end
-    initialSpectrum = cleanedSpectrum;
+    end 
 end
 data = data';

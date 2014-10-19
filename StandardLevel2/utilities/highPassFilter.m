@@ -40,8 +40,6 @@ highPassOut.highPassCutoff =  ...
 %% Compute the high pass filter
 EEG1 = EEG;
 EEG1.data = EEG.data(highPassOut.highPassChannels, :);
-EEG1.chanlocs = EEG.chanlocs(highPassOut.highPassChannels);
-EEG1temp.nbchan = length(EEG1.chanlocs);
 [EEG1, highPassOut.highPassFilterCommand] = ...
     pop_eegfiltnew(EEG1, highPassOut.highPassCutoff, []);
 EEG.data(highPassOut.highPassChannels, :) = EEG1.data;

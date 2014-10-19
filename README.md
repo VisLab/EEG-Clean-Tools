@@ -19,3 +19,7 @@ Version 0.20 Released 10/18/2014
 * Converted standardLevel2Pipeline to a function
 * Moved the computationTimes structure to standardLevel2Pipeline so that
 it is returned.
+
+Version 0.21 In progress
+
+* Removed any reference to chanlocs in highPassFilter
