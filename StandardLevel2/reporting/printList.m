@@ -1,12 +1,12 @@
-function [] = printList(list, msg, perLine)
+function [] = printList(list, perLine, indent)
 % Output the values in list a specified number of values per line
-fprintf('\t\t%s:\n\t\t[ ', msg);
 count = 0;
+fprintf('%s[ ', indent);
 for k = 1:length(list)
     fprintf('%g ', list(k));
     count = count + 1;
     if mod(count, perLine) == 0
-        fprintf('\n\t\t');
+        fprintf('\n%s', indent);
         count = 0;
     end
 end

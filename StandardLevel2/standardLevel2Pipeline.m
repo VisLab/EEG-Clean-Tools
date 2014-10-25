@@ -52,7 +52,6 @@ computationTimes.lineNoise = toc;
 %% Part IV: Remove a robust reference
 fprintf('Robust reference removal\n');
 tic
-save('temp.mat', 'EEG', '-v7.3');
 [EEG, EEG.etc.noisyParameters.reference] = robustReference(EEG, params);
 computationTimes.reference = toc;
-
+clock

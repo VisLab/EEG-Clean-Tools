@@ -1,7 +1,24 @@
 %% Visualize the EEG
-visualizeNoisyParameters(EEG.etc.noisyParameters, ...
-[EEG.etc.noisyParameters.name '...after standard level 2 processing'], EEG);
-% %% Experimental --- in progress
+fprintf('%s...\n', EEG.etc.noisyParameters.name);
+numbersPerRow = 15;
+indent = '  ';
+
+%% Report high pass filtering step
+reportHighPass(EEG.etc.noisyParameters, numbersPerRow, indent);
+
+%% Report line noise removal step
+reportLineNoise(EEG.etc.noisyParameters, numbersPerRow, indent);
+
+%% Report rereferencing step
+reportRereference(EEG.etc.noisyParameters, numbersPerRow, indent);
+
+% visualizeReferenced();
+% if ~exist('EEG', 'var')
+%     return;
+% end
+% visualizeNoisyParameters(EEG.etc.noisyParameters, ...
+% [EEG.etc.noisyParameters.name '...after standard level 2 processing'], EEG);
+% % %% Experimental --- in progress
 % reference = EEG.etc.noisyParameters.reference;
 % report1 = struct('results', reference.noisyOutOriginal, ...
 % 'chanlocs', reference.channelLocations, ...
