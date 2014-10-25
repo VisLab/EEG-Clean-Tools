@@ -5,14 +5,13 @@ function [EEG, computationTimes] = standardLevel2Pipeline(EEG, params)
 %  EEG                       An EEGLAB structure with the data and chanlocs
 %  params                    A structure with usually the following:
 %
-%  name                      A string with a name identifying dataset
-%  referenceChannels         A vector of channels to be used for
+%     name                   A string with a name identifying dataset
+%     referenceChannels      A vector of channels to be used for
 %                            rereferencing (Usually these are EEG (no
 %                            mastoids or EOG)
-%  channelsToBeReferenced    A vector of channels to be high-passed, 
+%     rereferencedChannels   A vector of channels to be high-passed, 
 %                            line-noise removed, and referenced. 
-%  lineFrequencies           A list of line frequencies
-%  thisName                  An identifying dataset name (for plotting)
+%     lineFrequencies        A list of line frequencies
 %  
 % Additional setup:
 %    EEGLAB should be in the path.

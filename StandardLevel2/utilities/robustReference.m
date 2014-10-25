@@ -18,8 +18,8 @@ referenceOut = struct();
  
 referenceOut.referenceChannels = getStructureParameters(referenceIn, ...
     'referenceChannels',  1:size(signal.data, 1));
-referenceOut.channelsToBeReferenced =  getStructureParameters(referenceIn, ...
-    'channelsToBeReferenced',  1:size(signal.data, 1));
+referenceOut.rereferencedChannels =  getStructureParameters(referenceIn, ...
+    'rereferencedChannels',  1:size(signal.data, 1));
 referenceOut.channelLocations = getStructureParameters(referenceIn, ...
                                      'channelLocations', signal.chanlocs);
 referenceOut.channelInformation = getStructureParameters(referenceIn, ...
@@ -52,7 +52,7 @@ clear signalTmp;
 
 %% Now remove reference from filtered signal and interpolate bad channels
 signal = removeReference(signal, referenceOut.averageReference, ...
-                         referenceOut.channelsToBeReferenced);
+                         referenceOut.rereferencedChannels);
 noisyOut = findNoisyChannels(signal, referenceIn); 
 referenceOut.interpolatedChannels = noisyOut.noisyChannels;
 if ~isempty(referenceOut.interpolatedChannels)  

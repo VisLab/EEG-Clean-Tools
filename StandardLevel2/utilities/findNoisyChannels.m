@@ -246,6 +246,7 @@ findNoisyOut.badChannelsFromDeviation = badChannelsFromDeviation(:)';
 noisyChannels = union(findNoisyOut.badChannelsFromDeviation, ...
     findNoisyOut.badChannelsFromCorrelation);
 
+printList(referenceChannels, 'Reference channels before Ransac', 15);
 %% Method 4: Ransac corelation
 % Setup for ransac (if a 2-stage algorithm, remove other bad channels first)
 if isempty(findNoisyOut.channelLocations)
