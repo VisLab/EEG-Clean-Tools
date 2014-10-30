@@ -1,5 +1,5 @@
-% Version 0.15
-% This version is still in progress and is the latest as of 10-8-14.
+% Version 0.21
+% This version is still in progress and is the latest as of 10-30-14.
 % It still needs:
 %    1)  Automatic line noise peak finding --- approximate peaks now
 %        have to be set.
@@ -15,13 +15,17 @@
 %    6)  Parallelization has been added to findNoisyChannels. This version
 %        does not have an efficient memory footprint.
 %
-% Written by Kay Robbins October 8, 2014
+% Written by Kay Robbins October 30, 2014
 %
 % To run, call the standardLevel2Pipeline script. The
-% runTestStandardLevel2VEP shows and an example of how to setup.
+% runTestStandardLevel2VEP shows and an example of how to setup. The
+% runStandardLevel2ReportVEP shows how to run a report.
 %
 % Note: you must make sure that the EEGLAB is in the path and that 
 % all the subdirectories of the StandardLevel2 directory are in the path.
+%
+% This version supports integration with ESS. See runStandardLevel2NCTU for
+% an example.
 %
 % The end of the standLevel2Pipeline has a commented line showing how to call the visualization.
 % The script produces an array of times it took to compute each step.

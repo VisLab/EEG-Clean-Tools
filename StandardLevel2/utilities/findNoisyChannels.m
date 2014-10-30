@@ -265,10 +265,6 @@ else
     ransacUnbrokenFrames = srate*findNoisyOut.ransacUnbrokenTime;
 end
 
-printList(ransacChannels, 'ransac channels: ', 20);
-tChans = findNoisyOut.channelLocations;
-fprintf('number of channelLocations: %d\n', length(tChans));
-save('tchans.mat', 'tChans', '-v7.3');
 nchanlocs = findNoisyOut.channelLocations(ransacChannels);
 if length(nchanlocs) ~= size(nchanlocs, 2)
     nchanlocs = nchanlocs';

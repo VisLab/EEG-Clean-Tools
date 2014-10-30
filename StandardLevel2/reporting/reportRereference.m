@@ -42,23 +42,38 @@ function reportRereference(noisyParameters, numbersPerRow, indent)
     printList(reference.rereferencedChannels,  ...
         numbersPerRow, [indent, indent]);
 
-    fprintf('\n%sNoisy channels before referencing:\n', indent);
+    fprintf('\n\n%sNoisy channels before referencing:\n', indent);
     printList(reference.noisyOutOriginal.noisyChannels,  ...
         numbersPerRow, [indent, indent]);
     fprintf('\n%sNoisy channels interpolated after referencing:\n', indent);
     printList(reference.interpolatedChannels, numbersPerRow, [indent, indent]);
     fprintf('\n%sRemaining noisy channels:\n', indent);
     printList(reference.noisyOut.noisyChannels, numbersPerRow, [indent, indent]);
-    fprintf('\n%sBad by max correlation criteria:\n', indent)
+    % Maximum correlation criterion
+    fprintf('\n\n%sBad by max correlation criteria (original):\n', indent)
+    printList(reference.noisyOutOriginal.badChannelsFromCorrelation, ...
+        numbersPerRow, [indent, indent]);
+    fprintf('\n%sBad by max correlation criteria (rereferenced):\n', indent)
     printList(reference.noisyOut.badChannelsFromCorrelation, ...
         numbersPerRow, [indent, indent]);
-    fprintf('\n%sBad by large deviation criteria:\n', indent);
+    % Large deviation criterion
+    fprintf('\n\n%sBad by large deviation criteria (original):\n', indent);
+    printList(reference.noisyOutOriginal.badChannelsFromDeviation, ...
+        numbersPerRow, [indent, indent]);
+    fprintf('\n\n%sBad by large deviation criteria (rereferenced):\n', indent);
     printList(reference.noisyOut.badChannelsFromDeviation, ...
         numbersPerRow, [indent, indent]);
-    fprintf('\n%sBad by high frequency noise (low SNR) criteria:\n', indent);
+    % HF SNR ratio criterion
+    fprintf('\n\n%sBad by high frequency noise (low SNR) criteria (original):\n', indent);
+    printList(reference.noisyOutOriginal.badChannelsFromHFNoise, ...
+        numbersPerRow, [indent, indent]);
+    fprintf('\n%sBad by high frequency noise (low SNR) criteria (referenced):\n', indent);
     printList(reference.noisyOut.badChannelsFromHFNoise, ...
         numbersPerRow, [indent, indent]);
-    fprintf('\n%sBad by Ransac criteria:\n', indent);
+    fprintf('\n\n%sBad by Ransac criteria (original):\n', indent);
+    printList(reference.noisyOutOriginal.badChannelsFromRansac, ...
+        numbersPerRow, [indent, indent]);
+        fprintf('\n%sBad by Ransac criteria (rereferenced):\n', indent);
     printList(reference.noisyOut.badChannelsFromRansac, ...
         numbersPerRow, [indent, indent]);
 end

@@ -20,6 +20,8 @@ Version 0.20 Released 10/18/2014
 * Moved the computationTimes structure to standardLevel2Pipeline so that
 it is returned.
 
-Version 0.21 In progress
+Version 0.21 Released 10/30/2104
 
 * Removed any reference to chanlocs in highPassFilter
+* Full integration with ESS Study Level 2 code
+* Preliminary version of Standard Level 2 Report finalized (gives pdf)

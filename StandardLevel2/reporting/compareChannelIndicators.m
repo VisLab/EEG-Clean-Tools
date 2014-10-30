@@ -69,7 +69,7 @@ function compareChannelIndicators(report1, report2)
         warning(['Ransac fraction map failed: ' mex.message]);
     end
 
-    function [echans, chaninfo, refchans] = getChannelInformation(report)
+function [echans, chaninfo, refchans] = getChannelInformation(report)
         bad_corr_sym = 'c';
         bad_amp_sym = '+';
         bad_noise_sym = 'x';
@@ -100,4 +100,5 @@ function compareChannelIndicators(report1, report2)
         end
         echans = chanlocs(refchans);
     end
+end
 end
