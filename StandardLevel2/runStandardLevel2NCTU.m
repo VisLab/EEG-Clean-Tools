@@ -1,7 +1,7 @@
 %% Example using ESS
 ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
 ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
-ess2Dir = 'N:\ARLAnalysis\NCTU1\Level2';
+ess2Dir = 'N:\ARLAnalysis\NCTU2\Level2';
 
 %% Validate level 1
 % obj1 = level1Study(ess1File);

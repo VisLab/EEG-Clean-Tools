@@ -25,3 +25,11 @@ Version 0.21 Released 10/30/2104
 * Removed any reference to chanlocs in highPassFilter
 * Full integration with ESS Study Level 2 code
 * Preliminary version of Standard Level 2 Report finalized (gives pdf)
+
+Version 0.22 Released 11/6/2014
+
+* Revised the method of computing the windowed channel deviations
+* Added summary reporting functions
+* Added a check to only perform ransac when sufficiently good channels
+  are available
+* Added check to only perform ransac when channel locations are available

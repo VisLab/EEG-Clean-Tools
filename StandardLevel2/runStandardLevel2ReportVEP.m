@@ -1,7 +1,7 @@
 %% Read in the file and set the necessary parameters
 indir = 'E:\\CTAData\\VEP'; % Input data directory used for this demo
-datadir = 'N:\\ARLAnalysis\\VEPStandardLevel2B';
-htmlbase = 'N:\\ARLAnalysis\\VEPStandardLevel2ReportsB';
+datadir = 'N:\\ARLAnalysis\\VEPStandardLevel2C';
+htmlbase = 'N:\\ARLAnalysis\\VEPStandardLevel2ReportsC';
 basename = 'vep';
 %% Run the pipeline
 for k = 1:18

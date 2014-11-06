@@ -138,10 +138,20 @@ showBadWindows(beforeRansac, afterRansac, beforeTimeScale, afterTimeScale, ...
 
 %% Comparison of noisy average reference and robust average reference
 tString = { noisyParameters.name, 'Comparison of reference signals'}; 
-figure('Name', tString{2}
+figure('Name', tString{2})
 plot(noisyParameters.reference.averageReference, ...
      noisyParameters.reference.averageReferenceWithNoisyChannels, '.k');
 xlabel('Robust reference')
 ylabel('Noisy reference');
+title(tString, 'Interpreter', 'None');
+
+%% Comparison of noisy average reference and robust average reference
+tString = { noisyParameters.name, 'noisy - robust reference signals'}; 
+t = length(noisyParameters.reference.averageReference)/EEG.srate;
+figure('Name', tString{2})
+plot(noisyParameters.reference.averageReferenceWithNoisyChannels - ...
+     noisyParameters.reference.averageReference, '.k');
+xlabel('seconds')
+ylabel('Difference');
 title(tString, 'Interpreter', 'None');
 

@@ -109,6 +109,7 @@ findNoisyOut = struct('srate', [], ...
                       'badChannelsFromCorrelation', [], ...
                       'badChannelsFromDeviation', [], ...
                       'badChannelsFromRansac', [], ... 
+                      'ransacPerformed', true, ...
                       'zscoreHFNoise', [], ...
                       'noiseLevels', [], ...
                       'maximumCorrelations', [], ...
@@ -126,7 +127,7 @@ findNoisyOut.referenceChannels = getStructureParameters(findNoisyIn, 'referenceC
 findNoisyOut.channelInformation = getStructureParameters(findNoisyIn, 'channelInformation', signal.chaninfo);
 findNoisyOut.channelLocations = getStructureParameters(findNoisyIn, 'channelLocations', signal.chanlocs);
 findNoisyOut.robustDeviationThreshold = getStructureParameters(findNoisyIn, 'robustDeviationThreshold', 5);
-findNoisyOut.highFrequencyNoiseThreshold = getStructureParameters(findNoisyIn, 'highFrequencyNoiseThreshold', 4);
+findNoisyOut.highFrequencyNoiseThreshold = getStructureParameters(findNoisyIn, 'highFrequencyNoiseThreshold', 5);
 findNoisyOut.correlationWindowSeconds = getStructureParameters(findNoisyIn, 'correlationWindowSeconds', 1);
 findNoisyOut.correlationThreshold = getStructureParameters(findNoisyIn, 'correlationThreshold', 0.4);
 findNoisyOut.badTimeThreshold = getStructureParameters(findNoisyIn, 'badTimeThreshold', 0.01);
@@ -162,7 +163,20 @@ findNoisyOut.robustChannelDeviation = zeros(originalNumberChannels, 1);
 findNoisyOut.ransacCorrelations = ones(originalNumberChannels, WRansac);
 findNoisyOut.ransacOffsets = ransacOffsets;
 
-%% Method 1: Compute the SNR (based on Christian Kothe's clean_channels)
+%% Method 1: Unusually high or low amplitude (using robust std)
+channelDeviation = 0.7413 *iqr(data); % Robust estimate of SD
+channelDeviationSD =  0.7413 * iqr(channelDeviation);
+channelDeviationMedian = median(channelDeviation);
+findNoisyOut.robustChannelDeviation(referenceChannels) = ...
+    (channelDeviation - channelDeviationMedian) / channelDeviationSD;
+
+% Find channels with unusually high deviation 
+badChannelsFromDeviation = ...
+    find(abs(findNoisyOut.robustChannelDeviation) > ...
+             findNoisyOut.robustDeviationThreshold);
+findNoisyOut.badChannelsFromDeviation = badChannelsFromDeviation(:)';
+
+%% Method 2: Compute the SNR (based on Christian Kothe's clean_channels)
 % Note: RANSAC uses the filtered values X of the data
 if findNoisyOut.srate > 100
     % Remove signal content above 50Hz
@@ -172,17 +186,17 @@ if findNoisyOut.srate > 100
         X(:,k) = filtfilt_fast(B, 1, data(:, k)); end
     % Determine z-scored level of EM noise-to-signal ratio for each channel
     noisiness = mad(data- X, 1)./mad(X, 1);
-    medianNoisiness = median(noisiness);
-    sdNoisiness = mad(noisiness, 1)*1.4826;
-    zscoreHFNoiseTemp = (noisiness - medianNoisiness) ./ sdNoisiness;
+    noisinessMedian = median(noisiness);
+    noisinessSD = mad(noisiness, 1)*1.4826;
+    zscoreHFNoiseTemp = (noisiness - noisinessMedian) ./ noisinessSD;
     noiseMask = zscoreHFNoiseTemp > findNoisyOut.highFrequencyNoiseThreshold;
     % Remap channels to original numbering
     badChannelsFromHFNoise  = referenceChannels(noiseMask);
     findNoisyOut.badChannelsFromHFNoise = badChannelsFromHFNoise(:)';
 else
     X = data;
-    medianNoisiness = 0;
-    sdNoisiness = 1;
+    noisinessMedian = 0;
+    noisinessSD = 1;
     zscoreHFNoiseTemp = zeros(numberChannels, 1);
     findNoisyOut.badChannelsFromHFNoise = [];
 end
@@ -190,7 +204,7 @@ end
 % Remap the channels to original numbering for the zscoreHFNoise
 findNoisyOut.zscoreHFNoise(referenceChannels) = zscoreHFNoiseTemp;
 
-%% Method 2: Global correlation criteria (from Nima Bigdely-Shamlo)
+%% Method 3: Global correlation criteria (from Nima Bigdely-Shamlo)
 channelCorrelations = ones(WCorrelation, numberChannels);
 noiseLevels = zeros(WCorrelation, numberChannels);
 channelDeviations = zeros(WCorrelation, numberChannels);
@@ -204,10 +218,10 @@ parfor k = 1:WCorrelation % Ignore last two time windows to stay in range
     abs_corr = abs(windowCorrelation - diag(diag(windowCorrelation)));
     channelCorrelations(k, :)  = quantile(abs_corr, 0.98);
     noiseLevels(k, :) = mad(dataPortion - eegPortion, 1)./mad(eegPortion, 1);
-    noiseLevels(k, :) = (noiseLevels(k, :) - medianNoisiness)./sdNoisiness;
+    noiseLevels(k, :) = (noiseLevels(k, :) - noisinessMedian)./noisinessSD;
     channelStd =  0.7413 *iqr(dataPortion);
-    channelStdStd =  0.7413 * iqr(channelStd);
-    channelDeviations(k, :) = (channelStd - median(channelStd)) / channelStdStd;
+    channelDeviations(k, :) = ...
+        (channelStd - channelDeviationMedian) / channelDeviationSD;
 end;
 clear xWin;
 clear dataWin;
@@ -224,86 +238,80 @@ badChannelsFromCorrelation = ...
 findNoisyOut.badChannelsFromCorrelation = badChannelsFromCorrelation(:)';
 findNoisyOut.medianMaxCorrelation =  median(findNoisyOut.maximumCorrelations, 2);
 
-%% Method 3: Unusually high or low amplitude (using robust std)
-channel_sd =  0.7413 *iqr(data);
-
-% Estimate the std of the distribution of channel amplitudes (estimated by their standrad deviations)
-% using the inter-quantile distance which is more robust to outliers
-channel_std_est =  0.7413 * iqr(channel_sd);
-
-% Median used instead of mean to be more robust to bad channel STDs
-
-findNoisyOut.robustChannelDeviation(referenceChannels) = ...
-    (channel_sd - median(channel_sd)) / channel_std_est;
-
-% Channels with amplitude far from robustDeviationThreshold std. from mean channel powers are unusual (bad).
-
-badChannelsFromDeviation = ...
-    find(abs(findNoisyOut.robustChannelDeviation) > findNoisyOut.robustDeviationThreshold);
-findNoisyOut.badChannelsFromDeviation = badChannelsFromDeviation(:)';
 
 %% Bad so far by amplitude and correlation (take these out before doing ransac)
 noisyChannels = union(findNoisyOut.badChannelsFromDeviation, ...
     findNoisyOut.badChannelsFromCorrelation);
-%% Method 4: Ransac corelation
+%% Method 4: Ransac corelation (may not be performed)
 % Setup for ransac (if a 2-stage algorithm, remove other bad channels first)
-if isempty(findNoisyOut.channelLocations)
-    error('find_noisyChannels:noChannelLocation', ...
+if isempty(findNoisyOut.channelLocations) 
+    warning('findNoisyChannels:noChannelLocation', ...
         'ransac could not be computed because there were no channel locations');
-end
-[ransacChannels, idiff] = setdiff(referenceChannels, noisyChannels);
-X = X(:, idiff);
+    findNoisyOut.badChannelsFromRansac = [];
+    findNoisyOut.ransacBadWindowFraction = 0;
+    findNoisyOut.ransacPerformed = false;
+else % Set up parameters and make sure enough good channels to proceed
+    [ransacChannels, idiff] = setdiff(referenceChannels, noisyChannels);
+    X = X(:, idiff);
 
-% Calculate the parameters for ransac
-ransacSubset = round(findNoisyOut.ransacChannelFraction*size(data, 2));
-if findNoisyOut.ransacUnbrokenTime < 0
-    error('find_noisyChannels:BadUnbrokenParameter', ...
-        'ransacUnbrokenTime must be greater than 0');
-elseif findNoisyOut.ransacUnbrokenTime < 1
-    ransacUnbrokenFrames = signalSize*findNoisyOut.ransacUnbrokenTime;
-else
-    ransacUnbrokenFrames = srate*findNoisyOut.ransacUnbrokenTime;
-end
+    % Calculate the parameters for ransac
+    ransacSubset = round(findNoisyOut.ransacChannelFraction*size(data, 2));
+    if findNoisyOut.ransacUnbrokenTime < 0
+        error('find_noisyChannels:BadUnbrokenParameter', ...
+            'ransacUnbrokenTime must be greater than 0');
+    elseif findNoisyOut.ransacUnbrokenTime < 1
+        ransacUnbrokenFrames = signalSize*findNoisyOut.ransacUnbrokenTime;
+    else
+        ransacUnbrokenFrames = srate*findNoisyOut.ransacUnbrokenTime;
+    end
 
-nchanlocs = findNoisyOut.channelLocations(ransacChannels);
-if length(nchanlocs) ~= size(nchanlocs, 2)
-    nchanlocs = nchanlocs';
-elseif length(nchanlocs) < 2
-    error('find_noisyChannels:AllChannelsBad', ...
-        'Too many channels have failed quality tests');
+    nchanlocs = findNoisyOut.channelLocations(ransacChannels);
+    if length(nchanlocs) ~= size(nchanlocs, 2)
+        nchanlocs = nchanlocs';
+    end
+    if length(nchanlocs) < ransacSubset + 1 || length(nchanlocs) < 3 || ...
+            ransacSubset < 2
+        warning('find_noisyChannels:NotEnoughGoodChannels', ...
+            'Too many channels have failed quality tests to perform ransac');
+        findNoisyOut.badChannelsFromRansac = [];
+        findNoisyOut.ransacBadWindowFraction = 0;
+        findNoisyOut.ransacPerformed = false;
+    end
 end
-try 
-% Calculate all-channel reconstruction matrices from random channel subsets
-   locs = [cell2mat({nchanlocs.X}); cell2mat({nchanlocs.Y});cell2mat({nchanlocs.Z})];
-catch err
-   error('findNoisyChannels:NoXYZChannelLocations', ...
-         'Must provide valid channel locations');
-end         
-if isempty(locs) || size(locs, 2) ~= length(ransacChannels) ...
-        || any(isnan(locs(:))) 
-      error('find_noisyChannels:EmptyChannelLocations', ...
-        'The signal chanlocs must have valid X, Y, and Z components');      
-end
-P = hlp_microcache('cleanchans', @calc_projector, locs, ...
-    findNoisyOut.ransacSampleSize, ransacSubset);
-ransacCorrelationsT = zeros(length(locs), WRansac);
+if findNoisyOut.ransacPerformed == true 
+    try 
+    % Calculate all-channel reconstruction matrices from random channel subsets
+       locs = [cell2mat({nchanlocs.X}); cell2mat({nchanlocs.Y});cell2mat({nchanlocs.Z})];
+    catch err
+       error('findNoisyChannels:NoXYZChannelLocations', ...
+             'Must provide valid channel locations');
+    end         
+    if isempty(locs) || size(locs, 2) ~= length(ransacChannels) ...
+            || any(isnan(locs(:))) 
+          error('find_noisyChannels:EmptyChannelLocations', ...
+            'The signal chanlocs must have valid X, Y, and Z components');      
+    end
+    P = hlp_microcache('cleanchans', @calc_projector, locs, ...
+        findNoisyOut.ransacSampleSize, ransacSubset);
+    ransacCorrelationsT = zeros(length(locs), WRansac);
 
-% Calculate each channel's correlation to its RANSAC reconstruction for each window
-n = length(ransacWindow);
-m = length(ransacChannels);
-p = findNoisyOut.ransacSampleSize;
-Xwin = reshape(X(1:n*WRansac, :)', m, n, WRansac);
-parfor k = 1:WRansac
-    ransacCorrelationsT(:, k) = ...
-        calculateRansacWindow(squeeze(Xwin(:, :, k))', P, n, m, p);
+    % Calculate each channel's correlation to its RANSAC reconstruction for each window
+    n = length(ransacWindow);
+    m = length(ransacChannels);
+    p = findNoisyOut.ransacSampleSize;
+    Xwin = reshape(X(1:n*WRansac, :)', m, n, WRansac);
+    parfor k = 1:WRansac
+        ransacCorrelationsT(:, k) = ...
+            calculateRansacWindow(squeeze(Xwin(:, :, k))', P, n, m, p);
+    end
+    clear Xwin;
+    findNoisyOut.ransacCorrelations(ransacChannels, :) = ransacCorrelationsT;
+    flagged = findNoisyOut.ransacCorrelations < findNoisyOut.ransacCorrelationThreshold;
+    badChannelsFromRansac = ...
+        find(sum(flagged, 2)*ransacFrames > ransacUnbrokenFrames)';
+    findNoisyOut.badChannelsFromRansac = badChannelsFromRansac(:)';
+    findNoisyOut.ransacBadWindowFraction = sum(flagged, 2)/size(flagged, 2);
 end
-clear Xwin;
-findNoisyOut.ransacCorrelations(ransacChannels, :) = ransacCorrelationsT;
-flagged = findNoisyOut.ransacCorrelations < findNoisyOut.ransacCorrelationThreshold;
-badChannelsFromRansac = ...
-    find(sum(flagged, 2)*ransacFrames > ransacUnbrokenFrames)';
-findNoisyOut.badChannelsFromRansac = badChannelsFromRansac(:)';
-findNoisyOut.ransacBadWindowFraction = sum(flagged, 2)/size(flagged, 2);
 
 % Combine bad channels detected from all methods
 noisyChannels = union(noisyChannels, ...
