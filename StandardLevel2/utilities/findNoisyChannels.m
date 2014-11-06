@@ -28,7 +28,7 @@ function  findNoisyOut = findNoisyChannels(signal, findNoisyIn)
 %     badTimeThreshold - cutoff fraction of bad corr windows (default = 0.01)
 %     ransacSampleSize - samples for computing ransac (default = 50)
 %     ransacChannelFraction - fraction of channels for robust reconstruction (default = 0.25)
-%     ransacThreshold - cutoff correlation for abnormal wrt neighbors(default = 0.75)
+%     ransacCorrelationThreshold - cutoff correlation for abnormal wrt neighbors(default = 0.75)
 %     ransacUnbrokenTime - cutoff fraction of time channel can be bad (default = 0.4)
 %     ransacWindowSeconds - correlation window for ransac (default = 5 sec)
 %

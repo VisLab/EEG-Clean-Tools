@@ -135,3 +135,13 @@ afterTimeScale = (1:length(afterRansac))*referenced.ransacWindowSeconds;
 thresholdName = 'ransac correlation threshold';
 showBadWindows(beforeRansac, afterRansac, beforeTimeScale, afterTimeScale, ...
       length(referenceChannels), legendStrings, noisyParameters.name, thresholdName);
+
+%% Comparison of noisy average reference and robust average reference
+tString = { noisyParameters.name, 'Comparison of reference signals'}; 
+figure('Name', tString{2}
+plot(noisyParameters.reference.averageReference, ...
+     noisyParameters.reference.averageReferenceWithNoisyChannels, '.k');
+xlabel('Robust reference')
+ylabel('Noisy reference');
+title(tString, 'Interpreter', 'None');
+
