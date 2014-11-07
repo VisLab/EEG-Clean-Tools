@@ -11,7 +11,7 @@ params = struct();
 params.lineFrequencies = [60, 120, 180, 240, 300, 360, 420];
 
 %% Read in the data and high-pass filter it.
-for k = 1:length(in_names)
+for k = 143:length(in_names)
     basename = in_names{k}(1:(end-4));
     thisName = basename;
     fname = [indir filesep in_names{k}];

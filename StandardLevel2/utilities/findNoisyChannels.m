@@ -33,6 +33,7 @@ function  findNoisyOut = findNoisyChannels(signal, findNoisyIn)
 %     ransacWindowSeconds - correlation window for ransac (default = 5 sec)
 %
 % Output paramters (c channels, w windows):
+%    ransacPerformed - true if there were enough good channels to do ransac
 %    noisyChannels - list of identified bad channel numbers
 %    badChannelsFromCorrelation  - list of bad channels identified by correlation
 %    badChannelsFromDeviation   - list of bad channels identified by amplitude
