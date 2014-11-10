@@ -1,6 +1,22 @@
 %% Visualize the EEG 
-fprintf('%s...\n', EEG.etc.noisyParameters.name);
+% The reporting function expects that EEG will be in the base workspace
+% with an EEG.etc.noisyParameters structure containing the report. It
+% also expects a variable called sumReportName in the base workspace
+% which contains the file name of a summary report. 
+% The reporting function appends a summary to this report. 
 
+%% Open the summary report file
+summaryReportLocation = [summaryFolder filesep summaryReportName];
+summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
+relativeReportLocation = [sessionFolder filesep sessionReportName];
+%% Output the report header
+summaryHeader = [EEG.etc.noisyParameters.name '[' ...
+    num2str(size(EEG.data, 1)) ' channels, ' num2str(size(EEG.data, 2)) ' frames]'];
+fprintf('%s...\n', summaryHeader);
+summaryHeader = [summaryHeader ' <a href="' relativeReportLocation ...
+    '">Report details</a>'];
+writeSummaryHeader(summaryFile,  summaryHeader);
+writeSummaryItem(summaryFile, '', 'first');
 %% Setup visualization parameters
 numbersPerRow = 15;
 indent = '  ';
@@ -18,17 +34,21 @@ referenced = noisyParameters.reference.noisyOut;
         getReportChannelInformation(referenced);
 referenceChannels = noisyParameters.reference.referenceChannels;
 %% Report high pass filtering step
-reportHighPass(noisyParameters, numbersPerRow, indent);
+summary = reportHighPass(1, noisyParameters, numbersPerRow, indent);
+writeSummaryItem(summaryFile, summary);
 
 %% Report line noise removal step
-reportLineNoise(noisyParameters, numbersPerRow, indent);
+summary = reportLineNoise(1, noisyParameters, numbersPerRow, indent);
+writeSummaryItem(summaryFile, summary);
 
 %% Spectrum after line noise removal
 channels = noisyParameters.lineNoise.lineNoiseChannels;
 tString = noisyParameters.name;
 showSpectrum(EEG, channels, tString);
+
 %% Report rereferencing step parameters
-reportRereference(noisyParameters, numbersPerRow, indent);
+summary = reportRereference(1, noisyParameters, numbersPerRow, indent);
+writeSummaryItem(summaryFile, summary);
 
 %% Scalp map of robust channel deviation (original)
 tString = 'Robust channel deviation';
@@ -155,3 +175,6 @@ xlabel('seconds')
 ylabel('Difference');
 title(tString, 'Interpreter', 'None');
 
+%% Close the summary file
+writeSummaryItem(summaryFile, '', 'last');
+fclose(summaryFile);

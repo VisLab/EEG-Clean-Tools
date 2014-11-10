@@ -1,14 +1,17 @@
-function reportHighPass(noisyParameters, numbersPerRow, indent)
+function summary = reportHighPass(fid, noisyParameters, numbersPerRow, indent)
+% Outputs a summary to file fid and returns a cell array of important messages
+    summary = cell(1, 0);
     if ~isfield(noisyParameters, 'highPass')
-        fprintf('Signal wasn''t high pass filtered\n');
+        summary{1} = 'Signal wasn''t high pass filtered\n';
+        fprintf(fid, summary{1});
         return;
     end
     highPass = noisyParameters.highPass;
-    fprintf('\n%sHigh pass filtering version %s\n', indent, ...
+    fprintf(fid, '\n%sHigh pass filtering version %s\n', indent, ...
         noisyParameters.version.HighPass);      
-    fprintf('%sHigh pass cutoff: %g Hz\n', indent, highPass.highPassCutoff);
+    fprintf(fid, '%sHigh pass cutoff: %g Hz\n', indent, highPass.highPassCutoff);
     fprintf('%sFilter command:\n%s%s%s\n', indent, indent, indent, ...
         highPass.highPassFilterCommand);
-    fprintf('%sHigh pass filtered channels:\n', indent);
-    printList(highPass.highPassChannels, numbersPerRow, [indent, indent]);
+    fprintf(fid, '%sHigh pass filtered channels:\n', indent);
+    printList(fid, highPass.highPassChannels, numbersPerRow, [indent, indent]);
 end

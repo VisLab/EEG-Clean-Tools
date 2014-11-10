@@ -54,6 +54,9 @@ redraw(myFigure, headAxes, mainAxes, colorbarAxes, showColorbar);
             bValues)
         % Find channels with valid locations and set scaled locations
         x = []; y = []; labels = {}; values = [];
+        interpolationRadius = 1;
+        plotRadius = 1;
+        validElements = [];
         if isempty(elementLocs)   % element locations not defined
             return;
         end
