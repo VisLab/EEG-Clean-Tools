@@ -35,3 +35,8 @@ Version 0.22 Released 11/9/2014
 * Added check to only perform ransac when channel locations are available
 * Fixed the input parameter structure on findNoisyChannels
 * Added the infrastructure for the summary of all datasets
+
+Version 0.23 Released
+
+* Removed the channel locations and channel information from noisyOut
+  because it is already in the reference structure at top level.

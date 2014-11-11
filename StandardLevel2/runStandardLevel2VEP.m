@@ -3,7 +3,6 @@ indir = 'E:\\CTAData\\VEP'; % Input data directory used for this demo
 %outdir = 'N:\\ARLAnalysis\\VEPStandardLevel2';
 outdir = 'N:\\ARLAnalysis\\VEPStandardLevel2D';
 basename = 'vep';
-
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% Parameters that must be preset
@@ -14,7 +13,7 @@ params.rereferencedChannels = 1:70;
 params.highPassChannels = 1:70;
 params.lineNoiseChannels = 1:70;
 %% Run the pipeline
-for k = 1:5%18
+for k = 1:2%18
     thisName = sprintf('%s_%02d', basename, k);
     params.name = thisName;
     fname = [indir filesep thisName '.set'];

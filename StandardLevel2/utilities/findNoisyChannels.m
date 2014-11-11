@@ -93,8 +93,6 @@ end
 noisyOut = struct('srate', [], ...
                       'samples', [], ...
                       'referenceChannels', [], ...
-                      'channelInformation', [], ...
-                      'channelLocations', [], ...
                       'robustDeviationThreshold', [], ...
                       'highFrequencyNoiseThreshold', [], ...
                       'correlationWindowSeconds', [], ...
@@ -129,8 +127,7 @@ noisyOut = struct('srate', [], ...
 noisyOut.srate = getStructureParameters(params, 'srate', signal.srate);
 noisyOut.samples = getStructureParameters(params, 'samples', size(signal.data, 2));
 noisyOut.referenceChannels = getStructureParameters(params, 'referenceChannels', 1:size(signal.data, 1));
-noisyOut.channelInformation = getStructureParameters(params, 'channelInformation', signal.chaninfo);
-noisyOut.channelLocations = getStructureParameters(params, 'channelLocations', signal.chanlocs);
+channelLocations = getStructureParameters(params, 'channelLocations', signal.chanlocs);
 noisyOut.robustDeviationThreshold = getStructureParameters(params, 'robustDeviationThreshold', 5);
 noisyOut.highFrequencyNoiseThreshold = getStructureParameters(params, 'highFrequencyNoiseThreshold', 5);
 noisyOut.correlationWindowSeconds = getStructureParameters(params, 'correlationWindowSeconds', 1);
@@ -251,7 +248,7 @@ noisyChannels = union(noisyOut.badChannelsFromDeviation, ...
     noisyOut.badChannelsFromCorrelation);
 %% Method 4: Ransac corelation (may not be performed)
 % Setup for ransac (if a 2-stage algorithm, remove other bad channels first)
-if isempty(noisyOut.channelLocations) 
+if isempty(channelLocations) 
     warning('findNoisyChannels:noChannelLocation', ...
         'ransac could not be computed because there were no channel locations');
     noisyOut.badChannelsFromRansac = [];
@@ -272,7 +269,7 @@ else % Set up parameters and make sure enough good channels to proceed
         ransacUnbrokenFrames = srate*noisyOut.ransacUnbrokenTime;
     end
 
-    nchanlocs = noisyOut.channelLocations(ransacChannels);
+    nchanlocs = channelLocations(ransacChannels);
     if length(nchanlocs) ~= size(nchanlocs, 2)
         nchanlocs = nchanlocs';
     end

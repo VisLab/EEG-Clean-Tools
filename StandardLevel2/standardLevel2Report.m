@@ -27,11 +27,13 @@ scalpMapInterpolation = 'v4';
 noisyParameters = EEG.etc.noisyParameters;
 original = noisyParameters.reference.noisyOutOriginal;
 referenced = noisyParameters.reference.noisyOut;
-
-[originalLocations, originalInformation, originalChannels] = ...
-        getReportChannelInformation(original);
-[referencedLocations, referencedInformation, referencedChannels] = ...
-        getReportChannelInformation(referenced);
+channelInformation = noisyParameters.reference.channelInformation;
+nosedir = channelInformation.nosedir;
+channelLocations = noisyParameters.reference.channelLocations;
+[originalLocations, originalChannels] = ...
+        getReportChannelInformation(channelLocations, original);
+[referencedLocations, referencedChannels] = ...
+        getReportChannelInformation(channelLocations, referenced);
 referenceChannels = noisyParameters.reference.referenceChannels;
 %% Report high pass filtering step
 summary = reportHighPass(1, noisyParameters, numbersPerRow, indent);
@@ -57,12 +59,11 @@ dataReferenced = referenced.robustChannelDeviation;
 scale = max(max(abs(dataOriginal), max(abs(dataReferenced))));
 clim = [-scale, scale];
 
-nosedir = originalInformation.nosedir;
+
 plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 
 %% Scalp map of robust channel deviation (referenced)
-nosedir = referencedInformation.nosedir;
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
 
@@ -73,12 +74,10 @@ dataReferenced = referenced.zscoreHFNoise;
 scale = max(max(abs(dataOriginal), max(abs(dataReferenced))));
 clim = [-scale, scale];
 
-nosedir = originalInformation.nosedir;
 plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 
 %% Scalp map of HF noise Z-score (referenced)
-nosedir = referencedInformation.nosedir;
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
 
@@ -88,12 +87,10 @@ dataOriginal = original.medianMaxCorrelation;
 dataReferenced = referenced.medianMaxCorrelation;
 clim = [0, 1];
 
-nosedir = originalInformation.nosedir;
 plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 
 %% Scalp map of median max correlation (referenced)
-nosedir = referencedInformation.nosedir;
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
  
@@ -103,11 +100,9 @@ dataOriginal = original.ransacBadWindowFraction;
 dataReferenced = referenced.ransacBadWindowFraction;
 clim = [0, 1];
 
-nosedir = originalInformation.nosedir;
 plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 %% Scalp map of bad ransac fraction (referenced)
-nosedir = referencedInformation.nosedir;
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
  

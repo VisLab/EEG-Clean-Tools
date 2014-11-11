@@ -1,13 +1,12 @@
-function [referenceLocations, channelInformation, referenceChannels] = ...
-        getReportChannelInformation(results)
+function [referenceLocations, referenceChannels] = ...
+        getReportChannelInformation(channelLocations, results)
     % Extracts channel locations with bad channels labeled, info and 
     % reference channel list from report
     badCorrelationSymbol = 'c';
     badAmplitudeSymbol = '+';
     badNoiseSymbol = 'x';
     badRansacSymbol = '?';
-    chanlocs = results.channelLocations;
-    channelInformation = results.channelInformation;
+    chanlocs = channelLocations;
     referenceChannels = results.referenceChannels;
     % Set the bad channel labels
     for j = results.badChannelsFromCorrelation

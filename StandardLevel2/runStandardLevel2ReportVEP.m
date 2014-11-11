@@ -11,7 +11,7 @@ if exist(reportSummary, 'file')
    delete(reportSummary);
 end
 %% Run the pipeline
-for k = 1:5 %18
+for k = 1:2 %18
     thisFile = sprintf('%s_%02d', basename, k);
     sessionReportName = [thisFile '.pdf'];
     fname = [datadir filesep thisFile '.set'];
