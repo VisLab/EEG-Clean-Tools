@@ -3,7 +3,7 @@ function summary = reportHighPass(fid, noisyParameters, numbersPerRow, indent)
     summary = cell(1, 0);
     if ~isfield(noisyParameters, 'highPass')
         summary{1} = 'Signal wasn''t high pass filtered\n';
-        fprintf(fid, summary{1});
+        fprintf(fid, '%s\n', summary{1});
         return;
     end
     highPass = noisyParameters.highPass;

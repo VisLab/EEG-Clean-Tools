@@ -21,9 +21,12 @@ referenceOut.referenceChannels = getStructureParameters(params, ...
 referenceOut.rereferencedChannels =  getStructureParameters(params, ...
     'rereferencedChannels',  1:size(signal.data, 1));
 referenceOut.channelLocations = getStructureParameters(params, ...
-                                     'channelLocations', signal.chanlocs);
+    'channelLocations', signal.chanlocs);
 referenceOut.channelInformation = getStructureParameters(params, ...
-                                     'channelInformation', signal.chaninfo);
+    'channelInformation', signal.chaninfo);
+referenceOut.interpolateHFChannels = ...
+    getStructureParameters(params, 'interpolateHFChannels', false);
+
 %% Find the noisy channels for the initial starting point
 referenceOut.averageReferenceWithNoisyChannels = ...
                 mean(signal.data(referenceOut.referenceChannels, :), 1);
@@ -53,10 +56,23 @@ clear signalTmp;
 %% Now remove reference from filtered signal and interpolate bad channels
 signal = removeReference(signal, referenceOut.averageReference, ...
                          referenceOut.rereferencedChannels);
-noisyOut = findNoisyChannels(signal, params); 
+noisyOut = findNoisyChannels(signal, params);
+% Potential source channels are those that aren't noisy at all 
+sourceChannels = setdiff(referenceOut.referenceChannels, noisyOut.noisyChannels);
+
+% Interpolated channels may or
 referenceOut.interpolatedChannels = noisyOut.noisyChannels;
+referenceOut.badChannelsNotInterpolated = [];
+if ~referenceOut.interpolateHFChannels % Don't interpolate HF channels
+    referenceOut.interpolatedChannels = union(...
+           noisyOut.badChannelsFromDeviation, union( ...
+           noisyOut.badChannelsFromCorrelation, ...
+           noisyOut.badChannelsFromRansac));
+    referenceOut.badChannelsNotInterpolated = setdiff( ...
+        noisyOut.badChannelsFromHFNoise, referenceOut.interpolatedChannels);
+end
 if ~isempty(referenceOut.interpolatedChannels)  
-    sourceChannels = setdiff(referenceOut.referenceChannels, referenceOut.interpolatedChannels);
+    sourceChannels = setdiff(sourceChannels, referenceOut.interpolatedChannels);
     signal = interpolateChannels(signal, referenceOut.interpolatedChannels, sourceChannels);
     noisyOut = findNoisyChannels(signal, params); 
 end
