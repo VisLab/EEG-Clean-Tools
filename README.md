@@ -36,7 +36,10 @@ Version 0.22 Released 11/9/2014
 * Fixed the input parameter structure on findNoisyChannels
 * Added the infrastructure for the summary of all datasets
 
-Version 0.23 Released
+Version 0.23 Released 11/13/2013
 
 * Removed the channel locations and channel information from noisyOut
   because it is already in the reference structure at top level.
+* Added reporting of average fraction of channels bad in windows.
+* Added first version of hdf5support -- rewrites the noisyParameters
+  to an HDF5 file.
