@@ -43,3 +43,5 @@ Version 0.23 Released 11/13/2013
 * Added reporting of average fraction of channels bad in windows.
 * Added first version of hdf5support -- rewrites the noisyParameters
   to an HDF5 file.
+
+Version 0.24
