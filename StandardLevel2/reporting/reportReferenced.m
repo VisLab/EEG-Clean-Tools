@@ -1,10 +1,14 @@
-function summary = reportRereference(fid, noisyParameters, numbersPerRow, indent)
+function summary = reportReferenced(fid, noisyParameters, numbersPerRow, indent)
 %% Extracts and outputs parameters for referencing calculation
 % Outputs a summary to file fid and returns a cell array of important messages
-    summary = cell(1, 0);
+    summary = {};
+    if ~isempty(noisyParameters.errors.reference)
+        summary{end+1} =  noisyParameters.errors.reference;
+        fprintf(fid, '%s\n', summary{end});
+    end
     if ~isfield(noisyParameters, 'reference')
-        summary{1} = 'Signal wasn''t referenced\n';
-        fprintf(fid, '%s\n', summary{1});
+        summary{end+1} = 'Signal wasn''t referenced';
+        fprintf(fid, '%s\n', summary{end});
         return;
     end
     reference = noisyParameters.reference;
@@ -41,17 +45,22 @@ function summary = reportRereference(fid, noisyParameters, numbersPerRow, indent
         reference.noisyOut.ransacPerformed);
     fprintf(fid, '%s%sInterpolateHFChannels: %g\n', indent, indent, ...
         reference.interpolateHFChannels);
-    fprintf(fid, '\n%sReference channels:\n', indent);
+    fprintf(fid, '\n%sReference channels (%d channels):\n', ...
+        indent, length(reference.referenceChannels));
     printList(fid, reference.referenceChannels, ...
         numbersPerRow, [indent, indent]);
-    fprintf(fid, '\n%sRereferencedChannels:\n', indent);
+    fprintf(fid, '\n%sRereferencedChannels (%d channels):\n', ...
+        indent, length(reference.rereferencedChannels));
     printList(fid, reference.rereferencedChannels,  ...
         numbersPerRow, [indent, indent]);
     
     %% Listing of noisy channels
+    outOriginal = reference.noisyOutOriginal;
+    out = reference.noisyOut;
+    channelLabels = {reference.channelLocations.labels};
     fprintf(fid, '\n\n%sNoisy channels before referencing:\n', indent);
-    printList(fid, reference.noisyOutOriginal.noisyChannels,  ...
-        numbersPerRow, [indent, indent]);
+    printLabeledList(fid, outOriginal.noisyChannels,  ...
+        channelLabels(outOriginal.noisyChannels), numbersPerRow, [indent, indent]);
     fprintf(fid, '\n%sNoisy channels interpolated after referencing:\n', indent);
     printList(fid, reference.interpolatedChannels, numbersPerRow, [indent, indent]);
     if ~isempty(reference.interpolatedChannels)

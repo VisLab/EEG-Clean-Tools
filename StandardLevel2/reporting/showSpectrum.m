@@ -1,9 +1,8 @@
 function [] = showSpectrum(EEG, channels, tString)
-
-
-    numChans = 6;
+    numChans = min(6, length(channels));
     fftwinfac = 4;
-    fftchans = floor(linspace(1, length(channels), numChans));
+    indexchans = floor(linspace(1, length(channels), numChans));
+    fftchans = channels(indexchans);
     colors = jet(length(fftchans));
     [sref, fref]= calculateSpectrum(EEG.data(fftchans, :), ...
         size(EEG.data, 2), EEG.srate, ...
@@ -14,7 +13,7 @@ function [] = showSpectrum(EEG, channels, tString)
     hold on
     legends = cell(1, length(fftchans));
     for c = 1:length(fftchans)
-        fftchan = channels(fftchans(c));
+        fftchan = fftchans(c);
         plot(fref, sref(c, :)', 'Color', colors(c, :))
         legends{c} = num2str(fftchan);
     end

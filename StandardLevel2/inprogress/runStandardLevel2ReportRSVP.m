@@ -1,27 +1,20 @@
 %% Read in the file and set the necessary parameters
-datadir = 'N:\\ARLAnalysis\\RSVPStandardLevel2B';
-htmlbase = 'N:\\ARLAnalysis\\RSVPStandardLevel2ReportsB';
+datadir = 'N:\\ARLAnalysis\\RSVPStandardLevel2C';
+summaryFolder = 'N:\\ARLAnalysis\\RSVPStandardLevel2ReportsC';
 basename = 'rsvp';
-publishReport = 1;
+summaryReportName = [basename '_summary.html'];
+sessionFolder = '.';
+reportSummary = [summaryFolder filesep summaryReportName];
+if exist(reportSummary, 'file') 
+   delete(reportSummary);
+end
+
 %% Run the pipeline
 for k = [1:7, 9:15]
     thisFile = sprintf('%s_%02d', basename, k);
+    sessionReportName = [thisFile '.pdf'];
     fname = [datadir filesep thisFile '.set'];
     load(fname, '-mat');
-    if ~publishReport
-        standardLevel2Report;
-    else
-        htmldir = [htmlbase filesep thisFile];
-        if ~exist(htmldir, 'dir')
-            mkdir(htmldir)
-        end
-        script_name = 'standardLevel2Report';
-        publish_options.outputDir = htmldir;
-        publish_options.maxWidth = 800;
-        publish_options.format = 'pdf';
-        publish(script_name, publish_options);
-        close all
-        fclose('all');
-    end
+    publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
+                  sessionFolder, sessionReportName);
 end
-

@@ -4,7 +4,10 @@ function writeSummaryItem(sumFile, summaryItem, firstlast)
     end
     if ~isempty(summaryItem)
        for k = 1:length(summaryItem)
-          fprintf(sumFile, '<li>%s</li>\n', summaryItem{k});
+           if ~isempty(summaryItem{k}) && ischar(summaryItem{k}) && ...
+               ~isempty(strtrim(summaryItem{k}))
+               fprintf(sumFile, '<li>%s</li>\n', summaryItem{k});
+           end
        end
     end
     if nargin == 3 && strcmpi(firstlast, 'last')

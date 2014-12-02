@@ -1,7 +1,8 @@
+%% Example: Running the pipeline outside of ESS
+
 %% Read in the file and set the necessary parameters
-indir = 'E:\\CTAData\\VEP'; % Input data directory used for this demo
-%outdir = 'N:\\ARLAnalysis\\VEPStandardLevel2';
-outdir = 'N:\\ARLAnalysis\\VEPStandardLevel2D';
+indir = 'E:\\CTAData\\VEP\'; % Input data directory used for this demo
+outdir = 'N:\\ARLAnalysis\\VEPStandardLevel2F';
 basename = 'vep';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
@@ -18,12 +19,10 @@ for k = 1:18
     params.name = thisName;
     fname = [indir filesep thisName '.set'];
     EEG = pop_loadset(fname);
-    
     [EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
     fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
-             computationTimes.highPass, computationTimes.resampling, ...
-             computationTimes.lineNoise, computationTimes.reference);
+        computationTimes.highPass, computationTimes.resampling, ...
+        computationTimes.lineNoise, computationTimes.reference);
     fname = [outdir filesep thisName '.set'];
     save(fname, 'EEG', '-mat', '-v7.3');
 end
-
