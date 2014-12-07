@@ -1,7 +1,7 @@
 %% Example using ESS
 ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
 ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
-ess2Dir = 'N:\ARLAnalysis\NCTU\Level2A';
+ess2Dir = 'N:\ARLAnalysis\NCTU\Level2';
 
 % ess1Path = 'J:\\NCTULaneKeeping';
 % ess1File = 'J:\NCTULaneKeeping\\study_description.xml';
