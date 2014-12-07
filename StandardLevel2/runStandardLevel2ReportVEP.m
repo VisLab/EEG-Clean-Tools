@@ -1,7 +1,7 @@
 %% Read in the file and set the necessary parameters
 indir = 'E:\\CTAData\\VEP'; % Input data directory used for this demo
-datadir = 'N:\\ARLAnalysis\\VEPStandardLevel2F';
-summaryFolder = 'N:\\ARLAnalysis\\VEPStandardLevel2ReportsF';
+datadir = 'N:\\ARLAnalysis\\VEPStandardLevel2I';
+summaryFolder = 'N:\\ARLAnalysis\\VEPStandardLevel2ReportsI';
 
 basename = 'vep';
 summaryReportName = [basename '_summary.html'];

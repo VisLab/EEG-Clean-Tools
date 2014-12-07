@@ -1,21 +1,19 @@
-function [] = showSpectrum(EEG, channels, tString)
-    numChans = min(6, length(channels));
+function [] = showSpectrum(EEG, channels, channelLabels, tString)
+% Show spectrum of EEG at channels selected from 
     fftwinfac = 4;
-    indexchans = floor(linspace(1, length(channels), numChans));
-    fftchans = channels(indexchans);
-    colors = jet(length(fftchans));
-    [sref, fref]= calculateSpectrum(EEG.data(fftchans, :), ...
+    colors = jet(length(channels));
+    [sref, fref]= calculateSpectrum(EEG.data(channels, :), ...
         size(EEG.data, 2), EEG.srate, ...
         'freqfac', 4, 'winsize', ...
         fftwinfac*EEG.srate, 'plot', 'off');
     tString1 = {tString,'Selected channels'};
     figure('Name', tString)
     hold on
-    legends = cell(1, length(fftchans));
-    for c = 1:length(fftchans)
-        fftchan = fftchans(c);
+    legends = cell(1, length(channels));
+    for c = 1:length(channels)
+        fftchan = channels(c);
         plot(fref, sref(c, :)', 'Color', colors(c, :))
-        legends{c} = num2str(fftchan);
+        legends{c} = [num2str(fftchan) ' (' channelLabels{c} ')'];
     end
     hold off
     xlabel('Frequency (Hz)')

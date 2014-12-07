@@ -1,7 +1,7 @@
 %% Example using ESS
 ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
 ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
-ess2Dir = 'N:\ARLAnalysis\NCTU3\Level2';
+ess2Dir = 'N:\ARLAnalysis\NCTU\Level2A';
 
 % ess1Path = 'J:\\NCTULaneKeeping';
 % ess1File = 'J:\NCTULaneKeeping\\study_description.xml';
@@ -13,7 +13,7 @@ ess2Dir = 'N:\ARLAnalysis\NCTU3\Level2';
 
 %% Create a level 2 study
 obj2 = level2Study('level1XmlFilePath', ess1File);
-obj2.createLevel2Study(ess2Dir);
+obj2.createLevel2Study(ess2Dir, 'sessionSubset', 1);
 %%
 % obj2 = level2Study('level2XmlFilePath', ...
 %     'N:\ARLAnalysis\NCTU\Level2\studyLevel2_description.xml');

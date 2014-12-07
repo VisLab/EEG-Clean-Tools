@@ -26,6 +26,8 @@ referenceOut.channelInformation = getStructureParameters(params, ...
     'channelInformation', signal.chaninfo);
 referenceOut.interpolateHFChannels = ...
     getStructureParameters(params, 'interpolateHFChannels', false);
+referenceOut.dumpOrdinaryReference = ...
+    getStructureParameters(params, 'dumpOrdinaryReference', false);
 
 %% Find the noisy channels for the initial starting point
 referenceOut.averageReferenceWithNoisyChannels = ...
@@ -39,38 +41,33 @@ referenceOut.noisyOutOriginal = findNoisyChannels(signal, params);
 noisyOutHuber = findNoisyChannels(signalTmp, params); 
 
 %% Construct new EEG with interpolated channels to find better average reference
-signalTmp.data = signalTmp.data(referenceOut.referenceChannels, :);
-
-%%
-fprintf('Reference channels in robust reference:\n');
-printList(1, referenceOut.referenceChannels, 10, '   ');
-fprintf('Channels %g\n', length(signalTmp.chanlocs)); 
-signalTmp.chanlocs = signalTmp.chanlocs(referenceOut.referenceChannels);
-signalTmp.nbchan = length(referenceOut.referenceChannels);
+% signalTmp.data = signal.data(referenceOut.referenceChannels, :);
+% signalTmp.chanlocs = signal.chanlocs(referenceOut.referenceChannels);
+% signalTmp.nbchan = length(referenceOut.referenceChannels);
+signalTmp = signal;
 noisyChannels = noisyOutHuber.noisyChannels;
-if length(signalTmp.chanlocs) - length(noisyChannels) < 2
+if referenceOut.referenceChannels - length(noisyChannels) < 2
     error('Could not perform a robust reference -- not enough good channels');
 elseif ~isempty(noisyChannels)
-    channelMask = false(1, size(signal.data, 1));
-    channelMask(noisyChannels) = true;
-    channelMask = channelMask(referenceOut.referenceChannels);
-    noisyChannelsReindexed = find(channelMask);
-    signalTmp = interpolateChannels(signalTmp, noisyChannelsReindexed);
+    sourceChannels = setdiff(referenceOut.referenceChannels, noisyChannels);
+    signalTmp = interpolateChannels(signalTmp, noisyChannels, sourceChannels);
 end
-referenceOut.averageReference = mean(double(signalTmp.data), 1);
+referenceOut.averageReference = ...
+    mean(signalTmp.data(referenceOut.referenceChannels, :), 1);
 clear signalTmp;
 
-%% Now remove reference from filtered signal and interpolate bad channels
+%% Now remove reference from the signal and interpolate bad channels
 signal = removeReference(signal, referenceOut.averageReference, ...
                          referenceOut.rereferencedChannels);
 noisyOut = findNoisyChannels(signal, params);
 % Potential source channels are those that aren't noisy at all 
 sourceChannels = setdiff(referenceOut.referenceChannels, noisyOut.noisyChannels);
 
-% Interpolated channels may not be interpolated if only fail because of HF
-referenceOut.interpolatedChannels = noisyOut.noisyChannels;
-referenceOut.badChannelsNotInterpolated = [];
-if ~referenceOut.interpolateHFChannels % Don't interpolate HF channels
+% Interpolated channels may not be interpolated if failed because of HF
+if referenceOut.interpolateHFChannels
+    referenceOut.interpolatedChannels = noisyOut.noisyChannels;
+    referenceOut.badChannelsNotInterpolated = [];
+else % Don't interpolate HF channels
     referenceOut.interpolatedChannels = union(...
            noisyOut.badChannelsFromDeviation, union( ...
            noisyOut.badChannelsFromCorrelation, ...
@@ -78,7 +75,7 @@ if ~referenceOut.interpolateHFChannels % Don't interpolate HF channels
     referenceOut.badChannelsNotInterpolated = setdiff( ...
         noisyOut.badChannelsFromHFNoise, referenceOut.interpolatedChannels);
 end
-sourceChannels = setdiff(sourceChannels, referenceOut.interpolatedChannels);
+
 if length(sourceChannels)  < 2
     error('Could not perform a robust reference -- not enough good channels');
 elseif ~isempty(referenceOut.interpolatedChannels)  

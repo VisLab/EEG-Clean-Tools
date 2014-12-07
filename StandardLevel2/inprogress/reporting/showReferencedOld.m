@@ -26,15 +26,9 @@ clim = [-scale, scale];
 plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 
-if reference.dumpOrdinaryReference
-    dataOriginalRef = reference.noisyOutOriginalRef.robustChannelDeviation;
-    plotScalpMap(dataOriginalRef, originalLocations, scalpMapInterpolation, ...
-    showColorbar, headColor, elementColor, clim, nosedir, [tString '(originalref)'])
-end
 %% Scalp map of robust channel deviation (referenced)
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
-
 
 %% Scalp map of HF noise Z-score (original)
 tString = 'Z-score HF SNR';
@@ -46,11 +40,6 @@ clim = [-scale, scale];
 plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 
-if reference.dumpOrdinaryReference
-    dataOriginalRef = reference.noisyOutOriginalRef.zscoreHFNoise;
-    plotScalpMap(dataOriginalRef, originalLocations, scalpMapInterpolation, ...
-    showColorbar, headColor, elementColor, clim, nosedir, [tString '(originalref)'])
-end
 %% Scalp map of HF noise Z-score (referenced)
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
@@ -64,11 +53,6 @@ clim = [0, 1];
 plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 
-if reference.dumpOrdinaryReference
-    dataOriginalRef = reference.noisyOutOriginalRef.medianMaxCorrelation;
-    plotScalpMap(dataOriginalRef, originalLocations, scalpMapInterpolation, ...
-    showColorbar, headColor, elementColor, clim, nosedir, [tString '(originalref)'])
-end
 %% Scalp map of median max correlation (referenced)
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
@@ -81,12 +65,6 @@ clim = [0, 1];
 
 plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
-
-if reference.dumpOrdinaryReference
-    dataOriginalRef = reference.noisyOutOriginalRef.ransacBadWindowFraction;
-    plotScalpMap(dataOriginalRef, originalLocations, scalpMapInterpolation, ...
-    showColorbar, headColor, elementColor, clim, nosedir, [tString '(originalref)'])
-end
 %% Scalp map of bad ransac fraction (referenced)
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])

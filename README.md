@@ -36,7 +36,7 @@ Version 0.22 Released 11/9/2014
 * Fixed the input parameter structure on findNoisyChannels
 * Added the infrastructure for the summary of all datasets
 
-Version 0.23 Released 11/13/2013
+Version 0.23 Released 11/13/2014
 
 * Removed the channel locations and channel information from noisyOut
   because it is already in the reference structure at top level.
@@ -44,9 +44,12 @@ Version 0.23 Released 11/13/2013
 * Added first version of hdf5support -- rewrites the noisyParameters
   to an HDF5 file.
 
-Version 0.24
+Version 0.24 Released 12/7/2104
 * Fixed channel selection bug in showSpectrum
 * Added error handling for failures in standardLevel2Pipeline
 * Added error reporting for failures
 * Corrected time scale on visualization of difference between 
   robust and mean reference 
+* Added channel labels as well as numbers to spectrum visualization
+* Fixed major bug in robustReference so that original signal is rereferenced
+* Revised and expanded the reporting

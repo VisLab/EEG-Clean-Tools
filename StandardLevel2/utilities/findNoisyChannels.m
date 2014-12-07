@@ -222,10 +222,10 @@ parfor k = 1:WCorrelation % Ignore last two time windows to stay in range
     abs_corr = abs(windowCorrelation - diag(diag(windowCorrelation)));
     channelCorrelations(k, :)  = quantile(abs_corr, 0.98);
     noiseLevels(k, :) = mad(dataPortion - eegPortion, 1)./mad(eegPortion, 1);
-    noiseLevels(k, :) = (noiseLevels(k, :) - noisinessMedian)./noisinessSD;
-    channelStd =  0.7413 *iqr(dataPortion);
-    channelDeviations(k, :) = ...
-        (channelStd - channelDeviationMedian) / channelDeviationSD;
+    %noiseLevels(k, :) = (noiseLevels(k, :) - noisinessMedian)./noisinessSD;
+    channelDeviations(k, :) =  0.7413 *iqr(dataPortion);
+%     channelDeviations(k, :) = ...
+%         (channelStd - channelDeviationMedian) / channelDeviationSD;
 end;
 clear xWin;
 clear dataWin;
