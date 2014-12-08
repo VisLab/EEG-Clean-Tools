@@ -1,9 +1,9 @@
 %% Read in the file and set the necessary parameters
-datadir = 'N:\\ARLAnalysis\\VEPABMStandardLevel2';
-summaryFolder = 'N:\\ARLAnalysis\\VEPABMStandardLevel2ReportsA';
-basename = 'A';
+datadir = 'N:\\ARLAnalysis\\VEPEMOTIVStandardLevel2A';
+summaryFolder = 'N:\\ARLAnalysis\\VEPEMOTIVStandardLevel2ReportsA';
+basename = 'E';
 
-summaryReportName = [basename 'BMVEP_summary.html'];
+summaryReportName = [basename 'MOTIVVEP_summary.html'];
 sessionFolder = '.';
 reportSummary = [summaryFolder filesep summaryReportName];
 if exist(reportSummary, 'file') 
@@ -12,7 +12,7 @@ end
 
 %% Run the pipeline
 for k = 1:18
-    thisName = sprintf('%s_%02d', basename, k); 
+    thisName = sprintf('%s_%02d', basename, k) 
     sessionReportName = [thisName '.pdf'];
     fname = [datadir filesep thisName '.set'];
     try

@@ -33,8 +33,8 @@ writeSummaryItem(summaryFile, {errorStatus});
 % Setup visualization parameters
 numbersPerRow = 15;
 indent = '  ';
-colors = [0, 0, 0; 1, 0, 0];
-legendStrings = {'Before referencing', 'After referencing'};
+colors = [0, 0, 0; 1, 0, 0; 0, 1, 0];
+legendStrings = {'Before referencing', 'After referencing', 'After referencing (relative)'};
 
 %% Report high pass filtering step
 summary = reportHighPass(consoleFID, noisyParameters, numbersPerRow, indent);
@@ -92,9 +92,13 @@ plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 
 %% Robust channel deviation (referenced)
-dataReferenced = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
+
+%% Robust channel deviation (referenced relative to original)
+dataReferencedRel = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
+plotScalpMap(dataReferencedRel, referencedLocations, scalpMapInterpolation, ...
+    showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced rel)'])
 
 %% Robust deviation window statistics
 medOrig = original.channelDeviationMedian;
@@ -102,14 +106,17 @@ sdnOrig = original.channelDeviationSD;
 beforeDeviationLevels = original.channelDeviations(referenceChannels, :);
 afterDeviationLevels = referenced.channelDeviations(referenceChannels, :);
 beforeDeviation = (beforeDeviationLevels - medOrig)./sdnOrig; 
-afterDeviation = (afterDeviationLevels - medOrig)./sdnOrig;
+afterDeviation = (afterDeviationLevels - medRef)./sdnRef;
+afterDeviationRel = (afterDeviationLevels - medOrig)./sdnOrig;
 thresholdName = 'Deviation score';
 theTitle = char([noisyParameters.name ': ' thresholdName ' distribution']);
-showCumulativeDistributions({beforeDeviation(:), afterDeviation(:)}, ...
+showCumulativeDistributions({beforeDeviation(:), afterDeviation(:), ...
+    afterDeviationRel(:)}, ...
     thresholdName, colors, theTitle, legendStrings, [-5, 5]);
 
 beforeDeviation = sum(beforeDeviation >= original.robustDeviationThreshold);
 afterDeviation = sum(afterDeviation >= referenced.robustDeviationThreshold);
+afterDeviationRel = sum(afterDeviationRel >= referenced.robustDeviationThreshold);
 beforeTimeScale = (0:length(beforeDeviation)-1)*original.correlationWindowSeconds;
 afterTimeScale = (0:length(afterDeviation)-1)*referenced.correlationWindowSeconds;
 [beforeAmpFraction, afterAmpFraction] = ...
@@ -119,7 +126,7 @@ afterTimeScale = (0:length(afterDeviation)-1)*referenced.correlationWindowSecond
 report0 = ['Deviation window statistics ((over ' ...
            num2str(size(referenced.channelDeviations, 2)) ' windows)']; 
 report1 = ['Large deviation channel fraction [before=', ...
-           num2str(beforeAmpFraction) ', after=' num2str(afterAmpFraction) ']'];
+           num2str(beforeAmpFraction) ', after rel=' num2str(afterAmpFraction) ']'];
 report2 = ['Median channel deviation: [before=', ...
           num2str(original.channelDeviationMedian) ...
           ', after=' num2str(referenced.channelDeviationMedian) ']'];
@@ -133,10 +140,12 @@ quarterChannels = round(length(referenceChannels)*0.25);
 halfChannels = round(length(referenceChannels)*0.5);
 report5 = ['Windows with > 1/4 deviation channels [before=', ...
           num2str(sum(beforeDeviation > quarterChannels)) ...
-          ', after=' num2str(sum(afterDeviation > quarterChannels)) ']'];
+          ', after=' num2str(sum(afterDeviation > quarterChannels)) ...
+          ', after rel=', num2str(sum(afterDeviationRel > halfChannels)) ']'];
 report6 = ['Windows with > 1/2 deviation channels [before=', ...
           num2str(sum(beforeDeviation > halfChannels)) ...
-          ', after=' num2str(sum(afterDeviation > halfChannels)) ']'];
+          ', after=' num2str(sum(afterDeviation > halfChannels)) ...
+          ', after rel=', num2str(sum(afterDeviationRel > halfChannels)) ']'];
 fprintf(consoleFID, '%s:\n%s%s\n%s%s\n%s%s\n%s%s\n%s%s\n%s%s\n', report0, ...
           indent, report1, indent, report2, indent, report3, ...
           indent, report4, indent, report5, indent, report6);
@@ -259,9 +268,13 @@ plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 
 %% HF noise Z-score (referenced)
-dataReferenced = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
 plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
     showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
+
+%% HF noise Z-score (referenced relative to original)
+dataReferencedRel = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
+plotScalpMap(dataReferencedRel, referencedLocations, scalpMapInterpolation, ...
+    showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced relative)'])
 
 %% HF noise window stats
 beforeNoiseLevels = original.noiseLevels(referenceChannels, :);
@@ -271,12 +284,12 @@ sdNoiseOrig = mad(beforeNoiseLevels(:), 1)*1.4826;
 medianNoiseRef = median(afterNoiseLevels(:));
 sdNoiseRef = mad(afterNoiseLevels(:), 1)*1.4826;
 beforeNoise = (beforeNoiseLevels - medianNoiseOrig)./sdNoiseOrig; 
-afterNoise = (afterNoiseLevels - medianNoiseOrig)./sdNoiseOrig;
+afterNoiseRel = (afterNoiseLevels - medianNoiseOrig)./sdNoiseOrig;
+afterNoise = (afterNoiseLevels - medianNoiseRef)./sdNoiseRef;
 thresholdName = 'HF noise';
 theTitle = char([noisyParameters.name ': ' thresholdName ' HF noise distribution']);
-showCumulativeDistributions({beforeNoise(:), afterNoise(:)},thresholdName, ...
-                             colors, theTitle, legendStrings, [-5, 5]);
-
+showCumulativeDistributions({beforeNoise(:), afterNoise(:), afterNoiseRel(:)},  ...
+    thresholdName, colors, theTitle, legendStrings, [-5, 5]);
 beforeNoise = sum(beforeNoise  >= original.highFrequencyNoiseThreshold);
 afterNoise = sum(afterNoise >= referenced.highFrequencyNoiseThreshold);
 beforeTimeScale = (0:length(beforeNoise)-1)*original.correlationWindowSeconds;
@@ -301,10 +314,12 @@ quarterChannels = round(length(referenceChannels)*0.25);
 halfChannels = round(length(referenceChannels)*0.5);
 report5 = ['Windows with > 1/4 HF channels [before=', ...
           num2str(sum(beforeNoise > quarterChannels)) ...
-          ', after=' num2str(sum(afterNoise > quarterChannels)) ']'];
+          ', after=' num2str(sum(afterNoise > quarterChannels)) ...
+          ', after rel=' num2str(sum(afterNoiseRel > quarterChannels)) ']'];
 report6 = ['Windows with > 1/2 HF channels [before=', ...
           num2str(sum(beforeNoise > halfChannels)) ...
-          ', after=' num2str(sum(afterNoise > halfChannels)) ']'];
+          ', after=' num2str(sum(afterNoise > halfChannels)) ...
+          ', after rel=' num2str(sum(afterNoiseRel > halfChannels)) ']'];
 report7 = ['Median window HF [before=', ...
           num2str(medianNoiseOrig) ', after=' num2str(medianNoiseRef) ']'];
 report8 = ['SD window HF [before=', ...
