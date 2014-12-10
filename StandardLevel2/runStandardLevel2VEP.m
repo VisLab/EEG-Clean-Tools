@@ -13,7 +13,7 @@ params.referenceChannels = 1:64;
 params.rereferencedChannels = 1:70;
 params.highPassChannels = 1:70;
 params.lineNoiseChannels = 1:70;
-params.dumpOrdinaryReference = true;
+
 %% Run the pipeline
 for k = 1%1:18
     thisName = sprintf('%s_%02d', basename, k);

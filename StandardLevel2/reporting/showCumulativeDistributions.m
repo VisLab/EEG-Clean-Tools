@@ -10,7 +10,7 @@ end
 xlabel(theXLabel);
 ylabel('Cumulative probability')
 title(theTitle)
-legend(theLegends, 'Location', 'NorthWest')
+legend(theLegends(1:length(items)), 'Location', 'NorthWest')
 set(gca, 'XLim', xRange, 'XLimMode', 'manual')
 hold off
 

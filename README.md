@@ -44,7 +44,7 @@ Version 0.23 Released 11/13/2014
 * Added first version of hdf5support -- rewrites the noisyParameters
   to an HDF5 file.
 
-Version 0.24 Released 12/7/2104
+Version 0.24 Released 12/7/2104 (major)
 * Fixed channel selection bug in showSpectrum
 * Added error handling for failures in standardLevel2Pipeline
 * Added error reporting for failures
@@ -53,3 +53,9 @@ Version 0.24 Released 12/7/2104
 * Added channel labels as well as numbers to spectrum visualization
 * Fixed major bug in robustReference so that original signal is rereferenced
 * Revised and expanded the reporting
+
+Version 0.25 Not yet released
+* Removed saving of temporary file after line noise removal
+* Fixed report of relative reference
+* Added check for constant reference channels -- now does not rereference
+  if any of the reference channels are constant

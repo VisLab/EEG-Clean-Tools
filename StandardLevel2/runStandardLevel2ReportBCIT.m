@@ -1,6 +1,6 @@
 %% Run through the high pass and look at the spectrum afterwards
-datadir = 'N:\\Driving\\Level2';
-summaryFolder = 'N:\\Driving\\Level2Reports';
+datadir = 'N:\\ARL_BCIT_Program\\Level2';
+summaryFolder = 'N:\\ARL_BCIT_Program\\Level2Reports';
 
 basename = 'bcit';
 summaryReportName = [basename '_summary.html'];

@@ -1,5 +1,4 @@
 %% Read in the file and set the necessary parameters
-indir = 'E:\\CTAData\\VEP'; % Input data directory used for this demo
 datadir = 'N:\\ARLAnalysis\\VEPStandardLevel2I';
 summaryFolder = 'N:\\ARLAnalysis\\VEPStandardLevel2ReportsI';
 
@@ -19,4 +18,3 @@ for k = 1:18
     publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
                   sessionFolder, sessionReportName);
 end
-

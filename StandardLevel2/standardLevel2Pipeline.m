@@ -84,7 +84,7 @@ catch mex
     EEG.etc.noisyParameters.errors = errorMessages;
     return;
 end 
-save('vep03temp.mat', 'EEG', '-v7.3');
+
 %% Part IV: Remove a robust reference
 fprintf('Robust reference removal\n');
 try

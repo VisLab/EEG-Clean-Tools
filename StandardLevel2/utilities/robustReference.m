@@ -26,9 +26,20 @@ referenceOut.channelInformation = getStructureParameters(params, ...
     'channelInformation', signal.chaninfo);
 referenceOut.interpolateHFChannels = ...
     getStructureParameters(params, 'interpolateHFChannels', false);
-referenceOut.dumpOrdinaryReference = ...
-    getStructureParameters(params, 'dumpOrdinaryReference', false);
 
+%% Check that no reference channels are constant
+if sum(sum(isnan(signal.data(referenceOut.referenceChannels, :))))
+    error('robustReference:nanReferenceChannels', ...
+       'The reference channel data contains NaNs -- processing is invalid');
+end    
+channelSTD = std(signal.data(referenceOut.referenceChannels, :), 1, 2);
+channels = channelSTD < 10e-20;
+if sum(channels) > 0
+    zeroList = getListString(referenceOut.referenceChannels(channels)');
+    error('robustReference:constantReferenceChannels', ...
+        ['The following reference channels are constant: ' zeroList]);
+end
+    
 %% Find the noisy channels for the initial starting point
 referenceOut.averageReferenceWithNoisyChannels = ...
                 mean(signal.data(referenceOut.referenceChannels, :), 1);
