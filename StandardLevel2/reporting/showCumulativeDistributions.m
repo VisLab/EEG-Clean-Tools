@@ -1,7 +1,7 @@
 function [] = showCumulativeDistributions(items, theXLabel, theColors, ...
     theTitle, theLegends, xRange)
 % Plots the cummulative distributions
-figure('Name', theTitle)
+figure('Name', theTitle{1})
 hold on
 for k = 1:length(items)
     [f, x] = ecdf(items{k}(:));
@@ -9,7 +9,7 @@ for k = 1:length(items)
 end
 xlabel(theXLabel);
 ylabel('Cumulative probability')
-title(theTitle)
+title(theTitle, 'Interpreter', 'None')
 legend(theLegends(1:length(items)), 'Location', 'NorthWest')
 set(gca, 'XLim', xRange, 'XLimMode', 'manual')
 hold off

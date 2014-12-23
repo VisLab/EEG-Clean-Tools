@@ -362,6 +362,6 @@ end
     xlabel('seconds')
     ylabel('Difference');
     title(tString, 'Interpreter', 'None');
-end
+
 writeSummaryItem(summaryFile, '', 'last');
 fclose(summaryFile);

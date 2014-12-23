@@ -11,12 +11,11 @@ function summary = reportHighPass(fid, noisyParameters, numbersPerRow, indent)
         return;
     end
     highPass = noisyParameters.highPass;
-    fprintf(fid, '\n%sHigh pass filtering version %s\n', indent, ...
+    fprintf(fid, '\nHigh pass filtering version %s\n', ...
         noisyParameters.version.HighPass);      
-    fprintf(fid, '%sHigh pass cutoff: %g Hz\n', indent, highPass.highPassCutoff);
-    fprintf('%sFilter command:\n%s%s%s\n', indent, indent, indent, ...
-        highPass.highPassFilterCommand);
-    fprintf(fid, '%sHigh pass filtered channels (%d channels):\n', ...
-            indent, length(highPass.highPassChannels));
-    printList(fid, highPass.highPassChannels, numbersPerRow, [indent, indent]);
+    fprintf(fid, 'High pass cutoff: %g Hz\n',highPass.highPassCutoff);
+    fprintf('Filter command:\n%s\n', indent, highPass.highPassFilterCommand);
+    fprintf(fid, 'High pass filtered channels (%d channels):\n', ...
+            length(highPass.highPassChannels));
+    printList(fid, highPass.highPassChannels, numbersPerRow, indent);
 end

@@ -1,4 +1,4 @@
-function plotScalpMap(data, chanlocs, interpolation, showColorbar, ...
+function plotScalpMapOld(data, chanlocs, interpolation, showColorbar, ...
     headColor, elementColor, clim, nosedir, titleString)
 % Plots the scalp map with color bar and electrodes
 %
@@ -54,10 +54,10 @@ redraw(myFigure, headAxes, mainAxes, colorbarAxes, showColorbar);
             bValues)
         % Find channels with valid locations and set scaled locations
         x = []; y = []; labels = {}; values = [];
-        squeezeFactor = 1;
         interpolationRadius = 1;
         plotRadius = 1;
         validElements = [];
+        squeezeFactor = 1;
         if isempty(elementLocs)   % element locations not defined
             return;
         end
@@ -219,7 +219,10 @@ redraw(myFigure, headAxes, mainAxes, colorbarAxes, showColorbar);
         intElements = intersect(validElements, intElements);
         intx  = x(intElements);
         inty  = y(intElements);
-        [intx, inty] = rotateChannels(nosedir, intx, inty);
+        allx    = x*squeezeFactor;
+        ally    = y*squeezeFactor;
+        [intx, inty] = rotateChannels(nosedir, x, y, intx, inty, allx, ...
+            ally);
         intValues = values(intElements);
         
         xmin = min(-headRadius, min(intx));
@@ -253,7 +256,6 @@ redraw(myFigure, headAxes, mainAxes, colorbarAxes, showColorbar);
 
     function redraw(myFigure, headAxes, mainAxes, colorbarAxes, showColorbar)
         redrawLayout(myFigure, mainAxes);
-        % Redraws the axes in the figure 
         minimumGaps = [15, 15, 15, 15];  % smallest standard borders
         marginLeft = 10;           % pixels on left panel border
         marginRight = 10;          % pixels on right panel border
@@ -351,9 +353,10 @@ redraw(myFigure, headAxes, mainAxes, colorbarAxes, showColorbar);
         xLab = get(mainAxes, 'XLabel');
         set(xLab, 'String', xString, 'Units', 'pixels', ...
             'Position', [round(w/2), -xLabelOffset]);
-    end % redrawLayout
+    end % redraw
 
-    function [intx, inty] = rotateChannels(nosedir, intx, inty)
+    function [intx, inty] = rotateChannels(nosedir, x, y, intx, inty, ...
+            allx, ally)
         % rotate channels based on chaninfo
         if strcmpi(nosedir, '+x')
             rotate = 0; %#ok<NASGU>
@@ -367,6 +370,12 @@ redraw(myFigure, headAxes, mainAxes, colorbarAxes, showColorbar);
             allcoords = (inty + intx*sqrt(-1))*exp(sqrt(-1)*rotate);
             intx = imag(allcoords);
             inty = real(allcoords);
+            allcoords = (ally + allx*sqrt(-1))*exp(sqrt(-1)*rotate); %
+            allx = imag(allcoords); 
+            ally = real(allcoords); 
+            allcoords = (y + x*sqrt(-1))*exp(sqrt(-1)*rotate); 
+            x = imag(allcoords); %
+            y = real(allcoords);
         end;
     end % rotateChannels
 

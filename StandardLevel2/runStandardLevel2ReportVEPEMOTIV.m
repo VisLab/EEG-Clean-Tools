@@ -1,6 +1,6 @@
 %% Read in the file and set the necessary parameters
 datadir = 'N:\\ARLAnalysis\\VEPEMOTIVStandardLevel2A';
-summaryFolder = 'N:\\ARLAnalysis\\VEPEMOTIVStandardLevel2ReportsA';
+summaryFolder = 'N:\\ARLAnalysis\\VEPEMOTIVStandardLevel2AReports';
 basename = 'E';
 
 summaryReportName = [basename 'MOTIVVEP_summary.html'];

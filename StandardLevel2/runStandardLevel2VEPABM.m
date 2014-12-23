@@ -1,6 +1,7 @@
 %% Read in the file and set the necessary parameters
 indir = 'E:\\CTAData\\VEP_ABM'; % Input data directory used for this demo
-outdir = 'N:\\ARLAnalysis\\VEPABMStandardLevel2A';
+%outdir = 'N:\\ARLAnalysis\\VEPABMStandardLevel2A';
+outdir = 'N:\\ARLAnalysis\\VEPABMOrdinaryLevel2A';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 basename = 'A';
 
@@ -24,7 +25,7 @@ for k = 1:18
     params.rereferencedChannels = params.referenceChannels;
     params.highPassChannels = params.referenceChannels;
     params.lineNoiseChannels = params.referenceChannels;
-    [EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
+    [EEG, computationTimes] = ordinaryLevel2Pipeline(EEG, params);
     fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
         computationTimes.highPass, computationTimes.resampling, ...
         computationTimes.lineNoise, computationTimes.reference);

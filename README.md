@@ -57,5 +57,11 @@ Version 0.24 Released 12/7/2104 (major)
 Version 0.25 Not yet released
 * Removed saving of temporary file after line noise removal
 * Fixed report of relative reference
-* Added check for constant reference channels -- now does not rereference
-  if any of the reference channels are constant
+* Modified findNoisyChannels to exclude NaN and constant channels 
+  from noisyChannel thresholding, but to designate them as bad channels
+* Moved resampling step before high pass filter
+* Assigned return values in a separate step
+* Put error check in ShowSpectrum when invalid data is invalid
+* Correct minor issues with PlotScalpMap
+* Added extractReferenceStatistics -- which extracts summary statistics
+  for an entire archive.

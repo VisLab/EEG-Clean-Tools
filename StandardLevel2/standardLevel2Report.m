@@ -10,26 +10,34 @@
 % 
 % The reporting function appends a summary to the summary report. 
 
-%% Open summary report file and write data status
-summaryReportLocation = [summaryFolder filesep summaryReportName];
-summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
-relativeReportLocation = [sessionFolder filesep sessionReportName];
-consoleFID = 1;
-
-% Output the report header
+%% Write data status and report header
 noisyParameters = EEG.etc.noisyParameters;
 summaryHeader = [noisyParameters.name '[' ...
     num2str(size(EEG.data, 1)) ' channels, ' num2str(size(EEG.data, 2)) ' frames]'];
 summaryHeader = [summaryHeader ' <a href="' relativeReportLocation ...
     '">Report details</a>'];
 writeSummaryHeader(summaryFile,  summaryHeader);
-writeSummaryItem(summaryFile, '', 'first');
 
 %  Write overview status
+writeSummaryItem(summaryFile, '', 'first');
 errorStatus = ['Error status: ' noisyParameters.errors.status];
 fprintf(consoleFID, '%s \n', errorStatus);
 writeSummaryItem(summaryFile, {errorStatus});
-  
+
+% Versions
+versions = EEG.etc.noisyParameters.version;
+versionString = [' Resampling:' versions.Resampling ...
+                 ' High pass:' versions.HighPass ...
+                 ' Line noise:' versions.LineNoise ...
+                 ' Reference:' versions.Reference ...
+                 ' Interpolate: ' versions.Interpolation];
+writeSummaryItem(summaryFile, {['Versions: ' versionString]});
+fprintf(consoleFID, 'Versions:\n%s\n', versionString);
+
+% Events
+[summary, hardFrames] = reportEvents(consoleFID, EEG);
+writeSummaryItem(summaryFile, summary);
+
 % Setup visualization parameters
 numbersPerRow = 15;
 indent = '  ';
@@ -48,14 +56,22 @@ if isfield(noisyParameters, 'lineNoise')
     lineChannels = noisyParameters.lineNoise.lineNoiseChannels; 
     numChans = min(6, length(lineChannels));
     indexchans = floor(linspace(1, length(lineChannels), numChans));
-    channels = lineChannels(indexchans);
-    channelLabels = {EEG.chanlocs(channels).labels};
+    displayChannels = lineChannels(indexchans);
+    channelLabels = {EEG.chanlocs(lineChannels).labels};
     tString = noisyParameters.name;
-    showSpectrum(EEG, channels, channelLabels, tString);
+    badChannels = showSpectrum(EEG, lineChannels, displayChannels, ...
+                             channelLabels, tString);
+    if ~isempty(badChannels)
+        badString = ['Channels with no spectra: ' getListString(badChannels)];
+        fprintf(consoleFID, '%s\n', badString);
+        writeSummaryItem(summaryFile, {badString});
+    end
 end
 %% Report referencing step 
 summary = reportReferenced(consoleFID, noisyParameters, numbersPerRow, indent);
 writeSummaryItem(summaryFile, summary);
+
+%% Robust channel deviation (original)
 if isfield(noisyParameters, 'reference')
     reference = noisyParameters.reference;
     headColor = [0.7, 0.7, 0.7];
@@ -74,9 +90,6 @@ if isfield(noisyParameters, 'reference')
         getReportChannelInformation(channelLocations, referenced);
     referenceChannels = reference.referenceChannels;
     numberReferenceChannels = length(referenceChannels);
-end
-%% Robust channel deviation (original)
-if isfield(noisyParameters, 'reference')
     tString = 'Robust channel deviation';
     dataOriginal = original.robustChannelDeviation;
     dataReferenced = referenced.robustChannelDeviation;
@@ -84,20 +97,19 @@ if isfield(noisyParameters, 'reference')
     sdnOrig = original.channelDeviationSD;
     medRef = referenced.channelDeviationMedian;
     sdnRef = referenced.channelDeviationSD;
+    dataReferencedRel = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
     scale = max(max(abs(dataOriginal), max(abs(dataReferenced))));
-    clim = [-scale, scale];
-    
+    clim = [-scale, scale];    
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
-end    
+end   
 %% Robust channel deviation (referenced)
 if isfield(noisyParameters, 'reference')
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
-end    
+end  
 %% Robust channel deviation (referenced relative to original)
-if isfield(noisyParameters, 'reference')
-    dataReferencedRel = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
+if isfield(noisyParameters, 'reference')  
     plotScalpMap(dataReferencedRel, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced rel)'])
 end    
@@ -113,7 +125,7 @@ if isfield(noisyParameters, 'reference')
     medianDeviationsRef = median(afterDeviationLevels(:));
     sdDeviationsRef = mad(afterDeviationLevels(:), 1)*1.4826;
     thresholdName = 'Deviation score';
-    theTitle = char([noisyParameters.name ': ' thresholdName ' distribution']);
+    theTitle = {char(noisyParameters.name); char([ thresholdName ' distribution'])};
     showCumulativeDistributions({beforeDeviation(:), afterDeviation(:), ...
         afterDeviationRel(:)}, ...
         thresholdName, colors, theTitle, legendStrings, [-5, 5]);
@@ -127,7 +139,7 @@ if isfield(noisyParameters, 'reference')
     fractionAfterRel = mean(afterDeviationRelCounts)/numberReferenceChannels;
     showBadWindows(beforeDeviationCounts, afterDeviationRelCounts, beforeTimeScale, afterTimeScale, ...
         numberReferenceChannels, legendStrings, noisyParameters.name, thresholdName);
-    reports = cell(16, 1);
+    reports = cell(19, 1);
     reports{1} = ['Deviation window statistics (over ' ...
         num2str(size(referenced.channelDeviations, 2)) ' windows)'];
     reports{2} = 'Large deviation channel fraction:';
@@ -168,9 +180,20 @@ if isfield(noisyParameters, 'reference')
               num2str(medianDeviationsOrig) ', after=' num2str(medianDeviationsRef) ']'];
     reports{18} = ['SD window deviations: [before=', ...
         num2str(sdDeviationsOrig) ', after=' num2str(sdDeviationsRef) ']'];
+    if isfield(referenced, 'dropOuts')
+        drops = sum(referenced.dropOuts, 2)';
+        indexDrops = find(drops > 0);
+        dropList = [indexDrops; drops(indexDrops)];
+        if ~isempty(indexDrops) > 0
+            reportString = sprintf('%g[%g drops] ', dropList(:)');
+        else
+            reportString = 'None';
+        end
+        reports{19} = ['Channels with dropouts: ' reportString];
+    end
     fprintf(consoleFID, '%s:\n', reports{1});
     for k = 2:length(reports)
-        fprintf(consoleFID, '%s%s\n', indent, reports{k});
+        fprintf(consoleFID, '%s\n', reports{k});
     end
     writeSummaryItem(summaryFile, {reports{1}, reports{2}, reports{3}});
 end    
@@ -194,7 +217,7 @@ if isfield(noisyParameters, 'reference')
     beforeCorrelationLevels = original.maximumCorrelations(referenceChannels, :);
     afterCorrelationLevels = referenced.maximumCorrelations(referenceChannels, :);
     thresholdName = 'Maximum correlation';
-    theTitle = char([noisyParameters.name ': ' thresholdName ' distribution']);
+    theTitle = {char(noisyParameters.name); char([thresholdName ' distribution'])};
     showCumulativeDistributions({beforeCorrelationLevels(:), afterCorrelationLevels(:)}, ...
         thresholdName, colors, theTitle, legendStrings, [0, 1]);
     
@@ -233,7 +256,7 @@ if isfield(noisyParameters, 'reference')
         ', after=' num2str(sum(afterCorrelationCounts > halfChannels)) ']'];
     fprintf(consoleFID, '%s:\n', reports{1});
     for k = 2:length(reports)
-        fprintf(consoleFID, '%s%s\n', indent, reports{k});
+        fprintf(consoleFID, '%s\n', reports{k});
     end
     writeSummaryItem(summaryFile, {reports{1}, reports{2}});
 end
@@ -257,7 +280,7 @@ if isfield(noisyParameters, 'reference')
     beforeRansacLevels = original.ransacCorrelations(referenceChannels, :);
     afterRansacLevels = referenced.ransacCorrelations(referenceChannels, :);
     thresholdName = 'Ransac correlation';
-    theTitle = char([noisyParameters.name ': ' thresholdName ' distribution']);
+    theTitle = {char([noisyParameters.name ': ' thresholdName ' distribution'])};
     showCumulativeDistributions({beforeRansacLevels(:), afterRansacLevels(:)}, ...
         thresholdName, colors, theTitle, legendStrings, [0, 1]);
     
@@ -293,7 +316,7 @@ if isfield(noisyParameters, 'reference')
         ', after=' num2str(sum(afterRansacCounts > halfChannels)) ']'];
     fprintf(consoleFID, '%s:\n', reports{1});
     for k = 2:length(reports)
-        fprintf(consoleFID, '%s%s\n', indent, reports{k});
+        fprintf(consoleFID, '%s\n', reports{k});
     end
     writeSummaryItem(summaryFile, {reports{1}, reports{2}});
 end    
@@ -306,23 +329,22 @@ if isfield(noisyParameters, 'reference')
     sdnOrig = original.noisinessSD;
     medRef = referenced.noisinessMedian;
     sdnRef = referenced.noisinessSD;
+    dataReferencedRel = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
     scale = max(max(abs(dataOriginal), max(abs(dataReferenced))));
-    clim = [-scale, scale];
-    
+    clim = [-scale, scale];  
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
-end    
+end  
 %% HF noise Z-score (referenced)
 if isfield(noisyParameters, 'reference')
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
-end    
+end
 %% HF noise Z-score (referenced relative to original)
-if isfield(noisyParameters, 'reference')
-    dataReferencedRel = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
+if isfield(noisyParameters, 'reference')    
     plotScalpMap(dataReferencedRel, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced relative)'])
-end    
+end 
 %% HF noise window stats
 if isfield(noisyParameters, 'reference')
     beforeNoiseLevels = original.noiseLevels(referenceChannels, :);
@@ -335,7 +357,7 @@ if isfield(noisyParameters, 'reference')
     afterNoiseRel = (afterNoiseLevels - medOrig)./sdnOrig;
     afterNoise = (afterNoiseLevels - medRef)./sdnRef;
     thresholdName = 'HF noise';
-    theTitle = char([noisyParameters.name ': ' thresholdName ' HF noise distribution']);
+    theTitle = {char(noisyParameters.name); [thresholdName ' HF noise distribution']};
     showCumulativeDistributions({beforeNoise(:), afterNoise(:), afterNoiseRel(:)},  ...
         thresholdName, colors, theTitle, legendStrings, [-5, 5]);
     beforeNoiseCounts = sum(beforeNoise  >= original.highFrequencyNoiseThreshold);
@@ -392,14 +414,14 @@ if isfield(noisyParameters, 'reference')
         num2str(sdNoiseOrig) ', after=' num2str(sdNoiseRef) ']'];
      fprintf(consoleFID, '%s:\n', reports{1});
     for k = 2:length(reports)
-        fprintf(consoleFID, '%s%s\n', indent, reports{k});
+        fprintf(consoleFID, '%s\n', reports{k});
     end
     writeSummaryItem(summaryFile, {reports{1}, reports{2}, reports{3}});
 end
 %% Noisy average reference vs robust average reference
-if isfield(noisyParameters, 'reference')
+if isfield(noisyParameters, 'reference') && isfield(reference, 'averageReference')
     corrAverage = corr(reference.averageReference(:), ...
-        reference.averageReferenceWithNoisyChannels(:));
+               reference.averageReferenceWithNoisyChannels(:));
     tString = { noisyParameters.name, ...
         ['Comparison of reference signals (corr=' num2str(corrAverage) ')']};
     figure('Name', tString{2})
@@ -412,7 +434,7 @@ if isfield(noisyParameters, 'reference')
         {['Correlation between noisy and robust reference: ' num2str(corrAverage)]});
 end   
 %% Noisy average reference - robust average reference by time
-if isfield(noisyParameters, 'reference')
+if isfield(noisyParameters, 'reference')&& isfield(reference, 'averageReference')
     tString = { noisyParameters.name, 'noisy - robust reference signals'};
     t = (0:length(reference.averageReference) - 1)/EEG.srate;
     figure('Name', tString{2})
@@ -423,5 +445,3 @@ if isfield(noisyParameters, 'reference')
     title(tString, 'Interpreter', 'None');
 end
 
-writeSummaryItem(summaryFile, '', 'last');
-fclose(summaryFile);

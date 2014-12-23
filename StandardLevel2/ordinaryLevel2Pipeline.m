@@ -1,4 +1,4 @@
-function [EEG, computationTimes] = standardLevel2Pipeline(EEG, params)
+function [EEG, computationTimes] = ordinaryLevel2Pipeline(EEG, params)
 
 %% Standard level 2 pipeline 
 % This assumes the following have been set:
@@ -28,7 +28,7 @@ function [EEG, computationTimes] = standardLevel2Pipeline(EEG, params)
 %% Setup the output structures and set the input parameters
 computationTimes= struct('resampling', 0, 'highPass', 0, ...
     'lineNoise', 0, 'reference', 0);
-errorMessages = struct('status', 'good', 'boundary', 0, 'resampling', 0, ...
+errorMessages = struct('status', 'good', 'resampling', 0, ...
     'highPass', 0, 'lineNoise', 0, 'reference', 0);
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 if isfield(EEG.etc, 'noisyParameters')
@@ -43,21 +43,7 @@ end
 EEG.etc.noisyParameters = ...
        struct('name', params.name, 'version', getStandardLevel2Version, ...
               'errors', []);
-%% Check for boundary events
-noisyOut.ignoreBoundaryEvents = ...
-    getStructureParameters(params, 'ignoreBoundaryEvents', false);
-if ~noisyOut.ignoreBoundaryEvents && ...
-                isfield(EEG, 'event') && ~isempty(EEG.event)
-    eTypes = find(strcmpi({EEG.event.type}, 'boundary'));
-    if ~isempty(eTypes)
-        errorMessages.status = 'unprocessed';
-        errorMessages.boundary = ['Dataset ' params.name  ...
-            ' has boundary events: [' getListString(eTypes) ...
-            '] which are treated as discontinuities unless set to ignore'];    
-        EEG.etc.noisyParameters.errors = errorMessages;
-        return;
-    end
-end
+
 %% Part I: Resampling
 fprintf('Resampling\n');
 try
@@ -67,7 +53,7 @@ try
     computationTimes.resampling = toc;
 catch mex
     errorMessages.resampling = ...
-        ['standardLevel2Pipeline failed resampleEEG: ' getReport(mex)];
+        ['ordinaryLevel2Pipeline failed resampleEEG: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noisyParameters.errors = errorMessages;
     return;
@@ -82,7 +68,7 @@ try
     computationTimes.highPass = toc;
 catch mex
     errorMessages.highPass = ...
-        ['standardLevel2Pipeline failed highPassFilter: ' getReport(mex)];
+        ['ordinaryLevel2Pipeline failed highPassFilter: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noisyParameters.errors = errorMessages;
     return;
@@ -97,22 +83,23 @@ try
     computationTimes.lineNoise = toc;
 catch mex
     errorMessages.lineNoise = ...
-        ['standardLevel2Pipeline failed cleanLineNoise: ' getReport(mex)];
+        ['ordinaryLevel2Pipeline failed cleanLineNoise: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noisyParameters.errors = errorMessages;
     return;
 end 
-
-%% Part IV: Remove a robust reference
-fprintf('Robust reference removal\n');
+% fn = ['N:\\ARLAnalysis\\VEPStandardLevel2L\\temp\\' params.name];
+% save(fn, 'EEG', '-v7.3');
+%% Part IV: Remove a average reference
+fprintf('Average reference removal\n');
 try
     tic
-    [EEG, reference] = robustReference(EEG, params);
+    [EEG, reference] = ordinaryReference(EEG, params);
     EEG.etc.noisyParameters.reference = reference;
     computationTimes.reference = toc;
 catch mex
     errorMessages.reference = ...
-        ['standardLevel2Pipeline failed robustReference: ' ...
+        ['ordinaryLevel2Pipeline failed ordinaryReference: ' ...
         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noisyParameters.errors = errorMessages;

@@ -2,8 +2,7 @@
 
 %% Read in the file and set the necessary parameters
 indir = 'E:\\CTAData\\VEP\'; % Input data directory used for this demo
-%outdir = 'N:\\ARLAnalysis\\VEPStandardLevel2M';
-outdir = 'N:\\ARLAnalysis\\VEPStandardLevel2A';
+outdir = 'N:\\ARLAnalysis\\VEPOrdinaryLevel2';
 basename = 'vep';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
@@ -21,7 +20,6 @@ for k = 1:18
     params.name = thisName;
     fname = [indir filesep thisName '.set'];
     EEG = pop_loadset(fname);
-    %[EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
     [EEG, computationTimes] = ordinaryLevel2Pipeline(EEG, params);
     fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
         computationTimes.highPass, computationTimes.resampling, ...

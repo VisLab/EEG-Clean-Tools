@@ -45,8 +45,9 @@ function  noisyOut = findNoisyChannels(signal, params)
 %    maximumCorrelations - w x c array with max window correlation
 %    ransacCorrelations = c x wr array with ransac correlations
 %
-% This function uses 4 methods for detecting bad channels:
-%
+% This function uses 4 methods for detecting bad channels after removing
+% from consideration channels that have NaN data or channels that are
+% identically constant.
 %
 % Method 1: too low or high amplitude. If the z score of robust
 %           channel deviation falls below robustDeviationThreshold, the channel is
@@ -104,6 +105,8 @@ noisyOut = struct('srate', [], ...
                       'ransacUnbrokenTime', [], ...
                       'ransacWindowSeconds', [], ...
                       'noisyChannels', [], ...
+                      'badChannelsFromNaNs', [], ... 
+                      'badChannelsFromNoData', [], ... 
                       'badChannelsFromHFNoise', [],  ...
                       'badChannelsFromCorrelation', [], ...
                       'badChannelsFromDeviation', [], ...
@@ -118,6 +121,7 @@ noisyOut = struct('srate', [], ...
                       'zscoreHFNoise', [], ...
                       'noiseLevels', [], ...
                       'maximumCorrelations', [], ...
+                      'dropOuts', [], ...
                       'medianMaxCorrelation', [], ...
                       'correlationOffsets', [], ...
                       'ransacCorrelations', [], ...
@@ -141,12 +145,22 @@ noisyOut.ransacWindowSeconds = getStructureParameters(params, 'ransacWindowSecon
 
 %% Set the computed fields to be empty
 referenceChannels = sort(noisyOut.referenceChannels); % Make sure channels are sorted
-referenceChannels = referenceChannels(:)'; 
-noisyOut.referenceChannels = referenceChannels(:)';  % Make sure row vector
+referenceChannels = referenceChannels(:)';            % Make sure row vector
+noisyOut.referenceChannels = referenceChannels;  
+
+%% Now detect reference channels that are constant for large periods or have NaNs
+nanChannels = sum(isnan(signal.data(referenceChannels, :)), 2) > 0;
+noSignalChannels = mad(signal.data(referenceChannels, :), 1, 2) < 10e-10 | ...
+    std(signal.data(referenceChannels, :), 1, 2) < 10e-10;
+noisyOut.badChannelsFromNaNs = referenceChannels(nanChannels(:)');
+noisyOut.badChannelsFromNoData = referenceChannels(noSignalChannels(:)');
+referenceChannels = setdiff(referenceChannels, ...
+    union(noisyOut.badChannelsFromNaNs, noisyOut.badChannelsFromNoData));
+
 %% Extact the data required
 data = signal.data;
 originalNumberChannels = size(data, 1);          % Save the original channels
-data = double(data(noisyOut.referenceChannels, :))';      % Remove the unneeded channels
+data = double(data(referenceChannels, :))';      % Remove the unneeded channels
 [signalSize, numberChannels] = size(data);
 correlationFrames = noisyOut.correlationWindowSeconds * signal.srate;
 correlationWindow = 0:(correlationFrames - 1);
@@ -159,6 +173,7 @@ WRansac = length(ransacOffsets);
 noisyOut.zscoreHFNoise = zeros(originalNumberChannels, 1);
 noisyOut.noiseLevels = zeros(originalNumberChannels, WCorrelation);
 noisyOut.maximumCorrelations = ones(originalNumberChannels, WCorrelation);
+noisyOut.dropOuts = zeros(originalNumberChannels, WCorrelation);
 noisyOut.correlationOffsets = correlationOffsets;
 noisyOut.channelDeviations = zeros(originalNumberChannels, WCorrelation);
 noisyOut.robustChannelDeviation = zeros(originalNumberChannels, 1);
@@ -168,17 +183,19 @@ noisyOut.ransacOffsets = ransacOffsets;
 %% Method 1: Unusually high or low amplitude (using robust std)
 channelDeviation = 0.7413 *iqr(data); % Robust estimate of SD
 channelDeviationSD =  0.7413 * iqr(channelDeviation);
-channelDeviationMedian = median(channelDeviation);
+channelDeviationMedian = nanmedian(channelDeviation);
 noisyOut.robustChannelDeviation(referenceChannels) = ...
     (channelDeviation - channelDeviationMedian) / channelDeviationSD;
 
 % Find channels with unusually high deviation 
 badChannelsFromDeviation = ...
     find(abs(noisyOut.robustChannelDeviation) > ...
-             noisyOut.robustDeviationThreshold);
+             noisyOut.robustDeviationThreshold | ...
+             isnan(noisyOut.robustChannelDeviation));
 noisyOut.badChannelsFromDeviation = badChannelsFromDeviation(:)';
 noisyOut.channelDeviationMedian = channelDeviationMedian;
 noisyOut.channelDeviationSD = channelDeviationSD;
+
 %% Method 2: Compute the SNR (based on Christian Kothe's clean_channels)
 % Note: RANSAC uses the filtered values X of the data
 if noisyOut.srate > 100
@@ -189,10 +206,11 @@ if noisyOut.srate > 100
         X(:,k) = filtfilt_fast(B, 1, data(:, k)); end
     % Determine z-scored level of EM noise-to-signal ratio for each channel
     noisiness = mad(data- X, 1)./mad(X, 1);
-    noisinessMedian = median(noisiness);
+    noisinessMedian = nanmedian(noisiness);
     noisinessSD = mad(noisiness, 1)*1.4826;
     zscoreHFNoiseTemp = (noisiness - noisinessMedian) ./ noisinessSD;
-    noiseMask = zscoreHFNoiseTemp > noisyOut.highFrequencyNoiseThreshold;
+    noiseMask = (zscoreHFNoiseTemp > noisyOut.highFrequencyNoiseThreshold) | ...
+                isnan(zscoreHFNoiseTemp);
     % Remap channels to original numbering
     badChannelsFromHFNoise  = referenceChannels(noiseMask);
     noisyOut.badChannelsFromHFNoise = badChannelsFromHFNoise(:)';
@@ -215,37 +233,42 @@ channelDeviations = zeros(WCorrelation, numberChannels);
 n = length(correlationWindow);
 xWin = reshape(X(1:n*WCorrelation, :)', numberChannels, n, WCorrelation);
 dataWin = reshape(data(1:n*WCorrelation, :)', numberChannels, n, WCorrelation);
-parfor k = 1:WCorrelation % Ignore last two time windows to stay in range
+parfor k = 1:WCorrelation 
     eegPortion = squeeze(xWin(:, :, k))';
     dataPortion = squeeze(dataWin(:, :, k))';
     windowCorrelation = corrcoef(eegPortion);
     abs_corr = abs(windowCorrelation - diag(diag(windowCorrelation)));
     channelCorrelations(k, :)  = quantile(abs_corr, 0.98);
     noiseLevels(k, :) = mad(dataPortion - eegPortion, 1)./mad(eegPortion, 1);
-    %noiseLevels(k, :) = (noiseLevels(k, :) - noisinessMedian)./noisinessSD;
     channelDeviations(k, :) =  0.7413 *iqr(dataPortion);
-%     channelDeviations(k, :) = ...
-%         (channelStd - channelDeviationMedian) / channelDeviationSD;
 end;
+dropOuts = isnan(channelCorrelations) | isnan(noiseLevels);
+channelCorrelations(dropOuts) = 0.0;
+noiseLevels(dropOuts) = 0.0;
 clear xWin;
 clear dataWin;
 noisyOut.maximumCorrelations(referenceChannels, :) = channelCorrelations';
 noisyOut.noiseLevels(referenceChannels, :) = noiseLevels';
 noisyOut.channelDeviations(referenceChannels, :) = channelDeviations';
+noisyOut.dropOuts(referenceChannels, :) = dropOuts';
 thresholdedCorrelations = ...
     noisyOut.maximumCorrelations < noisyOut.correlationThreshold;
 fractionBadCorrelationWindows = mean(thresholdedCorrelations, 2);
+fractionBadDropOutWindows = mean(noisyOut.dropOuts, 2);
 
 % Remap channels to their original numbers
 badChannelsFromCorrelation = ...
     find(fractionBadCorrelationWindows > noisyOut.badTimeThreshold);
+badChannelsFromDropOuts = ...
+    find(fractionBadDropOutWindows > noisyOut.badTimeThreshold);
 noisyOut.badChannelsFromCorrelation = badChannelsFromCorrelation(:)';
+noisyOut.badChannelsFromDropOuts = badChannelsFromDropOuts(:)';
 noisyOut.medianMaxCorrelation =  median(noisyOut.maximumCorrelations, 2);
-
 
 %% Bad so far by amplitude and correlation (take these out before doing ransac)
 noisyChannels = union(noisyOut.badChannelsFromDeviation, ...
-    noisyOut.badChannelsFromCorrelation);
+    union(noisyOut.badChannelsFromCorrelation, ...
+          noisyOut.badChannelsFromDropOuts));
 %% Method 4: Ransac corelation (may not be performed)
 % Setup for ransac (if a 2-stage algorithm, remove other bad channels first)
 if isempty(channelLocations) 
@@ -319,7 +342,10 @@ end
 
 % Combine bad channels detected from all methods
 noisyChannels = union(noisyChannels, ...
-    union(noisyOut.badChannelsFromRansac, noisyOut.badChannelsFromHFNoise));
+    union(union(noisyOut.badChannelsFromRansac, ...
+          noisyOut.badChannelsFromHFNoise), ...
+    union(noisyOut.badChannelsFromNaNs, ...
+          noisyOut.badChannelsFromNoData)));
 noisyOut.noisyChannels = noisyChannels;
 noisyOut.medianMaxCorrelation =  median(noisyOut.maximumCorrelations, 2);
 

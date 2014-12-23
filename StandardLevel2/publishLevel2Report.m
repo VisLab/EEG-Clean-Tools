@@ -6,17 +6,27 @@ function [] = publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
                                     filesep 'standardLevel2Report.pdf'];
         actualReportLocation = [summaryFolder filesep sessionFolder ...
                                     filesep sessionReportName];
-        assignin('base', 'summaryFolder', summaryFolder);
-        assignin('base', 'summaryReportName', summaryReportName);
-        assignin('base', 'sessionFolder', sessionFolder);
-        assignin('base', 'sessionReportName', sessionReportName); 
+        summaryReportLocation = [summaryFolder filesep summaryReportName];
+        
+        summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
+        relativeReportLocation = [sessionFolder filesep sessionReportName];
+        consoleFID = 1;
+        assignin('base', 'summaryFile', summaryFile);
+        assignin('base', 'consoleFID', consoleFID);
+        assignin('base', 'relativeReportLocation', relativeReportLocation);
         script_name = 'standardLevel2Report.m';
         publish_options.outputDir = [summaryFolder filesep sessionFolder];
         publish_options.maxWidth = 800;
         publish_options.format = 'pdf';
         publish_options.showCode = false;
         publish(script_name, publish_options);
+        writeSummaryItem(summaryFile, '', 'last');
+        fclose(summaryFile);
         close all
         movefile(tempReportLocation, actualReportLocation);
 end
 
+function [] = performPublishing(summaryFile, script_name, publish_options) 
+       publish(script_name, publish_options);
+
+end

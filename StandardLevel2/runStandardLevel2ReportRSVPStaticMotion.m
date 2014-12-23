@@ -1,6 +1,6 @@
 %% Run through the high pass and look at the spectrum afterwards
 datadir = 'N:\\ARLAnalysis\\StaticMotionRSVP';
-summaryFolder = 'N:\\ARLAnalysis\\StaticMotionRSVPReports';
+summaryFolder = 'N:\\ARLAnalysis\\StaticMotionRSVPReportsA';
 
 basename = 'staticMotionRSVP';
 summaryReportName = [basename '_summary.html'];

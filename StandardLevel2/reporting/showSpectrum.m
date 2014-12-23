@@ -1,19 +1,34 @@
-function [] = showSpectrum(EEG, channels, channelLabels, tString)
+function [badChannels] = showSpectrum(EEG, channels, displayChannels, ...
+    channelLabels, tString)
 % Show spectrum of EEG at channels selected from 
     fftwinfac = 4;
-    colors = jet(length(channels));
-    [sref, fref]= calculateSpectrum(EEG.data(channels, :), ...
-        size(EEG.data, 2), EEG.srate, ...
-        'freqfac', 4, 'winsize', ...
-        fftwinfac*EEG.srate, 'plot', 'off');
+    sref = cell(length(channels), 1);
+    fref = cell(length(channels), 1);
+    badList = false(length(channels), 1);
+    tempData = EEG.data(channels, :);
+    srate = EEG.srate;
+    numFrames = size(EEG.data, 2);
+    fftFactor = fftwinfac*EEG.srate;
+    parfor k = 1:length(channels)
+      [sref{k}, fref{k}]= calculateSpectrum(tempData(k, :), ...
+           numFrames, srate, 'freqfac', 4, 'winsize', ...
+           fftFactor, 'plot', 'off');
+       if isempty(sref{k})
+           badList(k) = true;
+       end
+    end   
+    badChannels = channels(badList);
     tString1 = {tString,'Selected channels'};
+    displayChannels = intersect(channels, displayChannels);
+    displayChannels = setdiff(displayChannels, badChannels);
+    colors = jet(length(displayChannels));
     figure('Name', tString)
     hold on
-    legends = cell(1, length(channels));
-    for c = 1:length(channels)
-        fftchan = channels(c);
-        plot(fref, sref(c, :)', 'Color', colors(c, :))
-        legends{c} = [num2str(fftchan) ' (' channelLabels{c} ')'];
+    legends = cell(1, length(displayChannels));
+    for c = 1:length(displayChannels)
+        fftchan = displayChannels(c);
+        plot(fref{fftchan}, sref{fftchan}', 'Color', colors(c, :))
+        legends{c} = [num2str(fftchan) ' (' channelLabels{fftchan} ')'];
     end
     hold off
     xlabel('Frequency (Hz)')

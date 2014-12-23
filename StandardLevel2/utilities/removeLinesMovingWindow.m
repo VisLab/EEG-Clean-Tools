@@ -18,8 +18,8 @@ function data = removeLinesMovingWindow(data, lineNoise)
 %       p               Significance level cutoff 
 %       pad             FFT padding factor 
 %       tapers          Precomputed tapers from dpss
-%       taperWindowSize Taper sliding window length 
-%       taperWindowStep Sliding window step size 
+%       taperWindowSize Taper sliding window length (seconds) 
+%       taperWindowStep Sliding window step size (seconds)
 %       tau             Window overlap smoothing factor 
 %
 % Output:

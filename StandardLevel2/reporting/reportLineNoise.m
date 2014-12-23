@@ -11,28 +11,26 @@ function summary = reportLineNoise(fid, noisyParameters, numbersPerRow, indent)
         return;
     end
     lineNoise = noisyParameters.lineNoise;
-    fprintf(fid, '%sVersion %s\n', indent, ...
-        noisyParameters.version.LineNoise);
-    fprintf(fid, '%sSampling frequency Fs: %g Hz\n', indent, lineNoise.Fs);
-    fprintf(fid, '%sLine noise frequencies:\n', indent);
-    printList(fid, lineNoise.lineFrequencies, numbersPerRow, [indent, indent]);
-    fprintf(fid, '%sMaximum iterations: %d\n', indent, ...
-        lineNoise.maximumIterations);
-    fprintf(fid, '%sSignificant frequency p-value: %g\n', indent, lineNoise.p);
-    fprintf(fid, '%s+/- frequency BW for significant peaks (fScanBandWidth): %g\n', ...
-        indent, lineNoise.fScanBandWidth);
-    fprintf(fid, '%sTaper bandwidth: %d Hz\n', indent, lineNoise.taperBandWidth);
-    fprintf(fid, '%sTaper window size: %d\n', indent, lineNoise.taperWindowSize);
-    fprintf(fid, '%sTaper step size: %d\n', indent, lineNoise.taperWindowStep);
-    fprintf(fid, '%sSigmoidal smoothing factor (tau): %g\n', indent, ...
+    fprintf(fid, 'Version %s\n', noisyParameters.version.LineNoise);
+    fprintf(fid, 'Sampling frequency Fs: %g Hz\n', lineNoise.Fs);
+    fprintf(fid, 'Line noise frequencies:\n');
+    printList(fid, lineNoise.lineFrequencies, numbersPerRow, indent);
+    fprintf(fid, 'Maximum iterations: %d\n', lineNoise.maximumIterations);
+    fprintf(fid, 'Significant frequency p-value: %g\n', lineNoise.p);
+    fprintf(fid, '+/- frequency BW for significant peaks (fScanBandWidth): %g\n', ...
+        lineNoise.fScanBandWidth);
+    fprintf(fid, 'Taper bandwidth: %d Hz\n', lineNoise.taperBandWidth);
+    fprintf(fid, 'Taper window size (seconds): %d\n', lineNoise.taperWindowSize);
+    fprintf(fid, 'Taper step size (seconds): %d\n', lineNoise.taperWindowStep);
+    fprintf(fid, 'Sigmoidal smoothing factor (tau): %g\n',  ...
         lineNoise.tau);
-    fprintf(fid, '%sSpectral pad factor: %d\n', indent, lineNoise.pad);
-    fprintf(fid, '%sAnalysis frequency interval(fPassBand): [ %g, %g ] Hz\n', ...
-        indent, lineNoise.fPassBand);
-    fprintf(fid, '%sTaper template: [ %g, %g, %g ]\n', indent, ...
+    fprintf(fid, 'Spectral pad factor: %d\n', lineNoise.pad);
+    fprintf(fid, 'Analysis frequency interval(fPassBand): [ %g, %g ] Hz\n', ...
+        lineNoise.fPassBand);
+    fprintf(fid, 'Taper template: [ %g, %g, %g ]\n', ...
         lineNoise.taperTemplate);
-    fprintf(fid, '%sLine noise channels (%d channels):\n', ...
-        indent, length(lineNoise.lineNoiseChannels));
-    printList(fid, lineNoise.lineNoiseChannels, numbersPerRow, [indent, indent]);
+    fprintf(fid, 'Line noise channels (%d channels):\n', ...
+        length(lineNoise.lineNoiseChannels));
+    printList(fid, lineNoise.lineNoiseChannels, numbersPerRow, indent);
 end
 
