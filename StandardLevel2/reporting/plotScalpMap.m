@@ -8,12 +8,16 @@ function plotScalpMap(data, chanlocs, interpolation, showColorbar, ...
 % Input:
 %   data            channel data vector
 %   chanlocs        channel locations
-%   interpolation   method of interpolation
+%   interpolation   method of interpolation              
 %   showColorbar    indicates whether to show colorbar
 %   headColor       color for plotting the head
 %   elementColor    electrode color
 %   nosedir         ['+X'|'-X'|'+Y'|'-Y'] direction of nose {default: '+X'}
 %   titleString     title of the scalp map figure
+%
+% This function calls MATLAB's underlying griddata function. The methods of
+% interpolation are linear, cubic, natural, nearest, and v4. The function
+% is based on code from EEGLAB and EEGVIS.
 
 colorbarAxes = [];
 numberElements = length(data);

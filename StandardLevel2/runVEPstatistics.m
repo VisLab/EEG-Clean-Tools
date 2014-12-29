@@ -2,93 +2,60 @@
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% Gather standard level
-indir = 'N:\\ARLAnalysis\\VEPStandardLevel2M';
+inDir = 'N:\\ARLAnalysis\\VEPStandardLevel2B';
 %outdir = 'N:\\ARLAnalysis\\VEPOrdinaryLevel2A';
-saveFile = 'N:\\ARLAnalysis\\VEPStandardLevel2MReports\\dataStatistics.mat';
+saveFile = 'N:\\ARLAnalysis\\VEPStandardLevel2BReports\\dataStatistics.mat';
+issueFile = 'N:\\ARLAnalysis\\VEPStandardLevel2BReports\\issues.txt';
 collectionTitle = 'VEP standard ref';
 numDatasets = 18;
-%% Read in the NCTU preprocessed data and consolidate
-dataTitles = cell(numDatasets, 1);
-channels = zeros(numDatasets, 1);
-[~, statisticsTitles] = extractReferenceStatistics();
-statistics = zeros(length(dataTitles), length(statisticsTitles));
-fileList = dir(indir);
-in_names = {fileList(:).name};
-in_types = [fileList(:).isdir];
-in_names = in_names(~in_types);
-for k = 1:numDatasets
-    ext = in_names{k}((end-3):end);
-    if ~strcmpi(ext, '.set')
-        continue;
-    end
-    dataTitles{k} = in_names{k}(1:(end-4));
-    fprintf('%d: %s\n', k, in_names{k});
-    EEG = pop_loadset([indir filesep in_names{k}]);
-    statistics(k, :) = extractReferenceStatistics(EEG);
-    channels(k) = size(EEG.data, 1);
-end
 
+%% Get the directory list
+inList = dir(inDir);
+inNames = {inList(:).name};
+inTypes = [inList(:).isdir];
+inNames = inNames(~inTypes);
+
+%% Take only the .set files
+validNames = true(size(inNames));
+for j = 1:length(inNames)
+    ext = inNames{j}((end-3):end);
+    if ~strcmpi(ext, '.set')
+        validNames(j) = false;
+    else
+        inNames{j} = [inDir filesep inNames{j}];
+    end
+end
 %% Consolidate the results in a single structure for comparative analysis
-stdl2stats = struct('collectionTitle', [] , ...
-                    'dataTitles', [], ...
-                    'statisticsTitles', [], ...
-                    'statistics', [], ...
-                    'channels', []);
-stdl2stats.collectionTitle = collectionTitle;
-stdl2stats.dataTitles = dataTitles;
-stdl2stats.statisticsTitles = statisticsTitles;
-stdl2stats.statistics = statistics;
-stdl2stats.channels = channels;
+collectionStats = createCollectionStatistics(collectionTitle, inNames);
 %% Save the statistics in the specified file
-save(saveFile, 'stdl2stats', '-v7.3');
+save(saveFile, 'collectionStats', '-v7.3');
 
 %% Display the reference statistics
-showReferenceStatistics(stdl2stats);
+showReferenceStatistics(collectionStats);
+%% Generate an issue report for the collection
+[report, badFiles] = getCollectionIssues(collectionStats);
 
-%% Gather ordinary level
-
-indir = 'N:\\ARLAnalysis\\VEPOrdinaryLevel2A';
-saveFile = 'N:\\ARLAnalysis\\VEPOrdinaryLevel2AReports\\dataStatistics.mat';
-collectionTitle = 'VEP ordinary ref';
-numDatasets = 18;
-%% Read in the NCTU preprocessed data and consolidate
-dataTitles = cell(numDatasets, 1);
-channels = zeros(numDatasets, 1);
-[~, statisticsTitles] = extractReferenceStatistics();
-statistics = zeros(length(dataTitles), length(statisticsTitles));
-fileList = dir(indir);
-in_names = {fileList(:).name};
-in_types = [fileList(:).isdir];
-in_names = in_names(~in_types);
-for k = 1:numDatasets
-    ext = in_names{k}((end-3):end);
-    if ~strcmpi(ext, '.set')
-        continue;
-    end
-    dataTitles{k} = in_names{k}(1:(end-4));
-    fprintf('%d: %s\n', k, in_names{k});
-    EEG = pop_loadset([indir filesep in_names{k}]);
-    statistics(k, :) = extractReferenceStatistics(EEG);
-    channels(k) = size(EEG.data, 1);
-end
-
-%% Consolidate the results in a single structure for comparative analysis
-ordl2stats = struct('collectionTitle', [] , ...
-                    'dataTitles', [], ...
-                    'statisticsTitles', [], ...
-                    'statistics', [], ...
-                    'channels', []);
-ordl2stats.collectionTitle = collectionTitle;
-ordl2stats.dataTitles = dataTitles;
-ordl2stats.statisticsTitles = statisticsTitles;
-ordl2stats.statistics = statistics;
-ordl2stats.channels = channels;
-
-%% Save the statistics in the specified file
-save(saveFile, 'ordl2stats', '-v7.3');
-
-%% Show ordinary level 2 statistics
-showReferenceStatistics(ordl2stats);
-
-%% Show comparison between standard and ordinary
-showReferencePairedStatistics(ordl2stats, stdl2stats)
+%% Generate an issue report for the collection
+fid = fopen(issueFile, 'w');
+fprintf(fid, '%s\n', report);
+fclose(fid);
+% %% Consolidate the results in a single structure for comparative analysis
+% ordl2stats = struct('collectionTitle', [] , ...
+%                     'dataTitles', [], ...
+%                     'statisticsTitles', [], ...
+%                     'statistics', [], ...
+%                     'channels', []);
+% ordl2stats.collectionTitle = collectionTitle;
+% ordl2stats.dataTitles = dataTitles;
+% ordl2stats.statisticsTitles = statisticsTitles;
+% ordl2stats.statistics = statistics;
+% ordl2stats.channels = channels;
+% 
+% %% Save the statistics in the specified file
+% save(saveFile, 'ordl2stats', '-v7.3');
+% 
+% %% Show ordinary level 2 statistics
+% showReferenceStatistics(ordl2stats);
+% 
+% %% Show comparison between standard and ordinary
+% showReferencePairedStatistics(ordl2stats, stdl2stats)

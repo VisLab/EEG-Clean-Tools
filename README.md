@@ -65,3 +65,5 @@ Version 0.25 Not yet released
 * Correct minor issues with PlotScalpMap
 * Added extractReferenceStatistics -- which extracts summary statistics
   for an entire archive.
+* Added iterations on the remove robust reference
+* Added a summary reporting scheme for spotting problematic datasets.

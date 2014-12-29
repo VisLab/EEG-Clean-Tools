@@ -7,7 +7,7 @@
 % * summaryFolder folder where summary report goes
 % * sessionFolder folder where specific report goes
 % * sessionReportName name of individual report
-% 
+% * relativeReportLocation report location relative to summary
 % The reporting function appends a summary to the summary report. 
 
 %% Write data status and report header
@@ -42,8 +42,8 @@ writeSummaryItem(summaryFile, summary);
 numbersPerRow = 15;
 indent = '  ';
 colors = [0, 0, 0; 1, 0, 0; 0, 1, 0];
-legendStrings = {'Before referencing', 'After referencing', 'After referencing (relative)'};
-
+legendStrings = {'Before referencing', 'After referencing'};
+scalpMapInterpolation = 'v4';
 %% Report high pass filtering step
 summary = reportHighPass(consoleFID, noisyParameters, numbersPerRow, indent);
 writeSummaryItem(summaryFile, summary);
@@ -77,7 +77,7 @@ if isfield(noisyParameters, 'reference')
     headColor = [0.7, 0.7, 0.7];
     elementColor = [0, 0, 0];
     showColorbar = true;
-    scalpMapInterpolation = 'v4';
+ 
     
     original = reference.noisyOutOriginal;
     referenced = reference.noisyOut;
@@ -119,33 +119,29 @@ if isfield(noisyParameters, 'reference')
     afterDeviationLevels = referenced.channelDeviations(referenceChannels, :);
     beforeDeviation = (beforeDeviationLevels - medOrig)./sdnOrig;
     afterDeviation = (afterDeviationLevels - medRef)./sdnRef;
-    afterDeviationRel = (afterDeviationLevels - medOrig)./sdnOrig;
     medianDeviationsOrig = median(beforeDeviationLevels(:));
     sdDeviationsOrig = mad(beforeDeviationLevels(:), 1)*1.4826;
     medianDeviationsRef = median(afterDeviationLevels(:));
     sdDeviationsRef = mad(afterDeviationLevels(:), 1)*1.4826;
     thresholdName = 'Deviation score';
     theTitle = {char(noisyParameters.name); char([ thresholdName ' distribution'])};
-    showCumulativeDistributions({beforeDeviation(:), afterDeviation(:), ...
-        afterDeviationRel(:)}, ...
+    showCumulativeDistributions({beforeDeviation(:), afterDeviation(:)}, ...
         thresholdName, colors, theTitle, legendStrings, [-5, 5]);
     beforeDeviationCounts = sum(beforeDeviation >= original.robustDeviationThreshold);
     afterDeviationCounts = sum(afterDeviation >= referenced.robustDeviationThreshold);
-    afterDeviationRelCounts = sum(afterDeviationRel >= referenced.robustDeviationThreshold);
+ 
     beforeTimeScale = (0:length(beforeDeviationCounts)-1)*original.correlationWindowSeconds;
     afterTimeScale = (0:length(afterDeviationCounts)-1)*referenced.correlationWindowSeconds;
     fractionBefore = mean(beforeDeviationCounts)/numberReferenceChannels;
     fractionAfter = mean(afterDeviationCounts)/numberReferenceChannels;
-    fractionAfterRel = mean(afterDeviationRelCounts)/numberReferenceChannels;
-    showBadWindows(beforeDeviationCounts, afterDeviationRelCounts, beforeTimeScale, afterTimeScale, ...
+    showBadWindows(beforeDeviationCounts, afterDeviationCounts, beforeTimeScale, afterTimeScale, ...
         numberReferenceChannels, legendStrings, noisyParameters.name, thresholdName);
     reports = cell(19, 1);
     reports{1} = ['Deviation window statistics (over ' ...
         num2str(size(referenced.channelDeviations, 2)) ' windows)'];
     reports{2} = 'Large deviation channel fraction:';
     reports{3} = [indent ' [before=', ...
-        num2str(fractionBefore) ', after=' num2str(fractionAfter) ...
-        ', after rel=' num2str(fractionAfterRel) ']'];
+        num2str(fractionBefore) ', after=' num2str(fractionAfter) ']'];
     reports{4} = ['Median channel deviation: [before=', ...
         num2str(original.channelDeviationMedian) ...
         ', after=' num2str(referenced.channelDeviationMedian) ']'];
@@ -161,24 +157,20 @@ if isfield(noisyParameters, 'reference')
     reports{9} = ['Average fraction ' num2str(fractionAfter) ...
                ' (' num2str(mean(afterDeviationCounts)) ' channels)'];
     reports{10} = [ indent ' not meeting threshold after in each window'];
-    reports{11} = ['Average relative fraction ' num2str(fractionAfterRel) ...
-               ' (' num2str(mean(afterDeviationRelCounts)) ' channels)'];
-    reports{12} = [indent ' not meeting threshold after relative to before in each window'];
+    reports{11} = [indent ' not meeting threshold after relative to before in each window'];
     quarterChannels = round(length(referenceChannels)*0.25);
     halfChannels = round(length(referenceChannels)*0.5);
-    reports{13} = 'Windows with > 1/4 deviation channels:';
-    reports{14} = [indent '[before=' ...
+    reports{12} = 'Windows with > 1/4 deviation channels:';
+    reports{13} = [indent '[before=' ...
            num2str(sum(beforeDeviationCounts > quarterChannels)) ...
-        ', after=' num2str(sum(afterDeviationCounts > quarterChannels)) ...
-        ', after rel=', num2str(sum(afterDeviationRelCounts > halfChannels)) ']'];
-    reports{15} = 'Windows with > 1/2 deviation channels:';
-    reports{16} = [indent '[before=', ...
+        ', after=' num2str(sum(afterDeviationCounts > quarterChannels)) ']'];
+    reports{14} = 'Windows with > 1/2 deviation channels:';
+    reports{15} = [indent '[before=', ...
         num2str(sum(beforeDeviationCounts > halfChannels)) ...
-        ', after=' num2str(sum(afterDeviationCounts > halfChannels)) ...
-        ', after rel=', num2str(sum(afterDeviationRelCounts > halfChannels)) ']'];
-    reports{17} = ['Median window deviations: [before=', ...
+        ', after=' num2str(sum(afterDeviationCounts > halfChannels))  ']'];
+    reports{16} = ['Median window deviations: [before=', ...
               num2str(medianDeviationsOrig) ', after=' num2str(medianDeviationsRef) ']'];
-    reports{18} = ['SD window deviations: [before=', ...
+    reports{17} = ['SD window deviations: [before=', ...
         num2str(sdDeviationsOrig) ', after=' num2str(sdDeviationsRef) ']'];
     if isfield(referenced, 'dropOuts')
         drops = sum(referenced.dropOuts, 2)';
@@ -189,7 +181,7 @@ if isfield(noisyParameters, 'reference')
         else
             reportString = 'None';
         end
-        reports{19} = ['Channels with dropouts: ' reportString];
+        reports{18} = ['Channels with dropouts: ' reportString];
     end
     fprintf(consoleFID, '%s:\n', reports{1});
     for k = 2:length(reports)
@@ -197,18 +189,36 @@ if isfield(noisyParameters, 'reference')
     end
     writeSummaryItem(summaryFile, {reports{1}, reports{2}, reports{3}});
 end    
-%% Median max correlation (original)
+%% Median max abs correlation (original)
 if isfield(noisyParameters, 'reference')
     tString = 'Median max correlation';
     dataOriginal = original.medianMaxCorrelation;
-    dataReferenced = referenced.medianMaxCorrelation;
     clim = [0, 1];
-    
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
-end    
-%% Median max correlation (referenced)
+end  
+%% Mean max abs correlation (original)
 if isfield(noisyParameters, 'reference')
+    tString = 'Mean max correlation';
+    dataOriginal = mean(original.maximumCorrelations, 2); 
+    clim = [0, 1];
+    plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
+end  
+
+%% Median max abs correlation (referenced)
+if isfield(noisyParameters, 'reference')
+    tString = 'Median max correlation';
+    dataReferenced = referenced.medianMaxCorrelation;
+    clim = [0, 1];
+    plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
+end 
+%% Mean max abs correlation (referenced)
+if isfield(noisyParameters, 'reference')
+    tString = 'Mean max correlation';
+    dataReferenced = mean(referenced.maximumCorrelations, 2); 
+    clim = [0, 1];
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
 end    
@@ -329,7 +339,6 @@ if isfield(noisyParameters, 'reference')
     sdnOrig = original.noisinessSD;
     medRef = referenced.noisinessMedian;
     sdnRef = referenced.noisinessSD;
-    dataReferencedRel = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
     scale = max(max(abs(dataOriginal), max(abs(dataReferenced))));
     clim = [-scale, scale];  
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
@@ -340,11 +349,7 @@ if isfield(noisyParameters, 'reference')
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
 end
-%% HF noise Z-score (referenced relative to original)
-if isfield(noisyParameters, 'reference')    
-    plotScalpMap(dataReferencedRel, referencedLocations, scalpMapInterpolation, ...
-        showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced relative)'])
-end 
+
 %% HF noise window stats
 if isfield(noisyParameters, 'reference')
     beforeNoiseLevels = original.noiseLevels(referenceChannels, :);
@@ -354,15 +359,14 @@ if isfield(noisyParameters, 'reference')
     medianNoiseRef = median(afterNoiseLevels(:));
     sdNoiseRef = mad(afterNoiseLevels(:), 1)*1.4826;
     beforeNoise = (beforeNoiseLevels - medOrig)./sdnOrig;
-    afterNoiseRel = (afterNoiseLevels - medOrig)./sdnOrig;
     afterNoise = (afterNoiseLevels - medRef)./sdnRef;
     thresholdName = 'HF noise';
     theTitle = {char(noisyParameters.name); [thresholdName ' HF noise distribution']};
-    showCumulativeDistributions({beforeNoise(:), afterNoise(:), afterNoiseRel(:)},  ...
+    showCumulativeDistributions({beforeNoise(:), afterNoise(:)},  ...
         thresholdName, colors, theTitle, legendStrings, [-5, 5]);
     beforeNoiseCounts = sum(beforeNoise  >= original.highFrequencyNoiseThreshold);
     afterNoiseCounts = sum(afterNoise >= referenced.highFrequencyNoiseThreshold);
-    afterNoiseRelCounts = sum(afterNoiseRel >= referenced.highFrequencyNoiseThreshold);
+   
     beforeTimeScale = (0:length(beforeNoiseCounts)-1)*original.correlationWindowSeconds;
     afterTimeScale = (0:length(afterNoiseCounts)-1)*referenced.correlationWindowSeconds;
     showBadWindows(beforeNoiseCounts, afterNoiseCounts, beforeTimeScale, afterTimeScale, ...
@@ -370,14 +374,12 @@ if isfield(noisyParameters, 'reference')
     
     fractionBefore = mean(beforeNoiseCounts)/numberReferenceChannels;
     fractionAfter = mean(afterNoiseCounts)/numberReferenceChannels;
-    fractionAfterRel = mean(afterNoiseRelCounts)/numberReferenceChannels;
     reports = cell(17,0);
     reports{1} = ['Noise window statistics (over ' ...
         num2str(size(referenced.noiseLevels, 2)) ' windows)'];
     reports{2} = 'Channel fraction with HF noise:';
     reports{3} = [indent '[before=', ...
-                  num2str(fractionBefore) ', after=' num2str(fractionAfter) ...
-                 ', after rel=' num2str(fractionAfterRel) ']'];
+                  num2str(fractionBefore) ', after=' num2str(fractionAfter) ']'];
     reports{4} = ['Median noisiness: [before=', ...
         num2str(original.noisinessMedian) ...
         ', after=' num2str(referenced.noisinessMedian) ']'];
@@ -393,24 +395,20 @@ if isfield(noisyParameters, 'reference')
     reports{9} = ['Average fraction ' num2str(fractionAfter) ...
                ' (' num2str(mean(afterNoiseCounts)) ' channels):'];
     reports{10} = [indent ' not meeting threshold after in each window'];
-    reports{11} = ['Average relative fraction ' num2str(fractionAfterRel) ...
-               ' (' num2str(mean(afterNoiseRelCounts)) ' channels):'];
-    reports{12} = [indent ' not meeting threshold after relative to before in each window'];
+    reports{11} = [indent ' not meeting threshold after relative to before in each window'];
     quarterChannels = round(length(referenceChannels)*0.25);
     halfChannels = round(length(referenceChannels)*0.5);
-    reports{13} = 'Windows with > 1/4 HF channels:';
-    reports{14} = [indent '[before=', ...
+    reports{12} = 'Windows with > 1/4 HF channels:';
+    reports{13} = [indent '[before=', ...
         num2str(sum(beforeNoiseCounts > quarterChannels)) ...
-        ', after=' num2str(sum(afterNoiseCounts > quarterChannels)) ...
-        ', after rel=' num2str(sum(afterNoiseRelCounts > quarterChannels)) ']'];
-    reports{15} = 'Windows with > 1/2 HF channels:';
-    reports{16} = [indent '[before=', ...
+        ', after=' num2str(sum(afterNoiseCounts > quarterChannels)) ']'];
+    reports{14} = 'Windows with > 1/2 HF channels:';
+    reports{15} = [indent '[before=', ...
         num2str(sum(beforeNoiseCounts > halfChannels)) ...
-        ', after=' num2str(sum(afterNoiseCounts > halfChannels)) ...
-        ', after rel=' num2str(sum(afterNoiseRelCounts > halfChannels)) ']'];
-    reports{17} = ['Median window HF: [before=', ...
+        ', after=' num2str(sum(afterNoiseCounts > halfChannels)) ']'];
+    reports{16} = ['Median window HF: [before=', ...
         num2str(medianNoiseOrig) ', after=' num2str(medianNoiseRef) ']'];
-    reports{18} = ['SD window HF: [before=', ...
+    reports{17} = ['SD window HF: [before=', ...
         num2str(sdNoiseOrig) ', after=' num2str(sdNoiseRef) ']'];
      fprintf(consoleFID, '%s:\n', reports{1});
     for k = 2:length(reports)
