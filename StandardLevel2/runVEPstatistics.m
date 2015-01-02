@@ -2,10 +2,10 @@
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% Gather standard level
-inDir = 'N:\\ARLAnalysis\\VEPStandardLevel2B';
+inDir = 'N:\\ARLAnalysis\\VEPStandardLevel2C';
 %outdir = 'N:\\ARLAnalysis\\VEPOrdinaryLevel2A';
-saveFile = 'N:\\ARLAnalysis\\VEPStandardLevel2BReports\\dataStatistics.mat';
-issueFile = 'N:\\ARLAnalysis\\VEPStandardLevel2BReports\\issues.txt';
+saveFile = 'N:\\ARLAnalysis\\VEPStandardLevel2CReports\\dataStatistics.mat';
+issueFile = 'N:\\ARLAnalysis\\VEPStandardLevel2CReports\\issues.txt';
 collectionTitle = 'VEP standard ref';
 numDatasets = 18;
 

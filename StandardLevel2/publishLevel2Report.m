@@ -25,8 +25,3 @@ function [] = publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
         close all
         movefile(tempReportLocation, actualReportLocation);
 end
-
-function [] = performPublishing(summaryFile, script_name, publish_options) 
-       publish(script_name, publish_options);
-
-end

@@ -203,7 +203,7 @@ if noisyOut.srate > 100
     % Remove signal content above 50Hz
     B = design_fir(100,[2*[0 45 50]/noisyOut.srate 1],[1 1 0 0]);
     X = zeros(signalSize, numberChannels);
-    for k = 1:numberChannels  % Could be changed to parfor
+    parfor k = 1:numberChannels  % Could be changed to parfor
         X(:,k) = filtfilt_fast(B, 1, data(:, k)); end
     % Determine z-scored level of EM noise-to-signal ratio for each channel
     noisiness = mad(data- X, 1)./mad(X, 1);

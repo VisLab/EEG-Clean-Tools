@@ -1,4 +1,4 @@
-function [report, badFiles] = generateIssueReport(collectionStats, datasetIndex)
+function report = generateIssueReport(collectionStats, datasetIndex)
 % Generates an issue report for datasetIndex from collection
 if nargin < 2
     error('generateIssueReport:NotEnoughArgs', ...
@@ -10,52 +10,22 @@ elseif datasetIndex < 1 || ...
         num2str(size(collectionStats.statistics, 1)) ']']);
 end
 report = '';
-badChans = collectionStats.noisyChannels{datasetIndex};
-if ~isempty(badChans)
-    %% Listing of noisy channels
-    badList = getLabeledList(badChans.badChannelNumbers,  ...
-        badChans.badChannelLabels, 50, '');
+
+%% Report channels that couldn't be handled by the referencing
+badChans = collectionStats.noisyChannels(datasetIndex);
+if ~isempty(badChans.badNotInterpolated)
     report = [report ...
-        sprintf('Noisy channels after referencing and interpolation: %s\n', badList)];
-    if ~isempty(badChans.badInterpolated)
-        report = [report ...
-            sprintf('Noisy channels interpolated after referencing: %s\n', ...
-            getListString(badChans.badInterpolated))];
-    end
-    if ~isempty(badChans.badNotInterpolated)
-        report = [report ...
-            sprintf('Noisy channels not interpolated after referencing: %s\n', ...
-            getListString(badChans.badNotInterpolated))];
-    end
-    if ~isempty(badChans.badNaN)
-        report = [report ...
-            sprintf('Bad NaN channels: %s\n', getListString(badChans.badNaN))];
-    end
-    if ~isempty(badChans.badNoData)
-        report = [report ...
-            sprintf('Bad no data channels: %s\n', getListString(badChans.badNoData))];
-    end
-    if ~isempty(badChans.badDropOuts)
-        report = [report ...
-            sprintf('Bad drop out channels: %s\n', getListString(badChans.badDropOuts))];
-    end
-    if ~isempty(badChans.badCorr)
-        report = [report ...
-            sprintf('Bad correlation channels: %s\n', getListString(badChans.badCorr))];
-    end
-    if ~isempty(badChans.badDev)
-        report = [report ...
-            sprintf('Bad deviation channels: %s\n', getListString(badChans.badDev))];
-    end
-    if ~isempty(badChans.badRansac)
-        report = [report ...
-            sprintf('Bad ransac channels: %s\n', getListString(badChans.badRansac))];
-    end
-    if ~isempty(badChans.badHF)
-        report = [report ...
-            sprintf('Bad HF SNR channels: %s\n', getListString(badChans.badHF))];
-    end
+        sprintf('Noisy channels not interpolated after referencing: %s\n', ...
+        getListString(badChans.badNotInterpolated))];
 end
+if 0.25*badChans.numberReferenceChannels < ...
+        length(badChans.badChannelNumbers)
+     report = [report sprintf('Data set has %d of %d channels bad\n', ...
+               length(badChans.badChannelNumbers), ...
+                      badChans.numberReferenceChannels)];                      
+end   
+
+%% Report unusual statistics
 stats = collectionStats.statistics(datasetIndex, :);
 s = collectionStats.statisticsIndex;
 
@@ -65,6 +35,7 @@ if stats(s.aveCorRef) > 0.91 && stats(s.medCorRef) > 0.95
         sprintf('Max win correlation [median=%g, mean=%g]\n', ...
                 stats(s.medCorRef), stats(s.aveCorRef))];
 end
+
 if stats(s.aveCorRef) > stats(s.medCorRef) > 0.9 || ...
    stats(s.aveCorRef) < stats(s.medCorRef) < 0.95 
    report = [report  ...

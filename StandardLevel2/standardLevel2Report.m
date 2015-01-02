@@ -84,7 +84,7 @@ if isfield(noisyParameters, 'reference')
     channelInformation = reference.channelInformation;
     nosedir = channelInformation.nosedir;
     channelLocations = reference.channelLocations;
-    originalLocations = ...
+    [originalLocations, originalChannels, noiseLegendString] = ...
         getReportChannelInformation(channelLocations, original);
     referencedLocations = ...
         getReportChannelInformation(channelLocations, referenced);
@@ -97,9 +97,13 @@ if isfield(noisyParameters, 'reference')
     sdnOrig = original.channelDeviationSD;
     medRef = referenced.channelDeviationMedian;
     sdnRef = referenced.channelDeviationSD;
-    dataReferencedRel = ((dataReferenced*sdnRef + medRef) - medOrig)/sdnOrig;
     scale = max(max(abs(dataOriginal), max(abs(dataReferenced))));
     clim = [-scale, scale];    
+    fprintf(consoleFID, '\nNoisy channel legend: ');
+    for j = 1:length(noiseLegendString)
+        fprintf(consoleFID, '%s ', noiseLegendString{j});
+    end
+    fprintf(consoleFID, '\n\n');
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 end   
@@ -108,11 +112,7 @@ if isfield(noisyParameters, 'reference')
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
 end  
-%% Robust channel deviation (referenced relative to original)
-if isfield(noisyParameters, 'reference')  
-    plotScalpMap(dataReferencedRel, referencedLocations, scalpMapInterpolation, ...
-        showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced rel)'])
-end    
+
 %% Robust deviation window statistics
 if isfield(noisyParameters, 'reference')
     beforeDeviationLevels = original.channelDeviations(referenceChannels, :);
@@ -157,20 +157,19 @@ if isfield(noisyParameters, 'reference')
     reports{9} = ['Average fraction ' num2str(fractionAfter) ...
                ' (' num2str(mean(afterDeviationCounts)) ' channels)'];
     reports{10} = [ indent ' not meeting threshold after in each window'];
-    reports{11} = [indent ' not meeting threshold after relative to before in each window'];
     quarterChannels = round(length(referenceChannels)*0.25);
     halfChannels = round(length(referenceChannels)*0.5);
-    reports{12} = 'Windows with > 1/4 deviation channels:';
-    reports{13} = [indent '[before=' ...
+    reports{11} = 'Windows with > 1/4 deviation channels:';
+    reports{12} = [indent '[before=' ...
            num2str(sum(beforeDeviationCounts > quarterChannels)) ...
         ', after=' num2str(sum(afterDeviationCounts > quarterChannels)) ']'];
-    reports{14} = 'Windows with > 1/2 deviation channels:';
-    reports{15} = [indent '[before=', ...
+    reports{13} = 'Windows with > 1/2 deviation channels:';
+    reports{14} = [indent '[before=', ...
         num2str(sum(beforeDeviationCounts > halfChannels)) ...
         ', after=' num2str(sum(afterDeviationCounts > halfChannels))  ']'];
-    reports{16} = ['Median window deviations: [before=', ...
+    reports{15} = ['Median window deviations: [before=', ...
               num2str(medianDeviationsOrig) ', after=' num2str(medianDeviationsRef) ']'];
-    reports{17} = ['SD window deviations: [before=', ...
+    reports{16} = ['SD window deviations: [before=', ...
         num2str(sdDeviationsOrig) ', after=' num2str(sdDeviationsRef) ']'];
     if isfield(referenced, 'dropOuts')
         drops = sum(referenced.dropOuts, 2)';
@@ -181,7 +180,7 @@ if isfield(noisyParameters, 'reference')
         else
             reportString = 'None';
         end
-        reports{18} = ['Channels with dropouts: ' reportString];
+        reports{17} = ['Channels with dropouts: ' reportString];
     end
     fprintf(consoleFID, '%s:\n', reports{1});
     for k = 2:length(reports)
@@ -425,21 +424,21 @@ if isfield(noisyParameters, 'reference') && isfield(reference, 'averageReference
     figure('Name', tString{2})
     plot(reference.averageReference, ...
         reference.averageReferenceWithNoisyChannels, '.k');
-    xlabel('Robust reference')
-    ylabel('Noisy reference');
+    xlabel('Robust average reference')
+    ylabel('Ordinary average reference');
     title(tString, 'Interpreter', 'None');
     writeSummaryItem(summaryFile, ...
-        {['Correlation between noisy and robust reference: ' num2str(corrAverage)]});
+        {['Correlation between ordinary and robust average reference: ' num2str(corrAverage)]});
 end   
 %% Noisy average reference - robust average reference by time
 if isfield(noisyParameters, 'reference')&& isfield(reference, 'averageReference')
-    tString = { noisyParameters.name, 'noisy - robust reference signals'};
+    tString = { noisyParameters.name, 'ordinary - robust average reference signals'};
     t = (0:length(reference.averageReference) - 1)/EEG.srate;
     figure('Name', tString{2})
     plot(t, reference.averageReferenceWithNoisyChannels - ...
         reference.averageReference, '.k');
-    xlabel('seconds')
-    ylabel('Difference');
+    xlabel('Seconds')
+    ylabel('Ordinary - robust');
     title(tString, 'Interpreter', 'None');
 end
 

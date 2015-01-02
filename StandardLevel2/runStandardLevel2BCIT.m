@@ -1,7 +1,7 @@
 %% Run through the high pass and look at the spectrum afterwards
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
-indir = 'E:\CTAData\ARL_BCIT_Program\STDL1'; % Input data directory used for this demo
-outdir = 'N:\\ARL_BCIT_Program\\Level2';
+indir = 'E:\\CTAData\\ARL_BCIT_Program\\STDL1'; % Input data directory used for this demo
+outdir = 'N:\\ARL_BCIT_Program\\Level2A';
 %% Get a list of the files in the driving data from level 1
 in_list = dir(indir);
 in_names = {in_list(:).name};
@@ -11,7 +11,7 @@ params = struct();
 params.lineFrequencies = [60, 120, 180, 240];
 
 %% Read in the data and high-pass filter it.
-for k = 1375:length(in_names)
+for k = 1:length(in_names)
     ext = in_names{k}((end-3):end);
     if ~strcmpi(ext, '.set')
         continue;

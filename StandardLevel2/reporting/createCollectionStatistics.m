@@ -7,11 +7,11 @@ collectionStats = struct('collectionTitle', [] , ...
                          'statistics', [], ...
                          'channels', [], ...
                          'noisyChannels', []);
-[statisticsTitles, statisticsIndex] = extractReferenceStatistics();
+[statisticsTitles, statisticsIndex, noisyStructure] = extractReferenceStatistics();
 dataTitles = cell(length(fileList), 1);
 channels = zeros(length(fileList), 1);
 statistics = zeros(length(fileList), length(statisticsTitles));
-noisyChannels = cell(length(fileList), 1);
+noisyChannels(length(fileList)) = noisyStructure;
 badFiles = {};
 badReasons = {};
 for k = 1:length(fileList)
@@ -19,7 +19,7 @@ for k = 1:length(fileList)
     try    % Ignore non EEG files
         fprintf('%d: ', k);
         EEG = pop_loadset(fileList{k});
-        [~, ~, statistics(k, :), noisyChannels{k}] = ...
+        [~, ~,  noisyChannels(k), statistics(k, :),] = ...
             extractReferenceStatistics(EEG);
         channels(k) = size(EEG.data, 1);
     catch Mex

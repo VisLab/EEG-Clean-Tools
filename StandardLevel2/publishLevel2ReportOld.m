@@ -1,4 +1,4 @@
-function [] = publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
+function [] = publishLevel2ReportOld(EEG, summaryFolder, summaryReportName, ...
                  sessionFolder, sessionReportName)
    % Session folder is relative to the summary report location
         assignin('base', 'EEG', EEG); 
@@ -24,9 +24,4 @@ function [] = publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
         fclose(summaryFile);
         close all
         movefile(tempReportLocation, actualReportLocation);
-end
-
-function [] = performPublishing(summaryFile, script_name, publish_options) 
-       publish(script_name, publish_options);
-
 end
