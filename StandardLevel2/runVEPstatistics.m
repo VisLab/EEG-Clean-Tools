@@ -2,10 +2,10 @@
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% Gather standard level
-inDir = 'N:\\ARLAnalysis\\VEPStandardLevel2B';
+inDir = 'N:\\ARLAnalysis\\VEPStandardLevel2F';
 %outdir = 'N:\\ARLAnalysis\\VEPOrdinaryLevel2A';
-saveFile = 'N:\\ARLAnalysis\\VEPStandardLevel2BReports\\dataStatistics.mat';
-issueFile = 'N:\\ARLAnalysis\\VEPStandardLevel2BReports\\issues.txt';
+saveFile = 'N:\\ARLAnalysis\\VEPStandardLevel2FReports\\dataStatistics.mat';
+issueFile = 'N:\\ARLAnalysis\\VEPStandardLevel2FReports\\issues.txt';
 collectionTitle = 'VEP standard ref';
 numDatasets = 18;
 
@@ -33,11 +33,11 @@ save(saveFile, 'collectionStats', '-v7.3');
 %% Display the reference statistics
 showReferenceStatistics(collectionStats);
 %% Generate an issue report for the collection
-[report, badFiles] = getCollectionIssues(collectionStats);
+[badReport, badFiles] = getCollectionIssues(collectionStats);
 
 %% Generate an issue report for the collection
 fid = fopen(issueFile, 'w');
-fprintf(fid, '%s\n', report);
+fprintf(fid, '%s\n', badReport);
 fclose(fid);
 % %% Consolidate the results in a single structure for comparative analysis
 % ordl2stats = struct('collectionTitle', [] , ...

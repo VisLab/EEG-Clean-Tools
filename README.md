@@ -54,7 +54,7 @@ Version 0.24 Released 12/7/2104 (major)
 * Fixed major bug in robustReference so that original signal is rereferenced
 * Revised and expanded the reporting
 
-Version 0.25 Not yet released
+Version 0.25 Released 1/5/2015 (major)
 * Removed saving of temporary file after line noise removal
 * Fixed report of relative reference
 * Modified findNoisyChannels to exclude NaN and constant channels 

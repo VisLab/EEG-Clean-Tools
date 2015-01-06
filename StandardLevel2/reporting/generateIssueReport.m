@@ -13,10 +13,10 @@ report = '';
 
 %% Report channels that couldn't be handled by the referencing
 badChans = collectionStats.noisyChannels(datasetIndex);
-if ~isempty(badChans.badNotInterpolated)
+if ~isempty(badChans.channelsStillBad)
     report = [report ...
         sprintf('Noisy channels not interpolated after referencing: %s\n', ...
-        getListString(badChans.badNotInterpolated))];
+        getListString(badChans.channelsStillBad))];
 end
 if 0.25*badChans.numberReferenceChannels < ...
         length(badChans.badChannelNumbers)

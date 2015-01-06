@@ -1,8 +1,8 @@
 %% Run through the high pass and look at the spectrum afterwards
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
-indir = 'N:\\ARLAnalysis\\NCTU\\Level2F'; % Input data directory used for this demo
-saveFile = 'N:\\ARLAnalysis\\NCTU\\Level2F\\dataStatistics1.mat';
-issueFile = 'N:\\ARLAnalysis\\NCTU\\Level2F\\issues.txt';
+indir = 'N:\\ARLAnalysis\\NCTU\\Level2H'; % Input data directory used for this demo
+saveFile = 'N:\\ARLAnalysis\\NCTU\\Level2H\\dataStatistics1.mat';
+issueFile = 'N:\\ARLAnalysis\\NCTU\\Level2H\\issues.txt';
 collectionTitle = 'NCTU lane-keeping standard referenced';
 numDatasets = 80;
 %% Read in the NCTU preprocessed data and consolidate

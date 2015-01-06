@@ -32,7 +32,7 @@ referenceOut = struct( ...
     'interpolatedChannelsFromRansac', [], ...
     'interpolatedChannelsFromDropOuts', [], ...
     'interpolatedChannels', [], ...
-    'badChannelsNotInterpolated', [], ...
+    'channelsStillBad', [], ...
     'averageReference', [] ...
     );
 referenceOut.referenceChannels = getStructureParameters(params, ...
@@ -72,21 +72,20 @@ referenceChannels = setdiff(referenceOut.referenceChannels, unusableChannels);
 noisyOutHuber = findNoisyChannels(signalTmp, params); 
 
 %% Construct new EEG with interpolated channels to find better average reference
-signalTmp = signal;
 noisyChannels = union(noisyOutHuber.noisyChannels, unusableChannels);
 if referenceOut.referenceChannels - length(noisyChannels) < 2
     error('Could not perform a robust reference -- not enough good channels');
 elseif ~isempty(noisyChannels) 
     sourceChannels = setdiff(referenceOut.referenceChannels, noisyChannels);
-    signalTmp = interpolateChannels(signalTmp, noisyChannels, sourceChannels);
+    signalTmp = interpolateChannels(signal, noisyChannels, sourceChannels);
+else
+    signalTmp = signal;
 end
 averageReference = mean(signalTmp.data(referenceOut.referenceChannels, :), 1);
-signal = removeReference(signal, averageReference, ...
-                             referenceOut.rereferencedChannels);
-clear signalTmp;
-
+signalTmp = removeReference(signal, averageReference, ...
+                                 referenceOut.rereferencedChannels);
 %% Now remove reference from the signal iteratively interpolate bad channels
-noisyChannelsOld = unusableChannels;
+noisyChannels = unusableChannels;
 badChannelsFromNaNs = [];
 badChannelsFromNoData = [];
 badChannelsFromHFNoise = [];
@@ -98,13 +97,21 @@ actualIterations = 0;
 paramsNew = params;
 paramsNew.referenceChannels = setdiff(params.referenceChannels, ...
                                       unusableChannels);
-while actualIterations <= referenceOut.maxInterpolationIterations
-      noisyOut = findNoisyChannels(signal, paramsNew);
-      noisyChannels = union(noisyOut.noisyChannels, noisyChannelsOld);
-      sourceChannels = setdiff(params.referenceChannels, noisyChannels);
-      badChannelsFromNaNs = union(badChannelsFromNaNs, ...
+noisyChannelsOld = [];
+while true  
+    noisyOut = findNoisyChannels(signalTmp, paramsNew);
+    if isempty(noisyOut.noisyChannels) || ...
+            actualIterations > referenceOut.maxInterpolationIterations || ...
+            (isempty(setdiff(noisyOut.noisyChannels, noisyChannelsOld)) ...
+            && isempty(setdiff(noisyChannelsOld, noisyOut.noisyChannels)))
+        break;
+    end
+    noisyChannelsOld = noisyOut.noisyChannels;
+    noisyChannels = union(noisyOut.noisyChannels, noisyChannels);
+    sourceChannels = setdiff(params.referenceChannels, noisyChannels);
+    badChannelsFromNaNs = union(badChannelsFromNaNs, ...
           noisyOut.badChannelsFromNaNs);
-      badChannelsFromNoData = union(badChannelsFromNoData, ...
+    badChannelsFromNoData = union(badChannelsFromNoData, ...
           noisyOut.badChannelsFromNoData);
       badChannelsFromHFNoise = union(badChannelsFromHFNoise, ...
           noisyOut.badChannelsFromHFNoise);
@@ -116,47 +123,36 @@ while actualIterations <= referenceOut.maxInterpolationIterations
           noisyOut.badChannelsFromRansac);
       badChannelsFromDropOuts = union(badChannelsFromDropOuts, ...
           noisyOut.badChannelsFromDropOuts);
-      if isempty(noisyChannels) || ...
-              isempty(setdiff(noisyChannels, noisyChannelsOld))
-          break;
-      end
       if length(sourceChannels)  < 2
           error('robustReference:TooManyBad', ...
               'Could not perform a robust reference -- not enough good channels');
       end
       signalTmp = interpolateChannels(signal, noisyChannels, sourceChannels);
+      averageReference = mean(signalTmp.data(referenceOut.referenceChannels, :), 1);
+      signalTmp = removeReference(signalTmp, averageReference, ...
+                                 referenceOut.rereferencedChannels);
       fprintf('Interpolated channels: %s\n', getListString(noisyChannels));
-      averageReferenceNew = mean(signalTmp.data(params.referenceChannels, :), 1);
-      signal = removeReference(signal, averageReferenceNew, ...
-          referenceOut.rereferencedChannels);
-      averageReference = averageReference + averageReferenceNew;
       actualIterations = actualIterations + 1;
-      noisyChannelsOld = noisyChannels;
 end
+signal = signalTmp;
 
-if ~isempty(noisyChannels)  % Referencing ended with noisy channels
-    signal = interpolateChannels(signal, noisyChannels, sourceChannels);
-    averageReferenceNew = mean(signal.data(referenceOut.referenceChannels, :), 1);
-    signal = removeReference(signal, averageReferenceNew, ...
-                             referenceOut.rereferencedChannels);
-    averageReference = averageReference + averageReferenceNew;
-    referenceOut.interpolatedChannelsFromNaNs = ...
-        union(noisyOut.badChannelsFromNaNs, badChannelsFromNaNs);
-    referenceOut.interpolatedChannelsFromNoData = ...
-        union(noisyOut.badChannelsFromNoData, badChannelsFromNoData);
-    referenceOut.interpolatedChannelsFromHFNoise = ...
-        union(noisyOut.badChannelsFromHFNoise, badChannelsFromHFNoise);
-    referenceOut.interpolatedChannelsFromCorrelation = ...
-        union(noisyOut.badChannelsFromCorrelation, badChannelsFromCorrelation);
-    referenceOut.interpolatedChannelsFromDeviation = ...
-        union(noisyOut.badChannelsFromDeviation, badChannelsFromDeviation);
-    referenceOut.interpolatedChannelsFromRansac = ...
-        union(noisyOut.badChannelsFromRansac, badChannelsFromRansac);
-    referenceOut.interpolatedChannelsFromDropOuts = noisyOut.badChannelsFromDropOuts;
-    referenceOut.interpolatedChannels = noisyChannels; 
-    noisyOut = findNoisyChannels(signal, params);
-    referenceOut.badChannelsNotInterpolated = noisyOut.noisyChannels;
-end
+referenceOut.interpolatedChannelsFromNaNs = ...
+    union(noisyOut.badChannelsFromNaNs, badChannelsFromNaNs);
+referenceOut.interpolatedChannelsFromNoData = ...
+    union(noisyOut.badChannelsFromNoData, badChannelsFromNoData);
+referenceOut.interpolatedChannelsFromHFNoise = ...
+    union(noisyOut.badChannelsFromHFNoise, badChannelsFromHFNoise);
+referenceOut.interpolatedChannelsFromCorrelation = ...
+    union(noisyOut.badChannelsFromCorrelation, badChannelsFromCorrelation);
+referenceOut.interpolatedChannelsFromDeviation = ...
+    union(noisyOut.badChannelsFromDeviation, badChannelsFromDeviation);
+referenceOut.interpolatedChannelsFromRansac = ...
+    union(noisyOut.badChannelsFromRansac, badChannelsFromRansac);
+referenceOut.interpolatedChannelsFromDropOuts = noisyOut.badChannelsFromDropOuts;
+referenceOut.interpolatedChannels = noisyChannels;
+noisyOut = findNoisyChannels(signal, params);
+referenceOut.channelsStillBad = noisyOut.noisyChannels;
+
 referenceOut.noisyOut = noisyOut;
 referenceOut.averageReference = averageReference;
 referenceOut.actualInterpolationIterations = actualIterations;

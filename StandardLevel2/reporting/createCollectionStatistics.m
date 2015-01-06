@@ -19,7 +19,7 @@ for k = 1:length(fileList)
     try    % Ignore non EEG files
         fprintf('%d: ', k);
         EEG = pop_loadset(fileList{k});
-        [~, ~,  noisyChannels(k), statistics(k, :),] = ...
+        [~, ~,  noisyChannels(k), statistics(k, :)] = ...
             extractReferenceStatistics(EEG);
         channels(k) = size(EEG.data, 1);
     catch Mex

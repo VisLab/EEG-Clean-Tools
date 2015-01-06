@@ -1,7 +1,7 @@
 %% Read in the file and set the necessary parameters
 indir = 'E:\\CTAData\\VEP_EMOTIV'; % Input data directory used for this demo
-baddir = 'E:\\CTAData\\VEP_EMOTIV\\bad';
-outdir = 'N:\\ARLAnalysis\\VEPEMOTIVStandardLevel2A';
+%outdir = 'N:\\ARLAnalysis\\VEPEMOTIVStandardLevel2A';
+outdir = 'N:\\ARLAnalysis\\VEPEMOTIVOrdinaryLevel2A';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 basename = 'E';
 
@@ -28,15 +28,11 @@ for k = 1:18
     params.highPassChannels = params.referenceChannels;
     params.lineNoiseChannels = params.referenceChannels;
     params.correlationThreshold = 0.3;
-    try
-        [EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
-        fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
-                 computationTimes.highPass, computationTimes.resampling, ...
-                 computationTimes.lineNoise, computationTimes.reference);
-        fname = [outdir filesep thisName '.set'];
-        
-    catch ex
-        fname = [baddir filesep thisName '.set'];
-    end
+    %[EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
+    [EEG, computationTimes] = ordinaryLevel2Pipeline(EEG, params);
+    fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
+        computationTimes.highPass, computationTimes.resampling, ...
+        computationTimes.lineNoise, computationTimes.reference);
+    fname = [outdir filesep thisName '.set'];
     save(fname, 'EEG', '-mat', '-v7.3');
 end
