@@ -2,7 +2,7 @@
 
 %% Read in the file and set the necessary parameters
 indir = 'E:\\CTAData\\VEP\'; % Input data directory used for this demo
-outdir = 'N:\\ARLAnalysis\\VEPStandardLevel2F';
+outdir = 'N:\\ARLAnalysis\\VEPStandardLevel2A';
 basename = 'vep';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 

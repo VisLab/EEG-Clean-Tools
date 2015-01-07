@@ -71,3 +71,7 @@ Version 0.25 Released 1/5/2015 (major)
 Version 0.26 Released 1/7/2015
 * Release to fix bug in cleanLineNoise --- channels that are not 
   lineNoiseChannels were set to zero rather than being carried forward.
+
+Version 0.27 Released 1/7/2015
+* Correct version of bug fix in cleanLineNoise -- watch that single
+  precision conversion!

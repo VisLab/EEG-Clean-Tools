@@ -1,6 +1,6 @@
 %% Read in the file and set the necessary parameters
-datadir = 'N:\\ARLAnalysis\\VEPStandardLevel2F';
-summaryFolder = 'N:\\ARLAnalysis\\VEPStandardLevel2FReports';
+datadir = 'N:\\ARLAnalysis\\VEPStandardLevel2A';
+summaryFolder = 'N:\\ARLAnalysis\\VEPStandardLevel2AReports';
 basename = 'vep';
 summaryReportName = [basename '_summary.html'];
 sessionFolder = '.';

@@ -83,14 +83,12 @@ lineNoiseOut.tapers = checkTapers(lineNoiseOut.taperTemplate, Nwin, lineNoiseOut
 
 %% Perform the calculation for each channel separately
 data = double(signal.data);
-data1 = zeros(size(data));
 chans = sort(lineNoiseOut.lineNoiseChannels);
 parfor ch = chans
-    data1(ch, :) = removeLinesMovingWindow(squeeze(data(ch, :)), lineNoiseOut);
+    data(ch, :) = removeLinesMovingWindow(squeeze(data(ch, :)), lineNoiseOut);
 end
-signal.data(chans) = data1(chans);
+signal.data = data;
 clear data;
-clear data1;
 
 
 
