@@ -1,62 +1,36 @@
+%%
+
 %% test NCTU
 params = struct();
 params.lineFrequencies = [60, 120,  180, 212, 240];
-params.referenceChannels = EEGFinal.etc.noisyParameters.reference.referenceChannels;
-params.rereferencedChannels = EEGFinal.etc.noisyParameters.reference.rereferencedChannels;
-params.highPassChannels = EEGFinal.etc.noisyParameters.highPass.highPassChannels;
-params.lineNoiseChannels = EEGFinal.etc.noisyParameters.lineNoise.lineNoiseChannels;
-
-%%
-[EEG, computationTimes] = standardLevel2Pipeline(EEGOrig, params);
-fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
-        computationTimes.highPass, computationTimes.resampling, ...
-        computationTimes.lineNoise, computationTimes.reference);
-save('EEGNCTU_75ref.set', 'EEG', '-v7.3');
-
-%%
-% summaryFolder = '.';
-% summaryReportName = ['vep_summary4.html'];
-% sessionFolder = '.';
-% reportSummary = [summaryFolder filesep summaryReportName];
-% sessionReportName = 'vep_summary4';
-% publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
-%                   sessionFolder, sessionReportName);
-% 
-%%
-sessionReportName = 'NCTU71';
-summaryFolder = '.';
-summaryReportName = ['nctu.html'];
-sessionFolder = '.';
-reportSummary = [summaryFolder filesep summaryReportName];
-  tempReportLocation = [summaryFolder filesep sessionFolder ...
-                                    filesep 'standardLevel2Report.pdf'];
-        actualReportLocation = [summaryFolder filesep sessionFolder ...
-                                    filesep sessionReportName];
-        summaryReportLocation = [summaryFolder filesep summaryReportName];
-        
-        summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
-        relativeReportLocation = [sessionFolder filesep sessionReportName];
-        consoleFID = 1;
-        assignin('base', 'summaryFile', summaryFile);
-        assignin('base', 'consoleID', consoleFID);
-        assignin('base', 'relativeReportLocation', relativeReportLocation);
-sessionReportName = 'nctu';
-standardLevel2Report;
+params.referenceChannels = [1:22, 24:28, 3:32];
+params.rereferencedChannels = 1:32;
+[EEGNew, reference] = robustReference(EEG, params);
 % %%
-% load('NCTU_1.set', '-mat');
+% params = struct();
+% params.lineFrequencies = [60, 120,  180, 212, 240];
 % 
 % %%
-% noisyOutOriginal = findNoisyChannels(EEG, params);
+% [EEG, computationTimes] = standardLevel2Pipeline(EEGOrig, params);
+% fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
+%         computationTimes.highPass, computationTimes.resampling, ...
+%         computationTimes.lineNoise, computationTimes.reference);
+% save('EEGNCTU_75ref.set', 'EEG', '-v7.3');
 % 
 % %%
-% [EEG, reference] = robustReference(EEG, params);
+% % summaryFolder = '.';
+% % summaryReportName = ['vep_summary4.html'];
+% % sessionFolder = '.';
+% % reportSummary = [summaryFolder filesep summaryReportName];
+% % sessionReportName = 'vep_summary4';
+% % publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
+% %                   sessionFolder, sessionReportName);
+% % 
 % %%
-% [EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
-% %%
+% sessionReportName = 'NCTU71';
 % summaryFolder = '.';
 % summaryReportName = ['nctu.html'];
 % sessionFolder = '.';
-% sessionReportName = 'nctu';
 % reportSummary = [summaryFolder filesep summaryReportName];
 %   tempReportLocation = [summaryFolder filesep sessionFolder ...
 %                                     filesep 'standardLevel2Report.pdf'];
@@ -72,20 +46,50 @@ standardLevel2Report;
 %         assignin('base', 'relativeReportLocation', relativeReportLocation);
 % sessionReportName = 'nctu';
 % standardLevel2Report;
-% 
-% %%
-% params = struct();
-% params.lineFrequencies = [60, 120,  180];
-% params.referenceChannels = 1:32;
-% params.rereferencedChannels = 1:32;
-% params.highPassChannels = 1:32;
-% params.lineNoiseChannels = 1:32;
-% %%
-% [EEG2, computationTimes] = standardLevel2Pipeline(EEG, params);
-% fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
-%         computationTimes.highPass, computationTimes.resampling, ...
-%         computationTimes.lineNoise, computationTimes.reference);
-% save('EEGNCTU4standard.set', 'EEG', '-v7.3');
-% 
-% %%
-%  [EEG, reference] = ordinaryReference(EEG, params);
+% % %%
+% % load('NCTU_1.set', '-mat');
+% % 
+% % %%
+% % noisyOutOriginal = findNoisyChannels(EEG, params);
+% % 
+% % %%
+% % [EEG, reference] = robustReference(EEG, params);
+% % %%
+% % [EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
+% % %%
+% % summaryFolder = '.';
+% % summaryReportName = ['nctu.html'];
+% % sessionFolder = '.';
+% % sessionReportName = 'nctu';
+% % reportSummary = [summaryFolder filesep summaryReportName];
+% %   tempReportLocation = [summaryFolder filesep sessionFolder ...
+% %                                     filesep 'standardLevel2Report.pdf'];
+% %         actualReportLocation = [summaryFolder filesep sessionFolder ...
+% %                                     filesep sessionReportName];
+% %         summaryReportLocation = [summaryFolder filesep summaryReportName];
+% %         
+% %         summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
+% %         relativeReportLocation = [sessionFolder filesep sessionReportName];
+% %         consoleFID = 1;
+% %         assignin('base', 'summaryFile', summaryFile);
+% %         assignin('base', 'consoleID', consoleFID);
+% %         assignin('base', 'relativeReportLocation', relativeReportLocation);
+% % sessionReportName = 'nctu';
+% % standardLevel2Report;
+% % 
+% % %%
+% % params = struct();
+% % params.lineFrequencies = [60, 120,  180];
+% % params.referenceChannels = 1:32;
+% % params.rereferencedChannels = 1:32;
+% % params.highPassChannels = 1:32;
+% % params.lineNoiseChannels = 1:32;
+% % %%
+% % [EEG2, computationTimes] = standardLevel2Pipeline(EEG, params);
+% % fprintf('Computation times (seconds): %g high pass, %g resampling, %g line noise, %g reference \n', ...
+% %         computationTimes.highPass, computationTimes.resampling, ...
+% %         computationTimes.lineNoise, computationTimes.reference);
+% % save('EEGNCTU4standard.set', 'EEG', '-v7.3');
+% % 
+% % %%
+% %  [EEG, reference] = ordinaryReference(EEG, params);

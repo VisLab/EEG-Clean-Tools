@@ -88,7 +88,7 @@ chans = sort(lineNoiseOut.lineNoiseChannels);
 parfor ch = chans
     data1(ch, :) = removeLinesMovingWindow(squeeze(data(ch, :)), lineNoiseOut);
 end
-signal.data = data1;
+signal.data(chans) = data1(chans);
 clear data;
 clear data1;
 

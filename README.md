@@ -67,3 +67,7 @@ Version 0.25 Released 1/5/2015 (major)
   for an entire archive.
 * Added iterations on the remove robust reference
 * Added a summary reporting scheme for spotting problematic datasets.
+
+Version 0.26 Released 1/7/2015
+* Release to fix bug in cleanLineNoise --- channels that are not 
+  lineNoiseChannels were set to zero rather than being carried forward.

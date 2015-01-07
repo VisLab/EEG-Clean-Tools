@@ -1,7 +1,7 @@
 %% Read in the file and set the necessary parameters
 indir = 'E:\\CTAData\\VEP_ABM'; % Input data directory used for this demo
 %outdir = 'N:\\ARLAnalysis\\VEPABMStandardLevel2A';
-outdir = 'N:\\ARLAnalysis\\VEPABMOrdinaryLevel2A';
+outdir = 'N:\\ARLAnalysis\\VEPABMStandardLevel2B';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 basename = 'A';
 
