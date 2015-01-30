@@ -10,11 +10,14 @@ params = struct();
 % outdir = 'N:\\ARLAnalysis\\VEPDetrend\\processedHP';
 % params.detrendType = 'high pass';
 
-outdir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrended';
-params.detrendType = 'linear';
-params.detrendCutoff = 0.2;
-basenameOut = [basename '_cutoff' num2str(params.detrendCutoff)];
+% outdir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrended';
+% params.detrendType = 'linear';
+% params.detrendCutoff = 0.2;
+% basenameOut = [basename '_cutoff' num2str(params.detrendCutoff)];
 
+outdir = 'N:\ARLAnalysis\VEPNewTrend\VEPStandardLevel2RobustNoDetrend';
+params.detrendType = 'none';
+basenameOut = [basename '_nodetrend'];
 %% Parameters that must be preset
 params.lineFrequencies = [60, 120,  180, 212, 240];
 params.referenceChannels = 1:64;

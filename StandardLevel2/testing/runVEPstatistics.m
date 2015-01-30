@@ -4,7 +4,7 @@ saveFile = 'dataStatistics.mat';
 issueFile = 'issues.txt';
 
 %% Setup the directories and titles
-setupDir(6) = struct('inDir', [], 'outDir', [], 'title', []);
+setupDir(7) = struct('inDir', [], 'outDir', [], 'title', []);
 setupDir(1).inDir = 'N:\\ARLAnalysis\\VEPNew\\VEPStandardLevel2Robust';
 setupDir(1).outDir = 'N:\\ARLAnalysis\\VEPNew\\VEPStandardLevel2RobustReports';
 setupDir(1).title = 'VEP robust';
@@ -29,7 +29,9 @@ setupDir(6).inDir = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2MastoidBeforeAver
 setupDir(6).outDir = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2MastoidBeforeAverageReports';
 setupDir(6).title = 'VEP m-average';
 
-
+setupDir(7).inDir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrended';
+setupDir(7).outDir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrendedReports';
+setupDir(7).title = 'VEP d-robust';
 %% Get the directory list
 for k = 1:length(setupDir)
     inList = dir(setupDir(k).inDir);

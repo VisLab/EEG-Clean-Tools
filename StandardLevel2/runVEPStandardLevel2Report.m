@@ -23,9 +23,11 @@ pop_editoptions('option_single', false, 'option_savetwofiles', false);
 % datadir = 'N:\\ARLAnalysis\\VEPDetrend\\processedHP';
 % summaryFolder = 'N:\\ARLAnalysis\\VEPDetrend\\reportsHP';
 
-dataDir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrended';
-summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrendedReports';
+% dataDir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrended';
+% summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrendedReports';
 
+dataDir =  'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustNoDetrend';
+summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustNoDetrendReports';
 %% Get the directory list
 inList = dir(dataDir);
 inNames = {inList(:).name};
