@@ -1,17 +1,17 @@
-function summary = reportLineNoise(fid, noisyParameters, numbersPerRow, indent)
+function summary = reportLineNoise(fid, noiseDetection, numbersPerRow, indent)
 % Outputs a summary of line noise removal to file fid and returns a cell array of important messages
     summary = {};
-    if ~isempty(noisyParameters.errors.lineNoise)
-        summary{end+1} =  noisyParameters.errors.lineNoise;
+    if ~isempty(noiseDetection.errors.lineNoise)
+        summary{end+1} =  noiseDetection.errors.lineNoise;
         fprintf(fid, '%s\n', summary{end});
     end
-    if ~isfield(noisyParameters, 'lineNoise')
+    if ~isfield(noiseDetection, 'lineNoise')
         summary{end+1} = 'Signal didn''t have line noise removed';
         fprintf(fid, '%s\n', summary{end});
         return;
     end
-    lineNoise = noisyParameters.lineNoise;
-    fprintf(fid, 'Version %s\n', noisyParameters.version.LineNoise);
+    lineNoise = noiseDetection.lineNoise;
+    fprintf(fid, 'Version %s\n', noiseDetection.version.LineNoise);
     fprintf(fid, 'Sampling frequency Fs: %g Hz\n', lineNoise.Fs);
     fprintf(fid, 'Line noise frequencies:\n');
     printList(fid, lineNoise.lineFrequencies, numbersPerRow, indent);

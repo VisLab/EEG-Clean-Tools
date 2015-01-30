@@ -1,5 +1,5 @@
 function [report, badFileNames] = getCollectionIssues(collectionStats)
-
+%% Generates issue reports for a collection
      report = sprintf('Issue report for: %s\n', ...
                       collectionStats.collectionTitle);
      badFileNames = {};            
@@ -8,7 +8,7 @@ function [report, badFileNames] = getCollectionIssues(collectionStats)
          if isempty(dataReport)
              continue;
          end
-         badFileNames{end + 1} = collectionStats.dataTitles{k};
+         badFileNames{end + 1} = collectionStats.dataTitles{k}; %#ok<AGROW>
          report = [report ...
                   sprintf('\n%s:\n', collectionStats.dataTitles{k}) ...
                   dataReport]; %#ok<AGROW>

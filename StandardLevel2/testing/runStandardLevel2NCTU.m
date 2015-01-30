@@ -3,9 +3,14 @@
 % ess1File = 'J:\\CTAData\\NCTULaneKeepingTask\\study_description.xml';
 % ess2Dir = 'K:\\CTAData\NCTU\\Level2New1';
 
+% ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
+% ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
+% ess2Dir = 'N:\\ARLAnalysis\\NCTU\\Level2';
+
 ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
 ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
-ess2Dir = 'N:\\ARLAnalysis\\NCTU\\Level2I';
+ess2Dir = 'N:\ARLAnalysis\NCTUDetrend\NCTUStandardLevel2RobustDetrended';
+
 
 %% Validate level 1
 % obj1 = level1Study(ess1File);

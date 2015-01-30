@@ -8,7 +8,22 @@ saveFile = 'N:\\ARLAnalysis\\VEPStandardLevel2AReports\\dataStatistics.mat';
 issueFile = 'N:\\ARLAnalysis\\VEPStandardLevel2AReports\\issues.txt';
 collectionTitle = 'VEP standard ref';
 numDatasets = 18;
-
+pop_editoptions('option_single', false, 'option_savetwofiles', false);
+dataDir1 = 'N:\\ARLAnalysis\\KaggleBCI\\train';
+dataDir2 = 'N:\\ARLAnalysis\\KaggleBCI\\test';
+summaryFolder1 = 'N:\\ARLAnalysis\\KaggleBCI\\reports\\train';
+summaryFolder2 = 'N:\\ARLAnalysis\\KaggleBCI\\reports\\test';
+saveFile = 'N:\\ARLAnalysis\\VEPStandardLevel2AReports\\dataStatistics.mat';
+issueFile = 'N:\\ARLAnalysis\\VEPStandardLevel2AReports\\issues.txt';
+%% Get a list of the files in the driving data from level 1
+inList1 = dir(dataDir1);
+inNames1 = {inList1(:).name};
+inTypes1 = [inList1(:).isdir];
+inNames1 = inNames1(~inTypes1);
+inList2 = dir(dataDir2);
+inNames2 = {inList2(:).name};
+inTypes2 = [inList2(:).isdir];
+inNames2 = inNames2(~inTypes2);
 %% Get the directory list
 inList = dir(inDir);
 inNames = {inList(:).name};

@@ -29,7 +29,7 @@ referenceOut.interpolateHFChannels = ...
 
 %% Find the noisy channels for the initial starting point
 referenceOut.averageReferenceWithNoisyChannels = ...
-                mean(signal.data(referenceOut.referenceChannels, :), 1);
+                nanmean(signal.data(referenceOut.referenceChannels, :), 1);
 
 referenceOut.noisyOutOriginal = findNoisyChannels(signal, params); 
 

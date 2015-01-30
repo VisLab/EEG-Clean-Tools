@@ -1,6 +1,6 @@
 function [statisticsTitles, statisticsIndex,  noisyChannels, ... 
           statistics] = extractReferenceStatistics(EEG)
-
+% Creates st
     statisticsTitles = { ...
         'Median channel deviation original', ...
         'Median channel deviation referenced', ...
@@ -60,7 +60,7 @@ function [statisticsTitles, statisticsIndex,  noisyChannels, ...
     end
 
     statistics = zeros(1, length(statisticsTitles));
-    reference = EEG.etc.noisyParameters.reference;
+    reference = EEG.etc.noiseDetection.reference;
     original = reference.noisyOutOriginal;
     referenced = reference.noisyOut;
     referenceChannels = reference.referenceChannels;

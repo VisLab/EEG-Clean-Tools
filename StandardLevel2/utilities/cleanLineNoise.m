@@ -1,4 +1,5 @@
 function [signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseIn)
+% Remove sharp spectral peaks from signal using Sleppian filters
 %
 % Usage:
 % signal = cleanLineNoise(signal)
@@ -24,6 +25,7 @@ function [signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseIn)
 %                       etc.) (default is 0)
 %    pnts
 %    tapers          Precomputed tapers from dpss
+%    taperBandWidth  Taper bandwidth (default 2 Hz)
 %    taperWindowSize Taper sliding window length (default 4 sec)
 %    taperWindowStep Sliding window step size (default 4 sec = no overlap)
 %    tau             Window overlap smoothing factor (default 100)

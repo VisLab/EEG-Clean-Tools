@@ -1,4 +1,4 @@
-function [] = visualizeNoisyParameters(noisyParameters, msg, EEG)
+function [] = visualizeNoiseDetection(noiseDetection, msg, EEG)
 fprintf('\nVisualization: %s...\n', msg);
 numbersPerRow = 25;
 u
@@ -9,16 +9,16 @@ if ~exist('EEG', 'var')
     return;
 end
 
-channels = noisyParameters.reference.referenceChannels;
-tString = EEG.etc.noisyParameters.name;
+channels = noiseDetection.reference.referenceChannels;
+tString = EEG.etc.noiseDetection.name;
 makeSpectrum(tString, channels);
-if isfield(noisyParameters, 'reference')
+if isfield(noiseDetection, 'reference')
     showNoisyChannels(reference.noisyOutOriginal, ...
         reference.channelLocations, reference.channelInformation, ...
-        reference.referenceChannels, noisyParameters.name, 'Before referencing');
+        reference.referenceChannels, noiseDetection.name, 'Before referencing');
     showNoisyChannels(reference.noisyOut, ...
         reference.channelLocations, reference.channelInformation, ...
-        reference.referenceChannels, noisyParameters.name, ' Final interpolation');
+        reference.referenceChannels, noiseDetection.name, ' Final interpolation');
     showBadFrames(reference, tString);
 end
 

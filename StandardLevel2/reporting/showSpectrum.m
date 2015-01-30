@@ -1,6 +1,6 @@
-function [badChannels] = showSpectrum(EEG, channels, displayChannels, ...
+function [badChannels, fref, sref] = showSpectrum(EEG, channels, displayChannels, ...
     channelLabels, tString)
-% Show spectrum of EEG at channels selected from 
+% Calculate EEG spectra and show at display displayChannels
     fftwinfac = 4;
     sref = cell(length(channels), 1);
     fref = cell(length(channels), 1);
@@ -21,19 +21,21 @@ function [badChannels] = showSpectrum(EEG, channels, displayChannels, ...
     tString1 = {tString,'Selected channels'};
     displayChannels = intersect(channels, displayChannels);
     displayChannels = setdiff(displayChannels, badChannels);
-    colors = jet(length(displayChannels));
-    figure('Name', tString)
-    hold on
-    legends = cell(1, length(displayChannels));
-    for c = 1:length(displayChannels)
-        fftchan = displayChannels(c);
-        plot(fref{fftchan}, sref{fftchan}', 'Color', colors(c, :))
-        legends{c} = [num2str(fftchan) ' (' channelLabels{fftchan} ')'];
+    if ~isempty(displayChannels)
+        colors = jet(length(displayChannels));
+        figure('Name', tString)
+        hold on
+        legends = cell(1, length(displayChannels));
+        for c = 1:length(displayChannels)
+            fftchan = displayChannels(c);
+            plot(fref{fftchan}, sref{fftchan}', 'Color', colors(c, :))
+            legends{c} = [num2str(fftchan) ' (' channelLabels{fftchan} ')'];
+        end
+        hold off
+        xlabel('Frequency (Hz)')
+        ylabel('Power 10*log(\muV^2/Hz)')
+        legend(legends)
+        title(tString1, 'Interpreter', 'none')
+        drawnow
     end
-    hold off
-    xlabel('Frequency (Hz)')
-    ylabel('Power 10*log(\muV^2/Hz)')
-    legend(legends)
-    title(tString1, 'Interpreter', 'none')
-    drawnow
 end

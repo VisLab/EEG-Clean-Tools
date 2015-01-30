@@ -1,19 +1,19 @@
-function summary = reportReferenced(fid, noisyParameters, numbersPerRow, indent)
+function summary = reportReferenced(fid, noiseDetection, numbersPerRow, indent)
 %% Extracts and outputs parameters for referencing calculation
 % Outputs a summary to file fid and returns a cell array of important messages
     summary = {};
-    if ~isempty(noisyParameters.errors.reference)
-        summary{end+1} =  noisyParameters.errors.reference;
+    if ~isempty(noiseDetection.errors.reference)
+        summary{end+1} =  noiseDetection.errors.reference;
         fprintf(fid, '%s\n', summary{end});
     end
-    if ~isfield(noisyParameters, 'reference')
+    if ~isfield(noiseDetection, 'reference')
         summary{end+1} = 'Signal wasn''t referenced';
         fprintf(fid, '%s\n', summary{end});
         return;
     end
-    reference = noisyParameters.reference;
+    reference = noiseDetection.reference;
     fprintf(fid, 'Rereferencing version %s\n',  ...
-        noisyParameters.version.Reference);
+        noiseDetection.version.Reference);
     fprintf(fid, 'Sampling rate: %g Hz\n', reference.noisyOut.srate);
 
     fprintf(fid, 'Noisy channel detection parameters:\n');
@@ -44,9 +44,9 @@ function summary = reportReferenced(fid, noisyParameters, numbersPerRow, indent)
     fprintf(fid, '%sRansacPerformed: %g\n', indent, ...
         reference.noisyOut.ransacPerformed);
     fprintf(fid, '%sMaxInterpolationIterations: %g\n', indent, ...
-        reference.maxInterpolationIterations);
+        getFieldIfExists(reference, 'maxInterpolationIterations'));
     fprintf(fid, '%sActualInterpolationIterations: %g\n', indent, ...
-        reference.actualInterpolationIterations);
+          getFieldIfExists(reference, 'actualInterpolationIterations'));
     fprintf(fid, '\nReference channels (%d channels):\n', ...
         length(reference.referenceChannels));
     printList(fid, reference.referenceChannels, ...
@@ -54,6 +54,10 @@ function summary = reportReferenced(fid, noisyParameters, numbersPerRow, indent)
     fprintf(fid, '\nRereferencedChannels (%d channels):\n', ...
         length(reference.rereferencedChannels));
     printList(fid, reference.rereferencedChannels,  ...
+        numbersPerRow, indent);
+    fprintf(fid, '\nSpecific reference channels (%d channels):\n', ...
+        length(reference.specificReferenceChannels));
+    printList(fid, reference.specificReferenceChannels, ...
         numbersPerRow, indent);
     
     %% Listing of noisy channels

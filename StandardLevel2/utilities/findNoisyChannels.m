@@ -21,15 +21,15 @@ function  noisyOut = findNoisyChannels(signal, params)
 %     referenceChannels - a vector of channels to use
 %     chaninfo - standard EEGLAB chaninfo (nose direction is relevant)
 %     chanlocs - standard EEGLAB chanlocs structure
-%     robustDeviationThreshold - z score cutoff of robust channel deviation
-%     highFrequencyNoiseThreshold -  z score cutoff of SNR (signal above 50 Hz)
+%     robustDeviationThreshold - z score cutoff for robust channel deviation
+%     highFrequencyNoiseThreshold -  z score cutoff for SNR (signal above 50 Hz)
 %     correlationWindowSeconds - correlation window size in seconds (default = 1 sec)
 %     correlationThreshold - correlation below which window is bad (default = 0.4)
 %     badTimeThreshold - cutoff fraction of bad corr windows (default = 0.01)
 %     ransacSampleSize - samples for computing ransac (default = 50)
 %     ransacChannelFraction - fraction of channels for robust reconstruction (default = 0.25)
 %     ransacCorrelationThreshold - cutoff correlation for abnormal wrt neighbors(default = 0.75)
-%     ransacUnbrokenTime - cutoff fraction of time channel can be bad (default = 0.4)
+%     ransacUnbrokenTime - cutoff fraction of time channel can have poor ransac predictability (default = 0.4)
 %     ransacWindowSeconds - correlation window for ransac (default = 5 sec)
 %
 % Output parameters (c channels, w windows):

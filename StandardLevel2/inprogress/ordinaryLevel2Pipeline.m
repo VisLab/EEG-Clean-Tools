@@ -1,4 +1,4 @@
-function [EEG, computationTimes] = standardLevel2Pipeline(EEG, params)
+function [EEG, computationTimes] = ordinaryLevel2Pipeline(EEG, params)
 
 %% Standard level 2 pipeline 
 % This assumes the following have been set:
@@ -26,10 +26,10 @@ function [EEG, computationTimes] = standardLevel2Pipeline(EEG, params)
 %
 
 %% Setup the output structures and set the input parameters
-computationTimes= struct('resampling', 0, 'detrend', 0, ...
+computationTimes= struct('resampling', 0, 'highPass', 0, ...
     'lineNoise', 0, 'reference', 0);
-errorMessages = struct('status', 'good', 'boundary', 0, 'resampling', 0, ...
-    'detrend', 0, 'lineNoise', 0, 'reference', 0);
+errorMessages = struct('status', 'good', 'resampling', 0, ...
+    'highPass', 0, 'lineNoise', 0, 'reference', 0);
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 if isfield(EEG.etc, 'noiseDetection')
     warning('EEG.etc.noiseDetection already exists and will be cleared\n')
@@ -43,21 +43,7 @@ end
 EEG.etc.noiseDetection = ...
        struct('name', params.name, 'version', getStandardLevel2Version, ...
               'errors', []);
-%% Check for boundary events
-noisyOut.ignoreBoundaryEvents = ...
-    getStructureParameters(params, 'ignoreBoundaryEvents', false);
-if ~noisyOut.ignoreBoundaryEvents && ...
-                isfield(EEG, 'event') && ~isempty(EEG.event)
-    eTypes = find(strcmpi({EEG.event.type}, 'boundary'));
-    if ~isempty(eTypes)
-        errorMessages.status = 'unprocessed';
-        errorMessages.boundary = ['Dataset ' params.name  ...
-            ' has boundary events: [' getListString(eTypes) ...
-            '] which are treated as discontinuities unless set to ignore'];    
-        EEG.etc.noiseDetection.errors = errorMessages;
-        return;
-    end
-end
+
 %% Part I: Resampling
 fprintf('Resampling\n');
 try
@@ -67,26 +53,27 @@ try
     computationTimes.resampling = toc;
 catch mex
     errorMessages.resampling = ...
-        ['standardLevel2Pipeline failed resampleEEG: ' getReport(mex)];
+        ['ordinaryLevel2Pipeline failed resampleEEG: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
 end
 
-%% Part II: Detrend or high pass filter
-fprintf('Detrending\n');
+%% Part II: High pass filter
+fprintf('High pass filtering\n');
 try
     tic
-    [EEG, trend] = removeTrend(EEG, params);
-    EEG.etc.noiseDetection.detrend = trend;
-    computationTimes.detrend = toc;
+    [EEG, highPass] = highPassFilter(EEG, params);
+    EEG.etc.noiseDetection.highPass = highPass;
+    computationTimes.highPass = toc;
 catch mex
-    errorMessages.removeTrend = ...
-        ['standardLevel2Pipeline failed removeTrend: ' getReport(mex)];
+    errorMessages.highPass = ...
+        ['ordinaryLevel2Pipeline failed highPassFilter: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
 end
+    
 %% Part III: Remove line noise
 fprintf('Line noise removal\n');
 try
@@ -96,25 +83,27 @@ try
     computationTimes.lineNoise = toc;
 catch mex
     errorMessages.lineNoise = ...
-        ['standardLevel2Pipeline failed cleanLineNoise: ' getReport(mex)];
+        ['ordinaryLevel2Pipeline failed cleanLineNoise: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
 end 
- 
-%% Part IV: Remove a robust reference
-fprintf('Robust reference removal\n');
+% fn = ['N:\\ARLAnalysis\\VEPStandardLevel2L\\temp\\' params.name];
+% save(fn, 'EEG', '-v7.3');
+%% Part IV: Remove a average reference
+fprintf('Average reference removal\n');
 try
     tic
-    [EEG, reference] = robustReference(EEG, params);
+    [EEG, reference] = ordinaryReference(EEG, params);
     EEG.etc.noiseDetection.reference = reference;
     computationTimes.reference = toc;
 catch mex
     errorMessages.reference = ...
-        ['standardLevel2Pipeline failed robustReference: ' ...
+        ['ordinaryLevel2Pipeline failed ordinaryReference: ' ...
         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
 end 
+
 EEG.etc.noiseDetection.errors = errorMessages;

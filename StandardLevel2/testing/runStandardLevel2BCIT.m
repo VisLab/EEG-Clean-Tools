@@ -11,7 +11,7 @@ params = struct();
 params.lineFrequencies = [60, 120, 180, 240];
 
 %% Read in the data and high-pass filter it.
-for k = 2731:length(in_names)
+for k = 2623:length(in_names)
     ext = in_names{k}((end-3):end);
     if ~strcmpi(ext, '.set')
         continue;

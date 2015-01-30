@@ -75,3 +75,17 @@ Version 0.26 Released 1/7/2015
 Version 0.27 Released 1/7/2015
 * Correct version of bug fix in cleanLineNoise -- watch that single
   precision conversion!
+
+Version 0.28 (Not yet released)
+* Changed the name of the noisyParameter structure in EEG.etc to 
+  noiseDetection.   This is a major change with corresponding change
+  in ESS.
+* Added a specificReferenceChannels field to reference structure
+* Changed the averageReference field name to referenceSignal in reference
+  structure
+* Included a referenceType field in the reference structure (this
+  can be 'robust', 'average', or 'specific')
+* Eliminated the don't interpolateHFChannels flag.
+* Added routines to do specificReference (mastoid or average)
+* Modified showSpectrum to return the spectra of all of the channels.
+* Detrending at 0.2 Hz has replaced FIR filtering as default trend removal.
