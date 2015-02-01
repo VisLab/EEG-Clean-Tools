@@ -47,8 +47,8 @@ end
 
 %% Show the spectra
 numberPts = 200;
-colors = [1, 0, 0; 0.8, 0, 0.8; ...
-          0, 1, 0;  0, 0.5, 1; 0, 0, 0];
+colors = [1, 0, 0; 0.8, 0, 1; ...
+          0, 1, 0;   0, 0.5, 1; 0, 0, 0];
 legends = {'0.1', '0.2', '0.5', '1', 'HP1'};
 channels = [1, 5, 8, 10];
 for k = 1:length(datasets)

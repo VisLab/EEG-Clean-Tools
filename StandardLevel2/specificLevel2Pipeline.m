@@ -59,16 +59,16 @@ catch mex
     return;
 end
 
-%% Part II: High pass filter
-fprintf('High pass filtering\n');
+%% Part II: Detrend or high pass filter
+fprintf('Detrending\n');
 try
     tic
-    [EEG, highPass] = highPassFilter(EEG, params);
-    EEG.etc.noiseDetection.highPass = highPass;
-    computationTimes.highPass = toc;
+    [EEG, trend] = removeTrend(EEG, params);
+    EEG.etc.noiseDetection.detrend = trend;
+    computationTimes.detrend = toc;
 catch mex
-    errorMessages.highPass = ...
-        ['specificLevel2Pipeline failed highPassFilter: ' getReport(mex)];
+    errorMessages.removeTrend = ...
+        ['specificLevel2Pipeline failed removeTrend: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
@@ -88,8 +88,7 @@ catch mex
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
 end 
-% fn = ['N:\\ARLAnalysis\\VEPStandardLevel2L\\temp\\' params.name];
-% save(fn, 'EEG', '-v7.3');
+
 %% Part IV: Remove a average reference
 fprintf('Average reference removal\n');
 try

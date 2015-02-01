@@ -2,7 +2,7 @@
 
 %% Read in the file and set the necessary parameters
 indir = 'E:\\CTAData\\VEP\'; % Input data directory used for this demo
-outdir = 'N:\\ARLAnalysis\\VEP\\VEPSpecificLevel2AverageReference';
+outdir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPSpecificLevel2AverageDetrended';
 basename = 'vep';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
@@ -14,12 +14,16 @@ params.rereferencedChannels = 1:68;
 params.highPassChannels = 1:68;
 params.lineNoiseChannels = 1:68;
 params.specificReferenceChannels = 1:64;
+params.detrendType = 'linear';
+params.detrendCutoff = 0.2;
+basenameOut = [basename 'ave_ref_cutoff' num2str(params.detrendCutoff)];
 %% Run the pipeline (referencing to the mastoids before)
 for k = 1:18
     thisName = sprintf('%s_%02d', basename, k);
-    params.name = thisName;
     fname = [indir filesep thisName '.set'];
     EEG = pop_loadset(fname);
+    thisNameOut = sprintf('%s_%02d', basenameOut, k);
+    params.name = thisNameOut;
     [EEG, computationTimes] = specificLevel2Pipeline(EEG, params);
     fprintf(['Computation times (seconds): %g resampling,' ...
              '%g high pass, %g line noise, %g reference \n'], ...
