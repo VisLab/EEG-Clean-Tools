@@ -14,7 +14,8 @@ function [EEG, detrendOut] = removeTrend(EEG, detrendIn)
 %                     (default is all channels)
 %   detrendType       One of the strings 'high pass', 'linear', or 'none' 
 %                     indicating type of detrending (default is'linear')
-%   detrendCutoff     Detrend or high pass cutoff (default is 0.2 Hz)
+%   detrendCutoff     Detrend or high pass cutoff (default is 1 Hz)
+%   detrendStepSize   Seconds for detrend window slide (default is 0.02 s)
 %
 % Output:
 %   EEG               Revised EEG structure channels detrended or filtered
@@ -23,7 +24,8 @@ function [EEG, detrendOut] = removeTrend(EEG, detrendIn)
 % Structure parameters (detrendOut):
 %   detrendChannels   Vector of detrended or filtered channels 
 %   detrendType       Type of detrending or filtering
-%   detrendCutoff     High pass cutoff (default is 1 Hz)
+%   detrendCutoff     High pass cutoff or detrend window (default is 1 Hz)
+%   detrendStepSize   Seconds for detrend window slide (default is 0.02 s)
 %   detrendCommand    String version of detrending command
 %
 % Implementation notes:
@@ -41,11 +43,14 @@ if ~isstruct(detrendIn)
 end
 
 detrendOut = struct('detrendChannels', [], 'detrendType', [], ...
-                    'detrendCutoff', [], 'detrendCommand', []);
+                    'detrendCutoff', [], 'detrendStepSize', [], ...
+                    'detrendCommand', []);
 detrendOut.detrendChannels =  ...
     getStructureParameters(detrendIn, 'detrendChannels', 1:size(EEG.data, 1));
 detrendOut.detrendCutoff =  ...
-    getStructureParameters(detrendIn, 'detrendCutoff', 0.2);
+    getStructureParameters(detrendIn, 'detrendCutoff', 1);
+detrendOut.detrendStepSize =  ...
+    getStructureParameters(detrendIn, 'detrendStepSize', 0.020);
 detrendOut.detrendType = ...
     getStructureParameters(detrendIn, 'detrendType', 'linear');
 %% Detrend the data
@@ -60,8 +65,8 @@ elseif strcmpi(detrendOut.detrendType, 'high pass')
     
     EEG.data(detrendOut.detrendChannels, :) = EEG1.data;
 else
-    windowSize = 0.25./detrendOut.detrendCutoff;
-    stepSize = windowSize./5;
+    windowSize = 1.5/detrendOut.detrendCutoff; %0.25./detrendOut.detrendCutoff;
+    stepSize = detrendOut.detrendStepSize; %windowSize./10;
     EEG.data(detrendOut.detrendChannels, :) = ...
         localDetrend(EEG.data(detrendOut.detrendChannels, :)', ...
                             EEG.srate, windowSize, stepSize)';

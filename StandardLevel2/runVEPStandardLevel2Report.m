@@ -2,32 +2,29 @@
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% Specific directory
-% datadir = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2Average';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2AverageReports';
+% datadir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPSpecificLevel2Average';
+% summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPSpecificLevel2AverageReports';
 
-% datadir = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2MastoidBefore';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2MastoidBeforeReports';
+% datadir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPSpecificLevel2MastoidBefore';
+% summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPSpecificLevel2MastoidBeforeReports';
 
-% datadir = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2Mastoid';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2MastoidReports';
+% datadir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPSpecificLevel2Mastoid';
+% summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPSpecificLevel2MastoidReports';
 
-% datadir = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2MastoidBeforeAverage';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPNew\\VEPSpecificLevel2MastoidBeforeAverageReports';
+% datadir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPSpecificLevel2MastoidBeforeAverage';
+% summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPSpecificLevel2MastoidBeforeAverageReports';
 
-% datadir = 'N:\\ARLAnalysis\\VEPNew\\VEPStandardLevel2MastoidBeforeRobust';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPNew\\VEPStandardLevel2MastoidBeforeRobustReports';
+% datadir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2MastoidBeforeRobust';
+% summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2MastoidBeforeRobustReports';
 
-% datadir = 'N:\\ARLAnalysis\\VEPNew\\VEPStandardLevel2Robust';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPNew\\VEPStandardLevel2RobustReports';
+% datadir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2Robust';
+% summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustReports';
 
-% datadir = 'N:\\ARLAnalysis\\VEPDetrend\\processedHP';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPDetrend\\reportsHP';
+dataDir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrended';
+summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrendedReports';
 
-% dataDir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrended';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrendedReports';
-
-dataDir =  'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustNoDetrend';
-summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustNoDetrendReports';
+% dataDir =  'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustNoDetrend';
+% summaryFolder = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustNoDetrendReports';
 %% Get the directory list
 inList = dir(dataDir);
 inNames = {inList(:).name};

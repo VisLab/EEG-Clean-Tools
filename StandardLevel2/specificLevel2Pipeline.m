@@ -26,10 +26,10 @@ function [EEG, computationTimes] = specificLevel2Pipeline(EEG, params)
 %
 
 %% Setup the output structures and set the input parameters
-computationTimes= struct('resampling', 0, 'highPass', 0, ...
+computationTimes= struct('resampling', 0, 'detrend', 0, ...
     'lineNoise', 0, 'reference', 0);
 errorMessages = struct('status', 'good', 'resampling', 0, ...
-    'highPass', 0, 'lineNoise', 0, 'reference', 0);
+    'detrend', 0, 'lineNoise', 0, 'reference', 0);
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 if isfield(EEG.etc, 'noiseDetection')
     warning('EEG.etc.noiseDetection already exists and will be cleared\n')

@@ -13,11 +13,11 @@ params = struct();
 % params.detrendType = 'none';
 % basenameOut = [basename '_nodetrend'];
 
-outdir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2RobustDetrended';
+%-----------------------------mastoid before robust detrended ---------------------------
+outdir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2MastoidBeforeRobustDetrended';
 params.detrendType = 'linear';
 params.detrendCutoff = 1;
 basenameOut = [basename '_cutoff' num2str(params.detrendCutoff)];
-
 %% Parameters that must be preset
 params.lineFrequencies = [60, 120,  180, 212, 240];
 params.referenceChannels = 1:64;
@@ -32,6 +32,10 @@ for k = 1:18
     EEG = pop_loadset(fname);
     thisNameOut = sprintf('%s_%02d', basenameOut, k);
     params.name = thisNameOut;
+    data1 = double(EEG.data);
+    mastoidReference = mean(data1(69:70, :));
+    data1 = data1 - repmat(mastoidReference, 70, 1);
+    EEG.data = data1;
     [EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
     fprintf(['Computation times (seconds): %g resampling,' ...
              '%g detrend, %g line noise, %g reference \n'], ...
