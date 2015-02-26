@@ -16,7 +16,7 @@ params = struct();
 %-----------------------------mastoid before robust detrended ---------------------------
 outdir = 'N:\\ARLAnalysis\\VEPNewTrend\\VEPStandardLevel2MastoidBeforeRobustDetrended';
 params.detrendType = 'linear';
-params.detrendCutoff = 1;
+params.detrendCutoff = 0.5;
 basenameOut = [basename '_cutoff' num2str(params.detrendCutoff)];
 %% Parameters that must be preset
 params.lineFrequencies = [60, 120,  180, 212, 240];

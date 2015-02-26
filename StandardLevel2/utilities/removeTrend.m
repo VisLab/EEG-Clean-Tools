@@ -31,6 +31,7 @@ function [EEG, detrendOut] = removeTrend(EEG, detrendIn)
 % Implementation notes:
 %   1) High pass filtering is done with EEGLAB pop_eegfiltnew FIR filter
 %   2) Detrending is done with the chronux_2 runline command
+%   3) The EEG.data array will be converted to double regardless of type
 %
 %% Check the parameters
 if nargin < 1 || ~isstruct(EEG)
@@ -42,31 +43,42 @@ if ~isstruct(detrendIn)
     error('removeTrend:NoData', 'second argument must be a structure')
 end
 
+defaults = getPipelineDefaults(EEG, 'detrend');
 detrendOut = struct('detrendChannels', [], 'detrendType', [], ...
                     'detrendCutoff', [], 'detrendStepSize', [], ...
                     'detrendCommand', []);
-detrendOut.detrendChannels =  ...
-    getStructureParameters(detrendIn, 'detrendChannels', 1:size(EEG.data, 1));
-detrendOut.detrendCutoff =  ...
-    getStructureParameters(detrendIn, 'detrendCutoff', 1);
-detrendOut.detrendStepSize =  ...
-    getStructureParameters(detrendIn, 'detrendStepSize', 0.020);
-detrendOut.detrendType = ...
-    getStructureParameters(detrendIn, 'detrendType', 'linear');
-%% Detrend the data
+[detrendOut, errors] = checkDefaults(detrendIn, detrendOut, defaults);
+if ~isempty(errors)
+    error('removeTrend:BadParameters', ['|' sprintf('%s|', errors{:})]);
+end
+%% Detrend the data either using high pass or linear detrending
 EEG.data = double(EEG.data);
 if strcmpi(detrendOut.detrendType, 'none')
     detrendOut.detrendCommand = '';
-elseif strcmpi(detrendOut.detrendType, 'high pass')
+    return;
+end
+
+if strcmpi(detrendOut.detrendType, 'high pass')
     EEG1 = EEG;
     EEG1.data = EEG.data(detrendOut.detrendChannels, :);
+    EEG1.nbchan = size(EEG1.data, 1);
     [EEG1, detrendOut.detrendCommand] = ...
-        pop_eegfiltnew(EEG1, detrendOut.detrendCutoff, []);
-    
+        pop_eegfiltnew(EEG1, detrendOut.detrendCutoff, []); 
+    EEG.data(detrendOut.detrendChannels, :) = EEG1.data;
+elseif strcmpi(detrendOut.detrendType, 'high pass sinc')
+    fOrder = round(14080*EEG.srate/512);
+    fOrder = fOrder + mod(fOrder, 2);  % Must be even
+    EEG1 = EEG;
+    EEG1.data = EEG.data(detrendOut.detrendChannels, :);
+    EEG1.nbchan = size(EEG1.data, 1);
+    [EEG1, detrendOut.detrendCommand] = ...
+       pop_firws(EEG1, 'fcutoff', detrendOut.detrendCutoff, 'ftype', 'highpass', ...
+       'wtype', 'blackman', 'forder', fOrder, 'minphase', 0);
     EEG.data(detrendOut.detrendChannels, :) = EEG1.data;
 else
-    windowSize = 1.5/detrendOut.detrendCutoff; %0.25./detrendOut.detrendCutoff;
-    stepSize = detrendOut.detrendStepSize; %windowSize./10;
+    windowSize = 1.5/detrendOut.detrendCutoff;
+    windowSize = min(windowSize, size(EEG.data, 2));
+    stepSize = detrendOut.detrendStepSize; 
     EEG.data(detrendOut.detrendChannels, :) = ...
         localDetrend(EEG.data(detrendOut.detrendChannels, :)', ...
                             EEG.srate, windowSize, stepSize)';
@@ -74,4 +86,3 @@ else
         num2str(EEG.srate) ', ' num2str(windowSize) ', ' ...
         num2str(stepSize) ')'];
 end
-

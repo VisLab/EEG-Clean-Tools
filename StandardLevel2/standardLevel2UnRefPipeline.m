@@ -1,4 +1,4 @@
-function [EEG, computationTimes] = standardLevel2Pipeline(EEG, params)
+function [EEG, computationTimes] = standardLevel2UnRefPipeline(EEG, params)
 
 %% Standard level 2 pipeline 
 % This assumes the following have been set:
@@ -62,7 +62,7 @@ try
     end
 catch mex
     errorMessages.boundary = ...
-        ['standardLevel2Pipeline bad boundary events: ' getReport(mex)];
+        ['standardLevel2RevPipeline bad boundary events: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
@@ -77,7 +77,7 @@ try
     computationTimes.resampling = toc;
 catch mex
     errorMessages.resampling = ...
-        ['standardLevel2Pipeline failed resampleEEG: ' getReport(mex)];
+        ['standardLevel2RevPipeline failed resampleEEG: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
@@ -92,7 +92,7 @@ try
     computationTimes.detrend = toc;
 catch mex
     errorMessages.removeTrend = ...
-        ['standardLevel2Pipeline failed removeTrend: ' getReport(mex)];
+        ['standardLevel2RevPipeline failed removeTrend: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
@@ -111,7 +111,7 @@ try
     computationTimes.lineNoise = toc;
 catch mex
     errorMessages.lineNoise = ...
-        ['standardLevel2Pipeline failed cleanLineNoise: ' getReport(mex)];
+        ['standardLevel2RevPipeline failed cleanLineNoise: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
@@ -145,7 +145,7 @@ try
     computationTimes.reference = toc;
 catch mex
     errorMessages.reference = ...
-        ['standardLevel2Pipeline failed findReference: ' ...
+        ['standardLevel2RevPipeline failed findReference: ' ...
         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;

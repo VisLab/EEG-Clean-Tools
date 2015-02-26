@@ -10,7 +10,7 @@ function [signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseIn)
 %    lineNoiseIn     Input structure with fields described below
 %
 % Structure parameters (lineNoiseIn):
-%    fPassBand       Frequency band used (default [0, Fs/2] = entire band)
+%    fPassBand       Frequency band used (default [45, Fs/2] = entire band)
 %    Fs 	            Sampling frequency 
 %    fScanBandWidth  +/- bandwidth centered on each f0 to scan for significant
 %                       lines (TM)
@@ -50,22 +50,16 @@ elseif isempty(lineNoiseIn) || ~isstruct(lineNoiseIn)
 end
 
 %% Set the defaults to appropriate values
-lineNoiseOut = struct();
-lineNoiseOut.Fs = getStructureParameters(lineNoiseIn, 'Fs', signal.srate);
-lineNoiseOut.lineNoiseChannels = getStructureParameters(lineNoiseIn, 'lineNoiseChannels', 1:size(signal.data, 1));
-lineNoiseOut.lineFrequencies = getStructureParameters(lineNoiseIn, 'lineFrequencies', [60, 120, 180]);
-lineNoiseOut.p = getStructureParameters(lineNoiseIn, 'p', 0.01);
-lineNoiseOut.fScanBandWidth = getStructureParameters(lineNoiseIn, 'fScanBandWidth', 2);
-lineNoiseOut.taperBandWidth = getStructureParameters(lineNoiseIn, 'taperBandWidth', 2);
-lineNoiseOut.taperWindowSize = getStructureParameters(lineNoiseIn, 'taperWindowSize', 4);
-lineNoiseOut.taperWindowStep = getStructureParameters(lineNoiseIn, 'taperWindowStep', 1);
-lineNoiseOut.tau = getStructureParameters(lineNoiseIn, 'tau', 100);
-lineNoiseOut.pad = getStructureParameters(lineNoiseIn, 'pad', 0);  % Pad of 2 is slower but gives better results
-lineNoiseOut.fPassBand = getStructureParameters(lineNoiseIn, 'fPassBand', [45, (lineNoiseOut.Fs)/2]);                                           
-lineNoiseOut.maximumIterations = getStructureParameters(lineNoiseIn, 'maximumIterations', 10);
-if any(lineNoiseOut.lineNoiseChannels > size(signal.data, 1))
-    error('cleanLineNoise:Invalidchannels', ...
-        'Channels are not present in the dataset');
+defaults = getPipelineDefaults(signal, 'line noise');
+lineNoiseOut = struct('lineNoiseChannels', [], 'Fs', [], ...
+    'lineFrequencies', [], 'p', [], 'fScanBandWidth', [], ...
+    'taperBandWidth', [], 'taperWindowSize', [], ...
+    'taperWindowStep', [], 'tau', [], 'pad', [], ...
+    'fPassBand', [], 'maximumIterations', []);
+
+[lineNoiseOut, errors] = checkDefaults(lineNoiseIn, lineNoiseOut, defaults);
+if ~isempty(errors)
+    error('cleanLineNoise:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end
 
 %% Remove line frequencies that are greater than Nyquist frequencies

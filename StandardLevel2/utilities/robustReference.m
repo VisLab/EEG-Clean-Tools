@@ -1,33 +1,6 @@
-function [signal, referenceOut] = robustReference(signal, params)
-
-if nargin < 1
-    error('robustReference:NotEnoughArguments', 'requires at least 1 argument');
-elseif isstruct(signal) && ~isfield(signal, 'data')
-    error('robustReference:NoDataField', 'requires a structure data field');
-elseif size(signal.data, 3) ~= 1
-    error('robustReference:DataNotContinuous', 'signal data must be a 2D array');
-elseif size(signal.data, 2) < 2
-    error('robustReference:NoData', 'signal data must have multiple points');
-elseif ~exist('params', 'var') || isempty(params)
-    params = struct();
-end
-if ~isstruct(params)
-    error('robustReference:NoData', 'second argument must be a structure')
-end
-referenceOut = getReferenceStructure();
-referenceOut.referenceChannels = sort(getStructureParameters(params, ...
-    'referenceChannels',  1:size(signal.data, 1)));
-referenceOut.rereferencedChannels =  sort(getStructureParameters(params, ...
-    'rereferencedChannels',  1:size(signal.data, 1)));
-referenceOut.channelLocations = getStructureParameters(params, ...
-    'channelLocations', signal.chanlocs);
-referenceOut.channelInformation = getStructureParameters(params, ...
-    'channelInformation', signal.chaninfo);
-referenceOut.maxInterpolationIterations = ...
-     getStructureParameters(params, 'maxInterpolationIterations', 4);
-referenceOut.actualInterpolationIterations = 0;
-referenceOut.referenceType = 'robust';
-
+function [signal, referenceOut] = robustReference(signal, referenceIn)
+% Calculate the robust reference
+referenceOut = referenceIn;
 %% Check to make sure that reference channels have locations
 chanlocs = referenceOut.channelLocations(referenceOut.referenceChannels);
 if ~(length(cell2mat({chanlocs.X})) == length(chanlocs) && ...
@@ -42,7 +15,8 @@ end
 %% Find the noisy channels for the initial starting point
 referenceOut.referenceSignalWithNoisyChannels = ...
                 nanmean(signal.data(referenceOut.referenceChannels, :), 1);
-referenceOut.noisyOutOriginal = findNoisyChannels(signal, params); 
+referenceIn.evaluationChannels = referenceOut.referenceChannels;
+referenceOut.noisyOutOriginal = findNoisyChannels(signal, referenceIn); 
 
 %% Now remove the huber mean and find the channels that are still noisy
 unusableChannels = union(...
@@ -50,7 +24,7 @@ unusableChannels = union(...
     referenceOut.noisyOutOriginal.badChannelsFromNoData);
 referenceChannels = setdiff(referenceOut.referenceChannels, unusableChannels);
 signalTmp = removeHuberMean(signal, referenceChannels);
-noisyOutHuber = findNoisyChannels(signalTmp, params); 
+noisyOutHuber = findNoisyChannels(signalTmp, referenceIn); 
 
 %% Construct new EEG with interpolated channels to find better average reference
 noisyChannels = union(noisyOutHuber.noisyChannels, unusableChannels);
@@ -75,21 +49,21 @@ badChannelsFromDeviation = [];
 badChannelsFromRansac = [];
 badChannelsFromDropOuts = [];
 actualIterations = 0;
-paramsNew = params;
-paramsNew.referenceChannels = setdiff(params.referenceChannels, ...
+paramsNew = referenceIn;
+paramsNew.referenceChannels = setdiff(referenceIn.referenceChannels, ...
                                       unusableChannels);
 noisyChannelsOld = [];
 while true  
     noisyOut = findNoisyChannels(signalTmp, paramsNew);
     if isempty(noisyOut.noisyChannels) || ...
-            actualIterations > referenceOut.maxInterpolationIterations || ...
+            actualIterations > referenceOut.maxReferenceIterations || ...
             (isempty(setdiff(noisyOut.noisyChannels, noisyChannelsOld)) ...
             && isempty(setdiff(noisyChannelsOld, noisyOut.noisyChannels)))
         break;
     end
     noisyChannelsOld = noisyOut.noisyChannels;
     noisyChannels = union(noisyOut.noisyChannels, noisyChannels);
-    sourceChannels = setdiff(params.referenceChannels, noisyChannels);
+    sourceChannels = setdiff(referenceIn.referenceChannels, noisyChannels);
     badChannelsFromNaNs = union(badChannelsFromNaNs, ...
           noisyOut.badChannelsFromNaNs);
     badChannelsFromNoData = union(badChannelsFromNoData, ...
@@ -131,10 +105,10 @@ referenceOut.interpolatedChannelsFromRansac = ...
     union(noisyOut.badChannelsFromRansac, badChannelsFromRansac);
 referenceOut.interpolatedChannelsFromDropOuts = noisyOut.badChannelsFromDropOuts;
 referenceOut.interpolatedChannels = noisyChannels;
-noisyOut = findNoisyChannels(signal, params);
+noisyOut = findNoisyChannels(signal, referenceIn);
 referenceOut.channelsStillBad = noisyOut.noisyChannels;
 
 referenceOut.noisyOut = noisyOut;
 referenceOut.referenceSignal = averageReference;
-referenceOut.actualInterpolationIterations = actualIterations;
+referenceOut.actualReferenceIterations = actualIterations;
 

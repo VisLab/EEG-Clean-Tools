@@ -1,4 +1,4 @@
-function [datafit, f0Significant]= ...
+function [datafit, f0Significant, FvalSig, aSig, fSig, sig]= ...
                            fitSignificantFrequencies(data, f0, lineNoise)
 % Fits significant sine waves to specified peaks in continuous data
 %
@@ -62,8 +62,10 @@ else
 end
  
 % Estimate the contribution of any significant f0 lines
-fsig = f(frequencyMask);
-if ~isempty(fsig)
-    datafit = exp(1i*2*pi*(0:(N - 1))'*fsig/Fs)* A(frequencyMask) ...
-        + exp(-1i*2*pi*(0:(N - 1))'*fsig/Fs)*conj(A(frequencyMask));
+fSig = f(frequencyMask);
+aSig = A(frequencyMask);
+FvalSig = Fval(frequencyMask);
+if ~isempty(fSig)
+    datafit = exp(1i*2*pi*(0:(N - 1))'*fSig/Fs)* aSig ...
+        + exp(-1i*2*pi*(0:(N - 1))'*fSig/Fs)*conj(aSig);
 end

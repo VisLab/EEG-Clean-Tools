@@ -1,7 +1,8 @@
 function summary = reportLineNoise(fid, noiseDetection, numbersPerRow, indent)
 % Outputs a summary of line noise removal to file fid and returns a cell array of important messages
     summary = {};
-    if ~isempty(noiseDetection.errors.lineNoise)
+    if isfield(noiseDetection.errors, 'lineNoise') && ...
+            ~isempty(noiseDetection.errors.lineNoise)
         summary{end+1} =  noiseDetection.errors.lineNoise;
         fprintf(fid, '%s\n', summary{end});
     end

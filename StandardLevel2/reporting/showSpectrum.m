@@ -18,10 +18,11 @@ function [badChannels, fref, sref] = showSpectrum(EEG, channels, displayChannels
        end
     end   
     badChannels = channels(badList);
-    tString1 = {tString,'Selected channels'};
-    displayChannels = intersect(channels, displayChannels);
-    displayChannels = setdiff(displayChannels, badChannels);
     if ~isempty(displayChannels)
+        tString1 = {tString,'Selected channels'};
+        displayChannels = intersect(channels, displayChannels);
+        displayChannels = setdiff(displayChannels, badChannels);
+
         colors = jet(length(displayChannels));
         figure('Name', tString)
         hold on

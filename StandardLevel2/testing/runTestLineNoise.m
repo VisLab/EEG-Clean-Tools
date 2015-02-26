@@ -79,7 +79,7 @@ params.lineNoiseChannels = 1:70;
 % params.detrendCutoff = 0.2;
 % basenameOut = [basename '_cutoff' num2str(params.detrendCutoff)];
 
-outdir = 'N:\\ARLAnalysis\\VEPTrendRefactored2\\VEPStandardLevel2RevRobustHPCutoff0p3';
+
 params.detrendType = 'high pass';
 params.detrendCutoff = 0.3;
 basenameOut = [basename 'HPRev_cutoff' num2str(params.detrendCutoff)];
@@ -88,13 +88,6 @@ for k = 1%:18
     thisName = sprintf('%s_%02d', basename, k);
     fname = [indir filesep thisName '.set'];
     EEG = pop_loadset(fname);
-    thisNameOut = sprintf('%s_%02d', basenameOut, k);
-    params.name = thisNameOut;
-    [EEG, computationTimes] = standardLevel2Pipeline(EEG, params);
-    fprintf(['Computation times (seconds): %g resampling,' ...
-             '%g detrend, %g line noise, %g reference \n'], ...
-             computationTimes.resampling, computationTimes.detrend, ...
-             computationTimes.lineNoise, computationTimes.reference);
-    fname = [outdir filesep thisName '.set'];
-    save(fname, 'EEG', '-mat', '-v7.3');
+    params.name = thisName;
+    [EEG, EEGRev, correlations] = testHPLineNoiseOrder(EEG, params);
 end

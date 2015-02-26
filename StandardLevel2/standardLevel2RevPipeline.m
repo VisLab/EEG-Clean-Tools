@@ -1,4 +1,4 @@
-function [EEG, computationTimes] = standardLevel2Pipeline(EEG, params)
+function [EEG, computationTimes] = standardLevel2RevPipeline(EEG, params)
 
 %% Standard level 2 pipeline 
 % This assumes the following have been set:
@@ -62,7 +62,7 @@ try
     end
 catch mex
     errorMessages.boundary = ...
-        ['standardLevel2Pipeline bad boundary events: ' getReport(mex)];
+        ['standardLevel2RevPipeline bad boundary events: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
@@ -77,13 +77,43 @@ try
     computationTimes.resampling = toc;
 catch mex
     errorMessages.resampling = ...
-        ['standardLevel2Pipeline failed resampleEEG: ' getReport(mex)];
+        ['standardLevel2RevPipeline failed resampleEEG: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
 end
 
-%% Part II:  HP the signal for detecting bad channels
+%% Part II: Global detrend
+fprintf('Global trend removal\n');
+try
+    tic
+    [EEG, globalTrend] = removeGlobalTrend(EEG, params);
+    EEG.etc.noiseDetection.globalTrend = globalTrend;
+    computationTimes.globalTrend = toc;
+catch mex
+    errorMessages.globalTrend = ...
+        ['standardLevel2RevPipeline failed removeGlobalTrend: ' getReport(mex)];
+    errorMessages.status = 'unprocessed';
+    EEG.etc.noiseDetection.errors = errorMessages;
+    return;
+end 
+ 
+%% Part II: Remove line noise
+fprintf('Line noise removal\n');
+try
+    tic
+    [EEG, lineNoise] = cleanLineNoise(EEG, params);
+    EEG.etc.noiseDetection.lineNoise = lineNoise;
+    computationTimes.lineNoise = toc;
+catch mex
+    errorMessages.lineNoise = ...
+        ['standardLevel2RevPipeline failed cleanLineNoise: ' getReport(mex)];
+    errorMessages.status = 'unprocessed';
+    EEG.etc.noiseDetection.errors = errorMessages;
+    return;
+end 
+
+%% Part III:  HP the signal for detecting bad channels
 fprintf('Preliminary detrend to compute reference\n');
 try
     tic
@@ -92,37 +122,18 @@ try
     computationTimes.detrend = toc;
 catch mex
     errorMessages.removeTrend = ...
-        ['standardLevel2Pipeline failed removeTrend: ' getReport(mex)];
+        ['standardLevel2RevPipeline failed removeTrend: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
 end
- 
-%% Part III: Remove line noise
-fprintf('Line noise removal\n');
-try
-    tic
-    [EEGClean, lineNoise] = cleanLineNoise(EEGNew, params);
-    EEG.etc.noiseDetection.lineNoise = lineNoise;
-    chs = lineNoise.lineNoiseChannels;
-    EEG.data(chs, :) = ...
-        EEG.data(chs, :) - EEGNew.data(chs, :) + EEGClean.data(chs, :); 
-    clear EEGNew;
-    computationTimes.lineNoise = toc;
-catch mex
-    errorMessages.lineNoise = ...
-        ['standardLevel2Pipeline failed cleanLineNoise: ' getReport(mex)];
-    errorMessages.status = 'unprocessed';
-    EEG.etc.noiseDetection.errors = errorMessages;
-    return;
-end 
 
 %% Part IV: Find reference
 fprintf('Find reference\n');
 try
     tic
-    referenceOut = findReference(EEGClean, params);
-    clear EEGClean;
+    referenceOut = findReference(EEGNew, params);
+    clear EEGNew;
     referenceSignalOriginal = ...
         mean(EEG.data(referenceOut.evaluationChannels, :), 1);
     noisyChannels = referenceOut.interpolatedChannels;
@@ -138,14 +149,14 @@ try
         referenceOut.rereferencedChannels);
     referenceOut.referenceSignalOriginal = referenceSignalOriginal;
     referenceOut.referenceSignal = referenceSignal;
-    EEGClean = removeTrend(EEG, params);
-    referenceOut.noisyStatistics = findNoisyChannels(EEGClean, referenceOut);
-    clear EEGClean;
+    [EEGNew, trend] = removeTrend(EEG, params);
+    referenceOut.noisyStatistics = findNoisyChannels(EEGNew, referenceOut);
+    clear EEGNew;
     EEG.etc.noiseDetection.reference = referenceOut;
     computationTimes.reference = toc;
 catch mex
     errorMessages.reference = ...
-        ['standardLevel2Pipeline failed findReference: ' ...
+        ['standardLevel2RevPipeline failed findReference: ' ...
         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;

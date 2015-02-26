@@ -1,4 +1,4 @@
-function [referenceLocations, referenceChannels, legendString] = ...
+function [referenceLocations, evaluationChannels, legendString] = ...
         getReportChannelInformation(channelLocations, results)
     % Extracts channel locations with bad channels labeled, info and 
     % reference channel list from report
@@ -12,7 +12,7 @@ function [referenceLocations, referenceChannels, legendString] = ...
     legendString = {'NaN: n', 'NoData: z', 'Corr: c', ...
                     'Amp: +', 'Noise: x', 'Ran: ?'};
     chanlocs = channelLocations;
-    referenceChannels = results.referenceChannels;
+    evaluationChannels = results.evaluationChannels;
     % Set the bad channel labels
 
     if isfield(results, 'badChannelsFromNaNs')
@@ -45,11 +45,11 @@ function [referenceLocations, referenceChannels, legendString] = ...
         chanlocs(j).labels = [chanlocs(j).labels badRansacSymbol];
     end
 
-    good_chans = setdiff(referenceChannels, (results.noisyChannels)');
+    good_chans = setdiff(evaluationChannels, (results.noisyChannels)');
     for j = good_chans
         chanlocs(j).labels = ' ';
     end
-    referenceLocations = chanlocs(referenceChannels);
+    referenceLocations = chanlocs(evaluationChannels);
 end
 
 
