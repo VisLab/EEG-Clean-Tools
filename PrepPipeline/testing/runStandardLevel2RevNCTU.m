@@ -9,7 +9,7 @@
 
 ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
 ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
-ess2Dir = 'N:\ARLAnalysis\NCTURev\NCTUStandardLevel2RevHP03';
+ess2Dir = 'N:\ARLAnalysis\NCTURev\NCTUStandardLevel2RevHP1';
 
 
 %% Validate level 1
