@@ -1,9 +1,9 @@
-function [] = publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
+function [] = publishPrepPipelineReport(EEG, summaryFolder, summaryReportName, ...
                  sessionFolder, sessionReportName)
    % Session folder is relative to the summary report location
         assignin('base', 'EEG', EEG); 
         tempReportLocation = [summaryFolder filesep sessionFolder ...
-                                    filesep 'standardLevel2Report.pdf'];
+                                    filesep 'prepPipelineReport.pdf'];
         actualReportLocation = [summaryFolder filesep sessionFolder ...
                                     filesep sessionReportName];
         summaryReportLocation = [summaryFolder filesep summaryReportName];
@@ -14,7 +14,7 @@ function [] = publishLevel2Report(EEG, summaryFolder, summaryReportName, ...
         assignin('base', 'summaryFile', summaryFile);
         assignin('base', 'consoleFID', consoleFID);
         assignin('base', 'relativeReportLocation', relativeReportLocation);
-        script_name = 'standardLevel2Report.m';
+        script_name = 'prepPipelineReport.m';
         publish_options.outputDir = [summaryFolder filesep sessionFolder];
         publish_options.maxWidth = 800;
         publish_options.format = 'pdf';

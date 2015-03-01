@@ -1,6 +1,6 @@
-function [EEG, computationTimes] = standardLevel2UnRefPipeline(EEG, params)
+function [EEG, computationTimes] = prepPipeline(EEG, params)
 
-%% Standard level 2 pipeline 
+%% Prep pipeline 
 % This assumes the following have been set:
 %  EEG                       An EEGLAB structure with the data and chanlocs
 %  params                    A structure with at least the following:
@@ -9,6 +9,8 @@ function [EEG, computationTimes] = standardLevel2UnRefPipeline(EEG, params)
 %     referenceChannels      A vector of channels to be used for
 %                            rereferencing (Usually these are EEG (no
 %                            mastoids or EOG)
+%     evaluationChannels     A vector of channels to be used for
+%                            EEG interpolation
 %     rereferencedChannels   A vector of channels to be high-passed, 
 %                            line-noise removed, and referenced. 
 %     lineFrequencies        A list of line frequencies
@@ -139,7 +141,11 @@ try
     referenceOut.referenceSignalOriginal = referenceSignalOriginal;
     referenceOut.referenceSignal = referenceSignal;
     EEGClean = removeTrend(EEG, params);
+    
     referenceOut.noisyStatistics = findNoisyChannels(EEGClean, referenceOut);
+    if referenceOut.keepFiltered
+        EEG = EEGClean;
+    end
     clear EEGClean;
     EEG.etc.noiseDetection.reference = referenceOut;
     computationTimes.reference = toc;

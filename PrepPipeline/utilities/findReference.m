@@ -27,19 +27,17 @@ end
 referenceOut.rereferencedChannels = sort(referenceOut.rereferencedChannels);
 referenceOut.referenceChannels = sort(referenceOut.referenceChannels);
 referenceOut.evaluationChannels = sort(referenceOut.evaluationChannels);
-fprintf('Here before robust reference new\n');
 if isfield(referenceOut, 'reportingLevel') && ...
     strcmpi(referenceOut.reportingLevel, 'verbose');
     referenceOut.noisyStatisticsOriginal = findNoisyChannels(signal, referenceIn);
 end
 %% The reference
-fprintf('to here8 \n');
 if strcmpi(referenceOut.referenceType, 'robust') 
     referenceOut.evaluationChannels = referenceOut.referenceChannels;
-    referenceOut = robustReferenceNew(signal, referenceOut); 
+    referenceOut = robustReference(signal, referenceOut); 
 elseif strcmpi(referenceOut.referenceType, 'average') 
     referenceOut.evaluationChannels = referenceOut.referenceChannels;
-    referenceOut = specificReferenceNew(signal, referenceOut); 
+    referenceOut = specificReference(signal, referenceOut); 
 elseif strcmpi(referenceOut.referenceType, 'specific')
    if length(union(referenceOut.referenceChannels, ...
                     referenceOut.evaluationChannels)) ...
