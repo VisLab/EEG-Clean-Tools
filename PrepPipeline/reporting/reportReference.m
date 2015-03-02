@@ -1,4 +1,4 @@
-function [summary, noisyStatistics] = reportReferencedNew(fid, signal, noiseDetection, numbersPerRow, indent)
+function [summary, noisyStatistics] = reportReference(fid, noiseDetection, numbersPerRow, indent)
 %% Extracts and outputs parameters for referencing calculation
 % Outputs a summary to file fid and returns a cell array of important messages
     summary = {};
@@ -13,7 +13,7 @@ function [summary, noisyStatistics] = reportReferencedNew(fid, signal, noiseDete
     end
     reference = noiseDetection.reference;
     noisyStatistics = reference.noisyStatistics;
-    fprintf(fid, 'Rereferencing version %s\n',  ...
+    fprintf(fid, 'Referencing version %s\n',  ...
         noiseDetection.version.Reference);
     fprintf(fid, 'Reference type %s\n',  reference.referenceType);
     fprintf(fid, '\nReference channels (%d channels):\n', ...
@@ -63,68 +63,19 @@ function [summary, noisyStatistics] = reportReferencedNew(fid, signal, noiseDete
     
     %% Listing of noisy channels
     channelLabels = {reference.channelLocations.labels};
-    originalBad = reference.interpolatedChannels;
+    originalBad = reference.interpolatedChannels.all;
     badList = getLabeledList(originalBad,  ...
         channelLabels(originalBad), numbersPerRow, indent);
-    fprintf(fid, '\n\nNoisy channels before referencing:\n %s', badList);
     summary{end+1} = ['Bad channels before referencing: ' badList];
+    fprintf(fid, '\n\nBad channels before referencing:\n %s', badList);
+    printBadChannelsByType(fid, reference.interpolatedChannels, channelLabels, numbersPerRow, indent)
     
-    finalBad = noisyStatistics.noisyChannels;
+    finalBad = noisyStatistics.noisyChannels.all;
     badList = getLabeledList(finalBad, channelLabels(finalBad), ...
         numbersPerRow, indent);
-    fprintf(fid, '\nNoisy channels after referencing:\n %s', badList);
-    summary{end+1} = ['Bad channels after referencing: ' badList];
- 
-    %% NaN criteria
-    if isfield(noisyStatistics, 'badChannelsFromNaNs')   % temporary
-        badList = getLabeledList(noisyStatistics.badChannelsFromNaNs, ...
-            channelLabels(noisyStatistics.badChannelsFromNaNs), ...
-            numbersPerRow, indent);
-        fprintf(fid, '\n\nBad because of NaN (referenced):\n%s', badList);
-    end
-    %% All constant criteria
-    if isfield(noisyStatistics, 'badChannelsFromNoData')   % temporary      
-        badList = getLabeledList(noisyStatistics.badChannelsFromNoData, ...
-            channelLabels(noisyStatistics.badChannelsFromNoData), ...
-            numbersPerRow, indent);
-        fprintf(fid, '\n\nBad because data is constant (referenced):\n%s',...
-            badList);
-    end
-    %% Dropout criteria
-    if isfield(noisyStatistics, 'badChannelsFromDropOuts')   % temporary    
-        badList = getLabeledList(noisyStatistics.badChannelsFromDropOuts, ...
-            channelLabels(noisyStatistics.badChannelsFromDropOuts), ...
-            numbersPerRow, indent);
-        fprintf(fid, ...
-            '\n\nBad because of drop outs (referenced):\n%s', badList);       
-    end
-    %% Maximum correlation criterion
-    badList = getLabeledList(noisyStatistics.badChannelsFromCorrelation, ...
-        channelLabels(noisyStatistics.badChannelsFromCorrelation), ...
-        numbersPerRow, indent);
-    fprintf(fid, ...
-        '\n\nBad because of poor max correlation (referenced):\n%s', badList);
-
-    %% Large deviation criterion
-    badList = getLabeledList(noisyStatistics.badChannelsFromDeviation, ...
-        channelLabels(noisyStatistics.badChannelsFromDeviation), ...
-        numbersPerRow, indent);
-    fprintf(fid, ...
-        '\n\nBad because of large deviation (referenced):\n%s', badList);
-    %% HF SNR ratio criterion
-    badList = getLabeledList(noisyStatistics.badChannelsFromHFNoise, ...
-        channelLabels(noisyStatistics.badChannelsFromHFNoise), ...
-        numbersPerRow, indent);
-    fprintf(fid, ...
-        '\n\nBad because of HF noise (low SNR)(referenced):\n%s', badList);
-      
-    %% Ransac criteria
-    badList = getLabeledList(noisyStatistics.badChannelsFromRansac, ...
-        channelLabels(noisyStatistics.badChannelsFromRansac), ...
-        numbersPerRow, indent);
-    fprintf(fid, '\n\nBad because of poor Ransac predictability (referenced):\n%s', badList);
-  
-
+    fprintf(fid, '\n\nBad channels after interpolation+referencing:\n %s', badList);
+    summary{end+1} = ['Bad channels after interpolation+referencing:' badList];
+    printBadChannelsByType(fid, noisyStatistics.noisyChannels, channelLabels, numbersPerRow, indent)
     %% Iteration report
         report = sprintf('\n\nActual interpolation iterations: %d\n', ...
             reference.actualReferenceIterations);

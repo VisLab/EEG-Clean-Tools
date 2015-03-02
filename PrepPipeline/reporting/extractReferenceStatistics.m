@@ -61,9 +61,10 @@ function [statisticsTitles, statisticsIndex,  noisyChannels, ...
 
     statistics = zeros(1, length(statisticsTitles));
     reference = EEG.etc.noiseDetection.reference;
-    original = reference.noisyOutOriginal;
-    referenced = reference.noisyOut;
+    original = reference.noisyStatisticsOriginal;
+    referenced = reference.noisyStatistics;
     referenceChannels = reference.referenceChannels;
+    evaluationChannels = reference.evaluationChannels;
     %% Fill in the rest of the noisyChannels structure
     noisyChannels.numberReferenceChannels = length(referenceChannels);
     noisyChannels.actualInterpolationIterations = ...
@@ -71,42 +72,42 @@ function [statisticsTitles, statisticsIndex,  noisyChannels, ...
 
     channelLabels = {reference.channelLocations.labels};
     noisyChannels.badInterpolated = ...
-        getFieldIfExists(reference, 'interpolatedChannels');
+        getFieldIfExists(reference.interpolatedChannels, 'all');
     noisyChannels.channelsStillBad = ...
-        getFieldIfExists(reference, 'channelsStillBad');
+        getFieldIfExists(reference.noisyStatistics.noisyChannels, 'all');
     noisyChannels.badChannelNumbers = ...
         union(noisyChannels.badInterpolated, noisyChannels.channelsStillBad);
     noisyChannels.badChannelLabels = channelLabels(noisyChannels.badChannelNumbers);
  
     noisyChannels.interpolatedNaN = ...
-        getFieldIfExists(reference, 'interpolatedChannelsFromNaNs');
+        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromNaNs');
     noisyChannels.interpolatedNoData = ...
-        getFieldIfExists(reference, 'interpolatedChannelsFromNoData');
+        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromNoData');
     noisyChannels.interpolatedHF = ...
-        getFieldIfExists(reference, 'interpolatedChannelsFromHFNoise');
+        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromHFNoise');
     noisyChannels.interpolatedCorr = ...
-        getFieldIfExists(reference, 'interpolatedChannelsFromCorrelation');
+        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromCorrelation');
     noisyChannels.interpolatedDev = ...
-        getFieldIfExists(reference, 'interpolatedChannelsFromDeviation');
+        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromDeviation');
     noisyChannels.interpolatedRansac = ...
-        getFieldIfExists(reference, 'interpolatedChannelsFromRansac');
+        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromRansac');
     noisyChannels.interpolatedDropOuts = ...
-        getFieldIfExists(reference, 'interpolatedChannelsFromDropOuts');
+        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromDropOuts');
 
 %% Deviations
     statistics(s.medDevOrig) = original.channelDeviationMedian;
     statistics(s.medDevRef) = referenced.channelDeviationMedian;
     statistics(s.rSDDevOrig) = original.channelDeviationSD;
     statistics(s.rSDDevRef) = referenced.channelDeviationSD;
-    beforeDeviationLevels = original.channelDeviations(referenceChannels, :);
-    afterDeviationLevels = referenced.channelDeviations(referenceChannels, :);
+    beforeDeviationLevels = original.channelDeviations(evaluationChannels, :);
+    afterDeviationLevels = referenced.channelDeviations(evaluationChannels, :);
     statistics(s.medWinDevOrig) = median(beforeDeviationLevels(:));
     statistics(s.medWinDevRef) = median(afterDeviationLevels(:));
     statistics(s.rSDWinDevOrig) = mad(beforeDeviationLevels(:), 1)*1.4826;
     statistics(s.rSDWinDevRef) = mad(afterDeviationLevels(:), 1)*1.4826;
 %% Correlations
-    beforeCorrelation = original.maximumCorrelations(referenceChannels, :);
-    afterCorrelation = referenced.maximumCorrelations(referenceChannels, :);
+    beforeCorrelation = original.maximumCorrelations(evaluationChannels, :);
+    afterCorrelation = referenced.maximumCorrelations(evaluationChannels, :);
     statistics(s.medCorOrig) = median(beforeCorrelation(:));
     statistics(s.medCorRef) = median(afterCorrelation(:));
     statistics(s.aveCorOrig) = mean(beforeCorrelation(:));
@@ -117,8 +118,8 @@ function [statisticsTitles, statisticsIndex,  noisyChannels, ...
     statistics(s.medHFRef) = referenced.noisinessMedian;
     statistics(s.rSDHFOrig) = original.noisinessSD;
     statistics(s.rSDHFRef) = referenced.noisinessSD;
-    beforeNoiseLevels = original.noiseLevels(referenceChannels, :);
-    afterNoiseLevels = referenced.noiseLevels(referenceChannels, :);
+    beforeNoiseLevels = original.noiseLevels(evaluationChannels, :);
+    afterNoiseLevels = referenced.noiseLevels(evaluationChannels, :);
     statistics(s.medWinHFOrig) = median(beforeNoiseLevels(:));
     statistics(s.medWinHFRef) = median(afterNoiseLevels(:));
     statistics(s.rSDWinHFOrig) = mad(beforeNoiseLevels(:), 1)*1.4826;

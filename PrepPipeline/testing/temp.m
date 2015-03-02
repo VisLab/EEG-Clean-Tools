@@ -1,0 +1,3 @@
+%%
+[statisticsTitles, statisticsIndex,  noisyChannels, ... 
+          statistics] = extractReferenceStatistics(EEG);

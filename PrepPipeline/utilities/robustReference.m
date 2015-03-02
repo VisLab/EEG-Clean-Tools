@@ -1,36 +1,30 @@
 function referenceOut = robustReference(signal, referenceIn)
-% Calculate the robust reference
+% Find the channels that are to be interpolated for a robust reference
 referenceOut = referenceIn;
-%% Check to make sure that reference channels have locations
-chanlocs = referenceIn.channelLocations(referenceIn.referenceChannels);
-if ~(length(cell2mat({chanlocs.X})) == length(chanlocs) && ...
-     length(cell2mat({chanlocs.Y})) == length(chanlocs) && ...
-     length(cell2mat({chanlocs.Z})) == length(chanlocs)) && ...
-   ~(length(cell2mat({chanlocs.theta})) == length(chanlocs) && ...
-     length(cell2mat({chanlocs.radius})) == length(chanlocs))
-   error('robustReference:NoChannelLocations', ...
-         'reference channels must have locations');
-end
 
 %% Remove the huber mean and find the channels that are still noisy
-[nanChannels, noSignalChannels] = ...
+[badChannelsFromNaNs, badChannelsFromNoData] = ...
                findUnusableChannels(signal, referenceIn.referenceChannels); 
-unusableChannels = union(nanChannels, noSignalChannels);
+unusableChannels = union(badChannelsFromNaNs, badChannelsFromNoData);
+referenceOut.interpolatedChannels.badChannelsFromNaNs = badChannelsFromNaNs;
+referenceOut.interpolatedChannels.badChannelsFromNoData = badChannelsFromNoData;
 referenceChannels = setdiff(referenceIn.referenceChannels, unusableChannels);
 signalTmp = removeHuberMean(signal, referenceChannels);
 
 %% Now remove reference from the signal iteratively interpolate bad channels
-noisyChannels = unusableChannels;
-actualIterations = 0;                                
+referenceOut.actualReferenceIterations = 0;                                
 noisyChannelsOld = [];
 while true
     noisyOut = findNoisyChannels(signalTmp, referenceIn);
-    noisyChannels = union(noisyOut.noisyChannels, noisyChannels);
+    referenceOut.interpolatedChannels = ...
+        updateBadChannels(referenceOut.interpolatedChannels, ...
+        noisyOut.noisyChannels);
+    noisyChannels = referenceOut.interpolatedChannels.all;
     if isempty(noisyChannels) || ...
-            actualIterations > referenceIn.maxReferenceIterations || ...
-            (isempty(setdiff(noisyChannels, noisyChannelsOld)) ...
-            && isempty(setdiff(noisyChannelsOld, noisyChannels)))
-        referenceSignal =  mean(signal.data(referenceChannels, :), 1);
+       referenceOut.actualReferenceIterations > ...
+       referenceIn.maxReferenceIterations || ...
+       (isempty(setdiff(noisyChannels, noisyChannelsOld)) ...
+        && isempty(setdiff(noisyChannelsOld, noisyChannels)))
         break;
     end  
     noisyChannelsOld = noisyChannels; 
@@ -39,14 +33,11 @@ while true
         error('robustReference:TooManyBad', ...
             'Could not perform a robust reference -- not enough good channels');
     end
-    fprintf('Iteration: %d\n', actualIterations);
+    fprintf('Iteration: %d\n', referenceOut.actualReferenceIterations);
     fprintf('Interpolating channels: %s\n', getListString(noisyChannels));
     signalTmp = interpolateChannels(signal, noisyChannels, sourceChannels);
     referenceSignal = mean(signalTmp.data(referenceChannels, :), 1);
     signalTmp = removeReference(signal, referenceSignal, referenceChannels);
-    actualIterations = actualIterations + 1;
+    referenceOut.actualReferenceIterations = ...
+        referenceOut.actualReferenceIterations + 1;
 end
-referenceOut.interpolatedChannels = noisyChannels;
-referenceOut.referenceSignal = referenceSignal;
-referenceOut.actualReferenceIterations = actualIterations;
-

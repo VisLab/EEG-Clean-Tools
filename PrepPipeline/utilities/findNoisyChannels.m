@@ -129,18 +129,14 @@ noisyOut.robustChannelDeviation = zeros(originalNumberChannels, 1);
 noisyOut.ransacCorrelations = ones(originalNumberChannels, WRansac);
 noisyOut.ransacOffsets = ransacOffsets;
 
-% %% High pass filter at 1 Hz 
-% BHigh = design_fir(100,[0 2*[0.5 1 2]/noisyOut.srate 1],[0 0.25 1 1 1]);
-% parfor k = 1:numberChannels  % Could be changed to parfor
-%     data(:,k) = filtfilt_fast(BHigh, 1, data(:, k)); end
-
 %% Detect constant or NaN channels and remove from consideration
 nanChannelMask = sum(isnan(data), 1) > 0;
 noSignalChannelMask = mad(data, 1, 1) < 10e-10 | std(data, 1, 1) < 10e-10;
-noisyOut.badChannelsFromNaNs = evaluationChannels(nanChannelMask);
-noisyOut.badChannelsFromNoData = evaluationChannels(noSignalChannelMask);
+noisyOut.noisyChannels.badChannelsFromNaNs = evaluationChannels(nanChannelMask);
+noisyOut.noisyChannels.badChannelsFromNoData = evaluationChannels(noSignalChannelMask);
 evaluationChannels = setdiff(evaluationChannels, ...
-    union(noisyOut.badChannelsFromNaNs, noisyOut.badChannelsFromNoData));
+    union(noisyOut.noisyChannels.badChannelsFromNaNs, ...
+          noisyOut.noisyChannels.badChannelsFromNoData));
 data = signal.data;
 data = double(data(evaluationChannels, :))';  
 [signalSize, numberChannels] = size(data);
@@ -156,7 +152,7 @@ badChannelsFromDeviation = ...
     find(abs(noisyOut.robustChannelDeviation) > ...
              noisyOut.robustDeviationThreshold | ...
              isnan(noisyOut.robustChannelDeviation));
-noisyOut.badChannelsFromDeviation = badChannelsFromDeviation(:)';
+noisyOut.noisyChannels.badChannelsFromDeviation = badChannelsFromDeviation(:)';
 noisyOut.channelDeviationMedian = channelDeviationMedian;
 noisyOut.channelDeviationSD = channelDeviationSD;
 
@@ -177,13 +173,13 @@ if noisyOut.srate > 100
                 isnan(zscoreHFNoiseTemp);
     % Remap channels to original numbering
     badChannelsFromHFNoise  = evaluationChannels(noiseMask);
-    noisyOut.badChannelsFromHFNoise = badChannelsFromHFNoise(:)';
+    noisyOut.noisyChannels.badChannelsFromHFNoise = badChannelsFromHFNoise(:)';
 else
     X = data;
     noisinessMedian = 0;
     noisinessSD = 1;
     zscoreHFNoiseTemp = zeros(numberChannels, 1);
-    noisyOut.badChannelsFromHFNoise = [];
+    noisyOut.noisyChannels.badChannelsFromHFNoise = [];
 end
 
 % Remap the channels to original numbering for the zscoreHFNoise
@@ -225,20 +221,19 @@ badChannelsFromCorrelation = ...
     find(fractionBadCorrelationWindows > noisyOut.badTimeThreshold);
 badChannelsFromDropOuts = ...
     find(fractionBadDropOutWindows > noisyOut.badTimeThreshold);
-noisyOut.badChannelsFromCorrelation = badChannelsFromCorrelation(:)';
-noisyOut.badChannelsFromDropOuts = badChannelsFromDropOuts(:)';
+noisyOut.noisyChannels.badChannelsFromCorrelation = badChannelsFromCorrelation(:)';
+noisyOut.noisyChannels.badChannelsFromDropOuts = badChannelsFromDropOuts(:)';
 noisyOut.medianMaxCorrelation =  median(noisyOut.maximumCorrelations, 2);
 
 %% Bad so far by amplitude and correlation (take these out before doing ransac)
-noisyChannels = union(noisyOut.badChannelsFromDeviation, ...
-    union(noisyOut.badChannelsFromCorrelation, ...
-          noisyOut.badChannelsFromDropOuts));
+noisyChannels = union(noisyOut.noisyChannels.badChannelsFromDeviation, ...
+    union(noisyOut.noisyChannels.badChannelsFromCorrelation, ...
+          noisyOut.noisyChannels.badChannelsFromDropOuts));
 %% Method 4: Ransac corelation (may not be performed)
 % Setup for ransac (if a 2-stage algorithm, remove other bad channels first)
 if isempty(channelLocations) 
     warning('findNoisyChannels:noChannelLocation', ...
         'ransac could not be computed because there were no channel locations');
-    noisyOut.badChannelsFromRansac = [];
     noisyOut.ransacBadWindowFraction = 0;
     noisyOut.ransacPerformed = false;
 else % Set up parameters and make sure enough good channels to proceed
@@ -264,7 +259,6 @@ else % Set up parameters and make sure enough good channels to proceed
             ransacSubset < 2
         warning('find_noisyChannels:NotEnoughGoodChannels', ...
             'Too many channels have failed quality tests to perform ransac');
-        noisyOut.badChannelsFromRansac = [];
         noisyOut.ransacBadWindowFraction = 0;
         noisyOut.ransacPerformed = false;
     end
@@ -300,17 +294,17 @@ if noisyOut.ransacPerformed
     flagged = noisyOut.ransacCorrelations < noisyOut.ransacCorrelationThreshold;
     badChannelsFromRansac = ...
         find(sum(flagged, 2)*ransacFrames > ransacUnbrokenFrames)';
-    noisyOut.badChannelsFromRansac = badChannelsFromRansac(:)';
+    noisyOut.noisyChannels.badChannelsFromRansac = badChannelsFromRansac(:)';
     noisyOut.ransacBadWindowFraction = sum(flagged, 2)/size(flagged, 2);
 end
 
 % Combine bad channels detected from all methods
 noisyChannels = union(noisyChannels, ...
-    union(union(noisyOut.badChannelsFromRansac, ...
-          noisyOut.badChannelsFromHFNoise), ...
-    union(noisyOut.badChannelsFromNaNs, ...
-          noisyOut.badChannelsFromNoData)));
-noisyOut.noisyChannels = noisyChannels;
+    union(union(noisyOut.noisyChannels.badChannelsFromRansac, ...
+          noisyOut.noisyChannels.badChannelsFromHFNoise), ...
+    union(noisyOut.noisyChannels.badChannelsFromNaNs, ...
+          noisyOut.noisyChannels.badChannelsFromNoData)));
+noisyOut.noisyChannels.all = noisyChannels;
 noisyOut.medianMaxCorrelation =  median(noisyOut.maximumCorrelations, 2);
 
 %% Helper functions for findNoisyChannels
@@ -366,14 +360,7 @@ function noisyOut = getNoisyStructure()
         'ransacCorrelationThreshold', [], ...
         'ransacUnbrokenTime', [], ...
         'ransacWindowSeconds', [], ...
-        'noisyChannels', [], ...
-        'badChannelsFromNaNs', [], ...
-        'badChannelsFromNoData', [], ...
-        'badChannelsFromHFNoise', [],  ...
-        'badChannelsFromCorrelation', [], ...
-        'badChannelsFromDeviation', [], ...
-        'badChannelsFromRansac', [], ...
-        'badChannelsFromDropOuts', [], ...
+        'noisyChannels', getBadChannelStructure(), ...
         'ransacPerformed', true, ...
         'channelDeviationMedian', [], ...
         'channelDeviationSD', [], ...

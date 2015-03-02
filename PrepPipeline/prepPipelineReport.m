@@ -32,27 +32,23 @@ writeSummaryItem(summaryFile, {errorStatus});
 
 % Versions
 versions = EEG.etc.noiseDetection.version;
-versionString = [' Resampling:' getFieldIfExists(versions, 'Resampling'), ...
-                 ' Global trend:' getFieldIfExists(versions, 'GlobalTrend'), ...
-                 ' Detrend:'  getFieldIfExists(versions, 'Detrend'), ...
-                 ' Line noise:'  getFieldIfExists(versions, 'LineNoise'), ...
-                 ' Reference:'  getFieldIfExists(versions, 'Reference'), ...
-                 ' Interpolate: '  getFieldIfExists(versions, 'Interpolation')];
+versionString = getStructureString(EEG.etc.noiseDetection.version);
 writeSummaryItem(summaryFile, {['Versions: ' versionString]});
 fprintf(consoleFID, 'Versions:\n%s\n', versionString);
 
 % Events
-srateMsg = {'Sampling rate: ' num2str(EEG.srate) 'Hz'};
-writeSummaryItem(summaryFile, srateMsg);
-fprintf(consoleFID, '%s\n', srateMsg{1});
+srateMsg = ['Sampling rate: ' num2str(EEG.srate) 'Hz'];
+writeSummaryItem(summaryFile, {srateMsg});
+fprintf(consoleFID, '%s\n', srateMsg);
 [summary, hardFrames] = reportEvents(consoleFID, EEG);
 writeSummaryItem(summaryFile, summary);
 
 % Interpolated channels for referencing
 if isfield(noiseDetection, 'reference')
     interpolatedChannels = getFieldIfExists(noiseDetection, ...
-        'badChannelsInterpolatedForReference');
-    summaryItem = ['Bad channels interpolated for reference: [' num2str(interpolatedChannels), ']'];
+        'interpolatedChannels');
+    summaryItem = ['Bad channels interpolated for reference: [' ...
+                    num2str(interpolatedChannels), ']'];
     writeSummaryItem(summaryFile, {summaryItem});
     fprintf(consoleFID, '%s\n', summaryItem);
 end
@@ -75,7 +71,7 @@ writeSummaryItem(summaryFile, summary);
 summary = reportDetrend(consoleFID, noiseDetection, numbersPerRow, indent);
 writeSummaryItem(summaryFile, summary);
 
-%% Trend correlation relationships for evaluation channels
+%% Trend correlation evaluation channels relationships 
 if isfield(noiseDetection, 'globalTrend')
   channels = noiseDetection.globalTrend.globalTrendChannels;
   tString = 'Global trend (trend channels)';
@@ -86,15 +82,12 @@ if isfield(noiseDetection, 'globalTrend')
   fits = noiseDetection.globalTrend.linearFit(channels, :);
   correlations = noiseDetection.globalTrend.channelCorrelations(channels);
   showTrendCorrelation(fits, correlations, tString);
-end   
-%% Now detrend for additional report
-if isfield(noiseDetection, 'globalTrend')
-   EEGNew = removeTrend(EEG, noiseDetection.globalTrend);
 else
-   EEGNew = EEG;
+    fprintf(consoleFID, 'Global trend not evaluated\n');
+    EEGNew = EEG;
 end
 
-%% Spectrum after line noise removal (and detrend)
+%% Spectrum after line noise and detrend
 if isfield(noiseDetection, 'lineNoise')
     lineChannels = noiseDetection.lineNoise.lineNoiseChannels; 
     numChans = min(6, length(lineChannels));
@@ -102,8 +95,14 @@ if isfield(noiseDetection, 'lineNoise')
     displayChannels = lineChannels(indexchans);
     channelLabels = {EEG.chanlocs(lineChannels).labels};
     tString = noiseDetection.name;
+    if isfield(noiseDetection, 'detrend')
+       EEGNew = removeTrend(EEG, noiseDetection.detrend);
+    else
+       EEGNew = EEG;
+    end
     badChannels = showSpectrum(EEGNew, lineChannels, displayChannels, ...
                              channelLabels, tString);
+    clear EEGNew;
     if ~isempty(badChannels)
         badString = ['Channels with no spectra: ' getListString(badChannels)];
         fprintf(consoleFID, '%s\n', badString);
@@ -114,7 +113,8 @@ end
 
 %% Report referencing step
 if isfield(noiseDetection, 'reference') && ~isempty(noiseDetection.reference) 
-   [summary, noisyStatistics] = reportReferencedNew(consoleFID, EEGNew, noiseDetection, numbersPerRow, indent);
+   [summary, noisyStatistics] = reportReference(consoleFID,  ...
+                                  noiseDetection, numbersPerRow, indent);
     writeSummaryItem(summaryFile, summary);
    EEG.etc.noiseDetection.reference.noisyStatistics = noisyStatistics;
 end
@@ -500,7 +500,7 @@ if isfield(noiseDetection, 'reference') && ...
     ylabel('Ordinary average reference');
     title(tString, 'Interpreter', 'None');
     writeSummaryItem(summaryFile, ...
-        {['Correlation between ordinary and robust average reference: ' ...
+        {['Correlation between ordinary and robust average reference (unfiltered): ' ...
         num2str(corrAverage)]});
 end   
 %% Noisy average reference - robust average reference by time
@@ -525,7 +525,7 @@ if isfield(noiseDetection, 'reference')
     EEGTemp.pnts = length(a);
     EEGTemp.data = [a(:)'; b(:)'];
     EEGTemp.srate = EEG.srate;
-    EEGTemp = pop_eegfiltnew(EEGTemp, noiseDetection.trend.detrendCutoff, []);
+    EEGTemp = pop_eegfiltnew(EEGTemp, noiseDetection.detrend.detrendCutoff, []);
     corrAverage = corr(EEGTemp.data(1, :)', EEGTemp.data(2, :)');
     tString = { noiseDetection.name, ...
         ['Comparison of reference signals (corr=' num2str(corrAverage) ')']};
@@ -535,7 +535,7 @@ if isfield(noiseDetection, 'reference')
     ylabel('Ordinary average reference');
     title(tString, 'Interpreter', 'None');
     writeSummaryItem(summaryFile, ...
-        {['Correlation between ordinary and robust average reference: ' ...
+        {['Correlation between ordinary and robust average reference (filtered): ' ...
         num2str(corrAverage)]});
 end
 %% Noisy average reference - robust average reference by time

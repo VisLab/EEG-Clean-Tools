@@ -13,39 +13,40 @@ function [referenceLocations, evaluationChannels, legendString] = ...
                     'Amp: +', 'Noise: x', 'Ran: ?'};
     chanlocs = channelLocations;
     evaluationChannels = results.evaluationChannels;
+    noisyChannels = getFieldIfExists(results, 'noisyChannels');
     % Set the bad channel labels
 
-    if isfield(results, 'badChannelsFromNaNs')
-        for j = results.badChannelsFromNaNs
+    if isfield(noisyChannels, 'badChannelsFromNaNs')
+        for j = noisyChannels.badChannelsFromNaNs
             chanlocs(j).labels = [chanlocs(j).labels badNaNSymbol];
         end
     end
-    if isfield(results, 'badChannelsFromNoData')
-        for j = results.badChannelsFromNoData
+    if isfield(noisyChannels, 'badChannelsFromNoData')
+        for j = noisyChannels.badChannelsFromNoData
             chanlocs(j).labels = [chanlocs(j).labels badNoDataSymbol];
         end
     end
-    if isfield(results, 'badChannelsFromDropOuts')
-        for j = results.badChannelsFromDropOuts
+    if isfield(noisyChannels, 'badChannelsFromDropOuts')
+        for j = noisyChannels.badChannelsFromDropOuts
             chanlocs(j).labels = [chanlocs(j).labels badDropOutSymbol];
         end
     end
-    for j = results.badChannelsFromCorrelation
+    for j = noisyChannels.badChannelsFromCorrelation
         chanlocs(j).labels = [chanlocs(j).labels badCorrelationSymbol];
     end
-    for j = results.badChannelsFromDeviation
+    for j = noisyChannels.badChannelsFromDeviation
         chanlocs(j).labels = [chanlocs(j).labels badAmplitudeSymbol];
     end
 
-    for j = results.badChannelsFromHFNoise
+    for j = noisyChannels.badChannelsFromHFNoise
         chanlocs(j).labels = [chanlocs(j).labels badNoiseSymbol];
     end
 
-    for j = results.badChannelsFromRansac
+    for j = noisyChannels.badChannelsFromRansac
         chanlocs(j).labels = [chanlocs(j).labels badRansacSymbol];
     end
 
-    good_chans = setdiff(evaluationChannels, (results.noisyChannels)');
+    good_chans = setdiff(evaluationChannels, (noisyChannels.all)');
     for j = good_chans
         chanlocs(j).labels = ' ';
     end
