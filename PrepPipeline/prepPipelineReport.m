@@ -95,7 +95,7 @@ if isfield(noiseDetection, 'lineNoise')
     displayChannels = lineChannels(indexchans);
     channelLabels = {EEG.chanlocs(lineChannels).labels};
     tString = noiseDetection.name;
-    if isfield(noiseDetection, 'detrend')
+    if isfield(noiseDetection, 'detrend') 
        EEGNew = removeTrend(EEG, noiseDetection.detrend);
     else
        EEGNew = EEG;

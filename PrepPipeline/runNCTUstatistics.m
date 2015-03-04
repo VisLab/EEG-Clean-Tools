@@ -10,10 +10,16 @@ pop_editoptions('option_single', false, 'option_savetwofiles', false);
 % issueFile = 'N:\\ARLAnalysis\\NCTU\\SpecificLevel2Average\\issues.txt';
 % collectionTitle = 'NCTU lane-keeping average referenced';
 
-indir = 'N:\\ARLAnalysis\\NCTU\\SpecificLevel2MastoidBefore'; % Input data directory used for this demo
-saveFile = 'N:\\ARLAnalysis\\NCTU\\SpecificLevel2MastoidBefore\\dataStatistics.mat';
-issueFile = 'N:\\ARLAnalysis\\NCTU\\SpecificLevel2MastoidBefore\\issues.txt';
-collectionTitle = 'NCTU lane-keeping mastoid before';
+% indir = 'N:\\ARLAnalysis\\NCTU\\SpecificLevel2MastoidBefore'; % Input data directory used for this demo
+% saveFile = 'N:\\ARLAnalysis\\NCTU\\SpecificLevel2MastoidBefore\\dataStatistics.mat';
+% issueFile = 'N:\\ARLAnalysis\\NCTU\\SpecificLevel2MastoidBefore\\issues.txt';
+% collectionTitle = 'NCTU lane-keeping mastoid before';
+% numDatasets = 80;
+
+indir = 'N:\\ARLAnalysis\\NCTUPrep\\NCTURobustHP1Hz'; % Input data directory used for this demo
+saveFile = 'N:\\ARLAnalysis\\NCTUPrep\\NCTURobustHP1Hz\\dataStatistics.mat';
+issueFile = 'N:\\ARLAnalysis\\NCTUPrep\\NCTURobustHP1Hz\\issues.txt';
+collectionTitle = 'NCTU lane-keeping robust HP 1 Hz';
 numDatasets = 80;
 %% Read in the NCTU preprocessed data and consolidate
 fileList = cell(numDatasets, 1);

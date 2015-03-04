@@ -5,13 +5,13 @@ issueFile = 'issues.txt';
 
 %% Setup the directories and titles
 setupDir(3) = struct('inDir', [], 'outDir', [], 'title', []);
-setupDir(1).inDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz';
-setupDir(1).outDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz_Report';
-setupDir(1).title = 'VEP robust';
-
-setupDir(2).inDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPMastoidHP1Hz';
-setupDir(2).outDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPMastoidHP1Hz_Report';
-setupDir(2).title = 'VEP mastoid';
+% setupDir(1).inDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz';
+% setupDir(1).outDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz_Report';
+% setupDir(1).title = 'VEP robust';
+% 
+% setupDir(2).inDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPMastoidHP1Hz';
+% setupDir(2).outDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPMastoidHP1Hz_Report';
+% setupDir(2).title = 'VEP mastoid';
 
 setupDir(3).inDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz';
 setupDir(3).outDir = 'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz_Report';
@@ -59,7 +59,7 @@ setupDir(3).title = 'VEP average';
 % setupDir(11).title = 'VEP d-average';
 
 %% Get the directory list
-for k = 2%1:length(setupDir)
+for k = 3%1:length(setupDir)
     inList = dir(setupDir(k).inDir);
     inNames = {inList(:).name};
     inTypes = [inList(:).isdir];

@@ -1,5 +1,7 @@
 function [signal, referenceOut] = performReference(signal, signalFiltered, referenceIn)
 % Perform the specified reference
+%
+% In
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 %% Check the input parameters
 if nargin < 1
@@ -34,21 +36,21 @@ if isfield(referenceOut, 'reportingLevel') && ...
 end
 
 %% Make sure that reference channels have locations for interpolation
-chanlocs = referenceOut.channelLocations(referenceOut.referenceChannels);
+chanlocs = referenceOut.channelLocations(referenceOut.evaluationChannels);
 if ~(length(cell2mat({chanlocs.X})) == length(chanlocs) && ...
      length(cell2mat({chanlocs.Y})) == length(chanlocs) && ...
      length(cell2mat({chanlocs.Z})) == length(chanlocs)) && ...
    ~(length(cell2mat({chanlocs.theta})) == length(chanlocs) && ...
      length(cell2mat({chanlocs.radius})) == length(chanlocs))
-   error('robustReference:NoChannelLocations', ...
-         'reference channels must have locations');
+   error('performReference:NoChannelLocations', ...
+         'evaluation channels must have locations');
 end
 
 %% The reference
 if strcmpi(referenceOut.referenceType, 'robust')
     referenceOut = robustReference(signalFiltered, referenceOut);
 elseif strcmpi(referenceOut.referenceType, 'average')
-    u = union(referenceOut.referenceChannels,referenceOut.evaluationChannels);
+    u = union(referenceOut.referenceChannels, referenceOut.evaluationChannels);
     if length(u) ~= length(referenceOut.referenceChannels) || ...
             length(u) ~= length(referenceOut.evaluationChannels)
         warning('performReference:averageReference', ...
@@ -79,7 +81,7 @@ if ~isempty(noisyChannels) && strcmpi(referenceOut.referenceType, 'robust')
     sourceChannels = setdiff(referenceOut.evaluationChannels, noisyChannels);
     signal = interpolateChannels(signal, noisyChannels, sourceChannels);
     referenceSignal = ...
-        mean(signal.data(referenceOut.referenceChannels, :), 1);
+        nanmean(signal.data(referenceOut.referenceChannels, :), 1);
 else
     referenceSignal = referenceOut.referenceSignalOriginal;
 end

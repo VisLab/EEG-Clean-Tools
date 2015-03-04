@@ -1,22 +1,22 @@
 function [EEG, computationTimes] = prepPipeline(EEG, params)
 
 %% Prep pipeline 
-% This assumes the following have been set:
+% 
+% Input parameters:
 %  EEG                       An EEGLAB structure with the data and chanlocs
 %  params                    A structure with at least the following:
 %
 %     name                   A string with a name identifying dataset
 %     referenceChannels      A vector of channels to be used for
-%                            rereferencing (Usually these are EEG (no
-%                            mastoids or EOG)
+%                            rereferencing 
 %     evaluationChannels     A vector of channels to be used for
 %                            EEG interpolation
-%     rereferencedChannels   A vector of channels to be high-passed, 
+%     rereferencedChannels   A vector of channels to be  
 %                            line-noise removed, and referenced. 
-%     lineFrequencies        A list of line frequencies
+%     lineFrequencies        A list of line frequencies to be removed
 %  
 %
-% Returns:
+% Output parameters:
 %   EEG                      An EEGLAB structure with the data processed
 %                            and status written in EEG.etc.noiseDetection
 %   computationTimes         Time in seconds for each stage
@@ -106,9 +106,19 @@ try
     tic
     [EEGClean, lineNoise] = cleanLineNoise(EEGNew, params);
     EEG.etc.noiseDetection.lineNoise = lineNoise;
-    chs = lineNoise.lineNoiseChannels;
-    EEG.data(chs, :) = ...
-        EEG.data(chs, :) - EEGNew.data(chs, :) + EEGClean.data(chs, :); 
+    lineChannels = lineNoise.lineNoiseChannels;
+    EEG.data(lineChannels, :) = EEG.data(lineChannels, :) ...
+         - EEGNew.data(lineChannels, :) + EEGClean.data(lineChannels, :); 
+%         numChans = min(6, length(lineChannels));
+%         indexchans = floor(linspace(1, length(lineChannels), numChans));
+%         displayChannels = lineChannels(indexchans);
+%         channelLabels = {EEG.chanlocs(lineChannels).labels};
+%         tString = [params.name ':before removal'];
+%         showSpectrum(EEGNew, lineChannels, displayChannels, ...
+%                                  channelLabels, tString);
+%         tString = [params.name ':after removal'];
+%         showSpectrum(EEGClean, lineChannels, displayChannels, ...
+%                                  channelLabels, tString);
     clear EEGNew;
     computationTimes.lineNoise = toc;
 catch mex
