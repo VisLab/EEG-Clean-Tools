@@ -1,20 +1,24 @@
 function [EEG, computationTimes] = prepPipeline(EEG, params)
-
-%% Prep pipeline 
+% Run the PREP pipeline for standardized EEG data preparation 
 % 
 % Input parameters:
 %  EEG                       An EEGLAB structure with the data and chanlocs
 %  params                    A structure with at least the following:
 %
 %     name                   A string with a name identifying dataset
+%                            [default: EEG.setname]
 %     referenceChannels      A vector of channels to be used for
-%                            rereferencing 
+%                            rereferencing [default: all channels]
 %     evaluationChannels     A vector of channels to be used for
-%                            EEG interpolation
+%                            EEG interpolation [default: all channels]
 %     rereferencedChannels   A vector of channels to be  
-%                            line-noise removed, and referenced. 
+%                            line-noise removed, and referenced
+%                            [default: all channels]
 %     lineFrequencies        A list of line frequencies to be removed
+%                            [default: 60, 120, 180, 240]
 %  
+% Prep allows many other parameters to be over-ridden, but is meant to
+% be used in a fully automated fashion.
 %
 % Output parameters:
 %   EEG                      An EEGLAB structure with the data processed
@@ -23,9 +27,13 @@ function [EEG, computationTimes] = prepPipeline(EEG, params)
 %
 % Additional setup:
 %    EEGLAB should be in the path.
-%    The EEG-Clean-Tools/StandardLevel2 directory and its subdirectories 
+%    The EEG-Clean-Tools/PrepPipeline directory and its subdirectories 
 %    should be in the path.
 %
+% Author:  Kay Robbins, UTSA, March 2015
+%
+% Full documentation is available in a user manual distributed with this
+% source.
 
 %% Setup the output structures and set the input parameters
 computationTimes= struct('resampling', 0, 'globalTrend', 0,  ...
@@ -43,7 +51,7 @@ if ~isfield(params, 'name')
     params.name = ['EEG' EEG.filename];
 end
 EEG.etc.noiseDetection = ...
-       struct('name', params.name, 'version', getStandardLevel2Version, ...
+       struct('name', params.name, 'version', getPrepPipelineVersion, ...
               'errors', []);
 %% Check for boundary events
 try

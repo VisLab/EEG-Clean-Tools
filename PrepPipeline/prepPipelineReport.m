@@ -1,5 +1,9 @@
-%% Visualize the EEG 
-% The reporting function expects that EEG will be in the base workspace
+%% Visualize the EEG output from the PREP processing pipeline.
+%
+% Calling directly:
+%      prepPipelineReport
+%
+% This helper reporting script expects that EEG will be in the base workspace
 % with an EEG.etc.noiseDetection structure containing the report. It
 % also expects the following variables in the base workspace:
 % 
@@ -8,8 +12,13 @@
 % * sessionFolder folder where specific report goes
 % * sessionReportName name of individual report
 % * relativeReportLocation report location relative to summary
+%
 % The reporting function appends a summary to the summary report. 
-
+%
+% Usually the prepPipelineReport script is called through the function:
+%
+%        publishPrepPipelineReport 
+%
 %% Write data status and report header
 noiseDetection = EEG.etc.noiseDetection;
 if isfield(noiseDetection, 'reference')

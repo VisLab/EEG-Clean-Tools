@@ -89,3 +89,11 @@ Version 0.28 (Not yet released)
 * Added routines to do specificReference (mastoid or average)
 * Modified showSpectrum to return the spectra of all of the channels.
 * Detrending at 0.2 Hz has replaced FIR filtering as default trend removal.
+
+Version 0.4 (Not yet released - major change in strategy)
+* Changed the name from StandardLevel2 to PrepPipeline
+* Implemented the HP filter-free strategy
+* Added a keepFiltered version -- if false (the default) the data in the
+  repository is not high pass filtered
+* Added an option for removing global trend
+* Incorporated the different reference schemes into a single performReference

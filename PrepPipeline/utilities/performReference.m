@@ -63,17 +63,20 @@ elseif strcmpi(referenceOut.referenceType, 'specific')
         warning('performReference:specificReference', ...
             'The evaluation channels for interpolation should not be reference channels');
     end
-else
-    error('performReference:UnsupportedReferenceStrategy', ...
+elseif ~strcmpi(referenceOut.referenceType, 'none') && ...
+        ~strcmpi(referenceOut.referenceType, 'none-nointerp')
+    error('performReference:NoReference', ...
         [referenceOut.referenceType ' is not supported']);
 end
 
-if ~isempty(referenceOut.referenceChannels)
-    referenceOut.referenceSignalOriginal = ...
-        nanmean(signal.data(referenceOut.referenceChannels, :), 1);
+if isempty(referenceOut.referenceChannels) || ...
+        strcmpi(referenceOut.referenceType, 'none') || ...
+        strcmpi(referenceOut.referenceType, 'none-nointerp') 
+     referenceOut.referenceSignalOriginal = ...
+        zeros(1, size(signal.data, 2));
 else
     referenceOut.referenceSignalOriginal = ...
-        zeros(1, size(signal.data, 2));
+        nanmean(signal.data(referenceOut.referenceChannels, :), 1);
 end
 
 noisyChannels = referenceOut.interpolatedChannels.all;
@@ -92,12 +95,13 @@ signalClean = removeTrend(signal, referenceIn);
 referenceOut.noisyStatistics = findNoisyChannels(signalClean, referenceOut);
 
 % Interpolate bad channels after non-robust referencing
-if ~strcmpi(referenceOut.referenceType, 'robust') 
+if ~strcmpi(referenceOut.referenceType, 'robust') && ...
+   ~strcmpi(referenceOut.referenceType, 'none-nointerp')
     referenceOut.interpolatedChannels = ...
         updateBadChannels(referenceOut.interpolatedChannels, ...
              referenceOut.noisyStatistics.noisyChannels);
     noisyChannels = referenceOut.interpolatedChannels.all;
-    if ~isempty(noisyChannels)
+    if ~isempty(noisyChannels)  % Redo interpolation and detrend
         sourceChannels = setdiff(referenceOut.evaluationChannels, noisyChannels);
         signal = interpolateChannels(signal, noisyChannels, sourceChannels);
         signalClean = removeTrend(signal, referenceIn);
