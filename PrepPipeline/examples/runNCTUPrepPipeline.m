@@ -15,10 +15,13 @@
 % ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
 % ess2Dir = 'N:\ARLAnalysis\\NCTUPrep\\NCTUAverageHP1Hz';
 
+% ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
+% ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
+% ess2Dir = 'N:\ARLAnalysis\\NCTUPrep\\NCTUMastoidHP1Hz';
+
 ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
 ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
-ess2Dir = 'N:\ARLAnalysis\\NCTUPrep\\NCTUMastoidHP1Hz';
-
+ess2Dir = 'N:\ARLAnalysis\\NCTUPrep\\NCTUStandardized';
 %% Validate level 1
 obj1 = level1Study(ess1File);
 obj1.validate();

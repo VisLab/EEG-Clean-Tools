@@ -1,21 +1,21 @@
 %% Read in the file and set the necessary parameters
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
-
-dataDir =  'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz';
-summaryFolder = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz_Report';
+basename = 'shooter';
+dataDir = 'N:\\ARLAnalysis\\ShooterPrep\\Data';
+summaryFolder = 'N:\\ARLAnalysis\\ShooterPrep\\Reports';
 
 % dataDir =  'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz';
 % summaryFolder = 'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz_Report';
 
 % dataDir =  'N:\\ARLAnalysis\\VEPPrep\\VEPMastoidHP1Hz';
 % summaryFolder = 'N:\\ARLAnalysis\\VEPPrep\\VEPMastoidHP1Hz_Report';
+
 %% Get the directory list
 inList = dir(dataDir);
 inNames = {inList(:).name};
 inTypes = [inList(:).isdir];
 inNames = inNames(~inTypes);
-%%
-basename = 'vep';
+%% Set up the summary directories
 summaryReportName = [basename '_summary.html'];
 sessionFolder = '.';
 reportSummary = [summaryFolder filesep summaryReportName];
