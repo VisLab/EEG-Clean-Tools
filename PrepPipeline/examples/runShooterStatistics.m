@@ -5,8 +5,8 @@ issueFile = 'issues.txt';
 
 %% Setup the directories and titles
 setupDir(1) = struct('inDir', [], 'outDir', [], 'title', []);
-setupDir(1).inDir = 'N:\\ARLAnalysis\\ShooterPrep\\Data';
-setupDir(1).outDir = 'N:\\ARLAnalysis\\ShooterPrep\\Reports';
+setupDir(1).inDir = 'N:\\ARLAnalysis\\ShooterPrep\\DataReducedThreshold';
+setupDir(1).outDir = 'N:\\ARLAnalysis\\ShooterPrep\\ReportsReducedThreshold';
 setupDir(1).title = 'Shooter';
 
 

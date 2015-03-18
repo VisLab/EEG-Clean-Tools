@@ -22,10 +22,12 @@ srate = EEG.srate;
 firstEventTime = double(EEG.event(1).latency - 1)/srate;
 lastEventTime = double(EEG.event(end).latency - 1)/srate;
 lastDataTime = double(EEG.pnts-1)/srate;
-choppedFront = max(0, firstEventTime - frontChop)
-endTime = min(lastDataTime, lastEventTime + backChop)
-choppedBack = lastDataTime - endTime
+choppedFront = max(0, firstEventTime - frontChop);
+endTime = min(lastDataTime, lastEventTime + backChop);
+choppedBack = lastDataTime - endTime;
 EEG = pop_select(EEG, 'time', [choppedFront, endTime]);
-if strcmpi(EEG.event(1).type, 'boundary')
-    EEG.event(1) = [];
+boundaryEvents = strcmpi({EEG.event.type}, 'boundary');
+if sum(strcmpi(EEG.event(1).type, 'boundary')) > 0
+    fprintf('Removing %g boundary events\n', sum(boundaryEvents));
+    EEG.event(boundaryEvents) = [];
 end

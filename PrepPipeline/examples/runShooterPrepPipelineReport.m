@@ -1,14 +1,8 @@
 %% Read in the file and set the necessary parameters
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 basename = 'shooter';
-dataDir = 'N:\\ARLAnalysis\\ShooterPrep\\Data';
-summaryFolder = 'N:\\ARLAnalysis\\ShooterPrep\\Reports';
-
-% dataDir =  'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz_Report';
-
-% dataDir =  'N:\\ARLAnalysis\\VEPPrep\\VEPMastoidHP1Hz';
-% summaryFolder = 'N:\\ARLAnalysis\\VEPPrep\\VEPMastoidHP1Hz_Report';
+dataDir = 'N:\\ARLAnalysis\\ShooterPrep\\DataReducedThreshold';
+summaryFolder = 'N:\\ARLAnalysis\\ShooterPrep\\ReportsReducedThreshold';
 
 %% Get the directory list
 inList = dir(dataDir);

@@ -23,6 +23,7 @@ end
 referenceOut = getReferenceStructure();
 defaults = getPipelineDefaults(signal, 'reference');
 [referenceOut, errors] = checkDefaults(referenceIn, referenceOut, defaults);
+
 if ~isempty(errors)
     error('performReference:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end
