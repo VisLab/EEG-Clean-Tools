@@ -21,7 +21,7 @@
 
 ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
 ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
-ess2Dir = 'N:\ARLAnalysis\\NCTUPrep\\NCTUStandardized';
+ess2Dir = 'N:\\ARLAnalysis\\NCTUPrep\\NCTU_LK_STLD2_Unfiltered';
 %% Validate level 1
 obj1 = level1Study(ess1File);
 obj1.validate();
@@ -29,7 +29,3 @@ clear obj1;
 %% Create a level 2 study
 obj2 = level2Study('level1XmlFilePath', ess1File);
 obj2.createLevel2Study(ess2Dir);
-%%
-% obj2 = level2Study('level2XmlFilePath', ...
-%     'N:\ARLAnalysis\NCTU\Level2\studyLevel2_description.xml');
-% obj2.createLevel2Study();
