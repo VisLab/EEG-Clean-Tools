@@ -28,12 +28,20 @@ params.lineNoiseChannels = 1:70;
 % params.referenceChannels = 69:70;
 % basenameOut = [basename '_mastoidHP_cutoff' num2str(params.detrendCutoff)];
 
-outdir = 'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz';
+% outdir = 'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz';
+% params.detrendType = 'high pass';
+% params.detrendCutoff = 1;
+% params.referenceType = 'average';
+% params.keepFiltered = true;
+% basenameOut = [basename 'averageHP_cutoff' num2str(params.detrendCutoff)];
+
+outdir = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobust_Unfiltered';
 params.detrendType = 'high pass';
 params.detrendCutoff = 1;
-params.referenceType = 'average';
-params.keepFiltered = true;
-basenameOut = [basename 'averageHP_cutoff' num2str(params.detrendCutoff)];
+params.referenceType = 'robust';
+params.keepFiltered = false;
+basenameOut = [basename 'robust_unfiltered'];
+
 %% Run the pipeline
 for k = 1:18
     thisName = sprintf('%s_%02d', basename, k);

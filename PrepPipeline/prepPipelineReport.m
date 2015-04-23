@@ -109,8 +109,8 @@ if isfield(noiseDetection, 'lineNoise')
     else
        EEGNew = EEG;
     end
-    badChannels = showSpectrum(EEGNew, lineChannels, displayChannels, ...
-                             channelLabels, tString);
+    [fref, sref, badChannels] = showSpectrum(EEGNew, channelLabels, ...
+        lineChannels, displayChannels, tString);
     clear EEGNew;
     if ~isempty(badChannels)
         badString = ['Channels with no spectra: ' getListString(badChannels)];

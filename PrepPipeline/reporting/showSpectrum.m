@@ -1,6 +1,24 @@
-function [badChannels, fref, sref] = showSpectrum(EEG, channels, displayChannels, ...
-    channelLabels, tString)
-% Calculate EEG spectra and show at display displayChannels
+function [fref, sref, badChannels] = showSpectrum(EEG, channelLabels, ...
+                channels, displayChannels, tString)
+% Calculate EEG spectra for channels and show display displayChannels
+%
+% Parameters:
+%    EEG              EEGLAB EEG structure
+%    channels         vector of channel numbers to calculate spectrum for
+%    displayChannels  vector of channels to display (no plot if empty)
+%    channelLabels    cell array of labels corresponding to all channels
+%    tString          title of plot if there is a display
+%
+% Output:
+%    fref             vector of spectral frequencies in Hz
+%    sref             vector of spectral powers in 10*log(\muV^2/Hz)
+%    badChannels      vector of channels with failed spectrum (should be
+%                     empty unless there are serious issues)
+%
+%  Written by: Kay Robbins, UTSA, 2015
+%
+%  Uses calculateSpectrum -- adapted from EEGLAB
+%
     fftwinfac = 4;
     sref = cell(length(channels), 1);
     fref = cell(length(channels), 1);

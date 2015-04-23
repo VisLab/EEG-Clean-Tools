@@ -117,16 +117,6 @@ try
     lineChannels = lineNoise.lineNoiseChannels;
     EEG.data(lineChannels, :) = EEG.data(lineChannels, :) ...
          - EEGNew.data(lineChannels, :) + EEGClean.data(lineChannels, :); 
-%         numChans = min(6, length(lineChannels));
-%         indexchans = floor(linspace(1, length(lineChannels), numChans));
-%         displayChannels = lineChannels(indexchans);
-%         channelLabels = {EEG.chanlocs(lineChannels).labels};
-%         tString = [params.name ':before removal'];
-%         showSpectrum(EEGNew, lineChannels, displayChannels, ...
-%                                  channelLabels, tString);
-%         tString = [params.name ':after removal'];
-%         showSpectrum(EEGClean, lineChannels, displayChannels, ...
-%                                  channelLabels, tString);
     clear EEGNew;
     computationTimes.lineNoise = toc;
 catch mex

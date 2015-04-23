@@ -1,8 +1,11 @@
 %% Read in the file and set the necessary parameters
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
-dataDir =  'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz';
-summaryFolder = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz_Report';
+dataDir =  'N:\\ARLAnalysis\\VEPPrep\\VEPRobust_Unfiltered';
+summaryFolder = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobust_Unfiltered_Report';
+
+% dataDir =  'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz';
+% summaryFolder = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobustHP1Hz_Report';
 
 % dataDir =  'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz';
 % summaryFolder = 'N:\\ARLAnalysis\\VEPPrep\\VEPAverageHP1Hz_Report';
