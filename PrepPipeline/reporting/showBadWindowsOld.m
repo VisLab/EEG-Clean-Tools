@@ -1,18 +1,16 @@
-function [] = showBadWindowsNew(values, timeScales, colors, symbols,  ...
-                     numberChannels, legendStrings, name, thresholdName)
+function [] = showBadWindows(beforeValues, afterValues, beforeTimeScale, ...
+        afterTimeScale, numberChannels, legendStrings, name, thresholdName)
 % Display number of bad channels before and after referencing by window
 verticalLabel = ['Number of channels (out of '  num2str(numberChannels) ')'];
 tString = { name, ['Channels not meeting ' thresholdName ' threshold']}; 
 figure('Name', tString{2})
 hold on
-for k = 1:length(values)
-   plot(timeScales{k}, values{k}, 'LineStyle', 'none', ...
-       'Marker', symbols{k}, 'Color', colors(k,:)) 
-end
+plot(beforeTimeScale, beforeValues, '+k')
+plot(afterTimeScale, afterValues, 'or')
 hold off
 xlabel('Seconds')
 ylabel(verticalLabel);
-legend(legendStrings(:)', ...
+legend(legendStrings{1}, legendStrings{2}, ...
       'Location', 'SouthOutside', 'Orientation', 'Horizontal' )
 title(tString, 'Interpreter', 'None');
 

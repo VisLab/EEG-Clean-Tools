@@ -106,7 +106,7 @@ evaluationChannels = evaluationChannels(:)';            % Make sure row vector
 noisyOut.evaluationChannels = evaluationChannels;  
 
 
-%% Extact the data required
+%% Extract the data required
 data = signal.data;
 originalNumberChannels = size(data, 1);          % Save the original channels
 data = double(data(evaluationChannels, :))';      % Remove the unneeded channels
@@ -140,6 +140,7 @@ evaluationChannels = setdiff(evaluationChannels, ...
 data = signal.data;
 data = double(data(evaluationChannels, :))';  
 [signalSize, numberChannels] = size(data);
+
 %% Method 1: Unusually high or low amplitude (using robust std)
 channelDeviation = 0.7413 *iqr(data); % Robust estimate of SD
 channelDeviationSD =  0.7413 * iqr(channelDeviation);
@@ -186,6 +187,7 @@ end
 noisyOut.zscoreHFNoise(evaluationChannels) = zscoreHFNoiseTemp;
 noisyOut.noisinessMedian = noisinessMedian;
 noisyOut.noisinessSD = noisinessSD;
+
 %% Method 3: Global correlation criteria (from Nima Bigdely-Shamlo)
 channelCorrelations = ones(WCorrelation, numberChannels);
 noiseLevels = zeros(WCorrelation, numberChannels);
@@ -229,9 +231,13 @@ noisyOut.medianMaxCorrelation =  median(noisyOut.maximumCorrelations, 2);
 noisyChannels = union(noisyOut.noisyChannels.badChannelsFromDeviation, ...
     union(noisyOut.noisyChannels.badChannelsFromCorrelation, ...
           noisyOut.noisyChannels.badChannelsFromDropOuts));
+      
 %% Method 4: Ransac corelation (may not be performed)
 % Setup for ransac (if a 2-stage algorithm, remove other bad channels first)
-if isempty(channelLocations) 
+if noisyOut.ransacOff
+    noisyOut.ransacBadWindowFraction = 0;
+    noisyOut.ransacPerformed = false;
+elseif isempty(channelLocations) 
     warning('findNoisyChannels:noChannelLocation', ...
         'ransac could not be computed because there were no channel locations');
     noisyOut.ransacBadWindowFraction = 0;
@@ -263,6 +269,7 @@ else % Set up parameters and make sure enough good channels to proceed
         noisyOut.ransacPerformed = false;
     end
 end
+
 if noisyOut.ransacPerformed 
     try 
     % Calculate all-channel reconstruction matrices from random channel subsets
@@ -299,11 +306,14 @@ if noisyOut.ransacPerformed
 end
 
 % Combine bad channels detected from all methods
+noisy = noisyOut.noisyChannels;
+noisyOut.noisyChannels.badChannelsFromLowSNR = ...
+    intersect(noisy.badChannelsFromHFNoise, noisy.badChannelsFromCorrelation);
 noisyChannels = union(noisyChannels, ...
-    union(union(noisyOut.noisyChannels.badChannelsFromRansac, ...
-          noisyOut.noisyChannels.badChannelsFromHFNoise), ...
-    union(noisyOut.noisyChannels.badChannelsFromNaNs, ...
-          noisyOut.noisyChannels.badChannelsFromNoData)));
+    union(union(noisy.badChannelsFromRansac, ...
+          noisy.badChannelsFromHFNoise), ...
+    union(noisy.badChannelsFromNaNs, ...
+          noisy.badChannelsFromNoData)));
 noisyOut.noisyChannels.all = noisyChannels;
 noisyOut.medianMaxCorrelation =  median(noisyOut.maximumCorrelations, 2);
 

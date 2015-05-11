@@ -1,52 +1,76 @@
 function [referenceLocations, evaluationChannels, legendString] = ...
-        getReportChannelInformation(channelLocations, results)
+        getReportChannelInformation(channelLocations, ...
+                                    evaluationChannels, noisyChannels)
     % Extracts channel locations with bad channels labeled, info and 
     % reference channel list from report
     badNaNSymbol = 'n';
     badNoDataSymbol = 'z';
+    badLowSNRSymbol = 's';
     badDropOutSymbol = 'd';
     badCorrelationSymbol = 'c';
     badAmplitudeSymbol = '+';
     badNoiseSymbol = 'x';
     badRansacSymbol = '?';
-    legendString = {'NaN: n', 'NoData: z', 'Corr: c', ...
+    legendString = {'NaN: n', 'NoData: z', 'LowSNR: s', 'Corr: c', ...
                     'Amp: +', 'Noise: x', 'Ran: ?'};
     chanlocs = channelLocations;
-    evaluationChannels = results.evaluationChannels;
-    noisyChannels = getFieldIfExists(results, 'noisyChannels');
-    % Set the bad channel labels
-
-    if isfield(noisyChannels, 'badChannelsFromNaNs')
-        for j = noisyChannels.badChannelsFromNaNs
+    if ~isempty(noisyChannels.badChannelsFromNaNs)
+        noisy = noisyChannels.badChannelsFromNaNs(:)';
+        for j = noisy
             chanlocs(j).labels = [chanlocs(j).labels badNaNSymbol];
         end
     end
-    if isfield(noisyChannels, 'badChannelsFromNoData')
-        for j = noisyChannels.badChannelsFromNoData
+    
+    if ~isempty(noisyChannels.badChannelsFromNoData)
+        noisy = noisyChannels.badChannelsFromNoData(:)';
+        for j = noisy
             chanlocs(j).labels = [chanlocs(j).labels badNoDataSymbol];
         end
     end
-    if isfield(noisyChannels, 'badChannelsFromDropOuts')
-        for j = noisyChannels.badChannelsFromDropOuts
+    
+    if ~isempty(noisyChannels.badChannelsFromLowSNR)
+        noisy = noisyChannels.badChannelsFromLowSNR(:)';
+        for j = noisy
+            chanlocs(j).labels = [chanlocs(j).labels badLowSNRSymbol];
+        end
+    end
+    
+    if ~isempty(noisyChannels.badChannelsFromDropOuts)
+        noisy = noisyChannels.badChannelsFromDropOuts(:)';
+        for j = noisy
             chanlocs(j).labels = [chanlocs(j).labels badDropOutSymbol];
         end
     end
-    for j = noisyChannels.badChannelsFromCorrelation
-        chanlocs(j).labels = [chanlocs(j).labels badCorrelationSymbol];
+    
+    if ~isempty(noisyChannels.badChannelsFromCorrelation)
+        noisy = noisyChannels.badChannelsFromCorrelation(:)';
+        for j = noisy
+            chanlocs(j).labels = [chanlocs(j).labels badCorrelationSymbol];
+        end
     end
-    for j = noisyChannels.badChannelsFromDeviation
-        chanlocs(j).labels = [chanlocs(j).labels badAmplitudeSymbol];
+    
+    if ~isempty(noisyChannels.badChannelsFromDeviation)
+        noisy = noisyChannels.badChannelsFromDeviation(:)';
+        for j = noisy
+            chanlocs(j).labels = [chanlocs(j).labels badAmplitudeSymbol];
+        end
     end
 
-    for j = noisyChannels.badChannelsFromHFNoise
-        chanlocs(j).labels = [chanlocs(j).labels badNoiseSymbol];
+    if ~isempty(noisyChannels.badChannelsFromHFNoise)
+        noisy = noisyChannels.badChannelsFromHFNoise(:)';
+        for j = noisy
+            chanlocs(j).labels = [chanlocs(j).labels badNoiseSymbol];
+        end
     end
 
-    for j = noisyChannels.badChannelsFromRansac
-        chanlocs(j).labels = [chanlocs(j).labels badRansacSymbol];
+    if ~isempty(noisyChannels.badChannelsFromRansac)
+        noisy = noisyChannels.badChannelsFromRansac(:)';
+        for j = noisy
+            chanlocs(j).labels = [chanlocs(j).labels badRansacSymbol];
+        end
     end
 
-    good_chans = setdiff(evaluationChannels, (noisyChannels.all)');
+    good_chans = setdiff(evaluationChannels, noisyChannels.all);
     for j = good_chans
         chanlocs(j).labels = ' ';
     end

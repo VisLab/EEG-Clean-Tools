@@ -21,7 +21,7 @@
 
 ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
 ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
-ess2Dir = 'N:\\ARLAnalysis\\NCTUPrep\\NCTU_LK_STLD2_Unfiltered';
+ess2Dir = 'N:\\ARLAnalysis\\NCTUPrepNew\\NCTU_LK_Level2_Unfiltered';
 %% Validate level 1
 obj1 = level1Study(ess1File);
 obj1.validate();

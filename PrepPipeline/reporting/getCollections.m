@@ -40,9 +40,14 @@ for k = 1:length(collections)
         collections{k}.statistics(:, s.medWinHFRef);
 end;
 
-refCorr = cell(length(collections), 1);
+refCorrAve = cell(length(collections), 1);
 for k = 1:length(collections)
-    refCorr{k} = collections{k}.statistics(:, s.aveCorRef);
+    refCorrAve{k} = collections{k}.statistics(:, s.aveCorRef);
+end;
+
+origCorrAve = cell(length(collections), 1);
+for k = 1:length(collections)
+    origCorrAve{k} = collections{k}.statistics(:, s.aveCorOrig);
 end;
 
 refDev = cell(length(collections), 1);
@@ -74,7 +79,7 @@ end;
 collectionStats = struct('refRatiosDev', [], 'refRatiosWinDev', [], ...
                          'origRatiosWinDev', [], ...
                          'refRatiosHF', [], 'refRatiosWinHF', [], ...
-                         'refCorr', [], ...
+                         'refCorrAve', [], 'origCorrAve', [], ...
                          'refDev', [], 'refWinDev', [], 'origWinDev', [],...
                          'refHF', [], 'refWinHF', []);
 collectionStats.refRatiosDev = refRatiosDev;
@@ -82,7 +87,8 @@ collectionStats.refRatiosWinDev = refRatiosWinDev;
 collectionStats.origRatiosWinDev = origRatiosWinDev;
 collectionStats.refRatiosHF = refRatiosHF;
 collectionStats.refRatiosWinHF = refRatiosWinHF;
-collectionStats.refCorr = refCorr;
+collectionStats.refCorrAve = refCorrAve;
+collectionStats.origCorrAve = origCorrAve;
 collectionStats.refDev = refDev;
 collectionStats.refWinDev = refWinDev;
 collectionStats.origWinDev = origWinDev;

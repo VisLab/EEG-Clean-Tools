@@ -21,9 +21,13 @@ pop_editoptions('option_single', false, 'option_savetwofiles', false);
 % issueFile = 'N:\\ARLAnalysis\\NCTUPrep\\NCTURobustHP1Hz\\issues.txt';
 % collectionTitle = 'NCTU lane-keeping robust HP 1 Hz';
 
-indir = 'N:\\ARLAnalysis\\NCTUPrep\\NCTU_LK_STLD2_Unfiltered'; % Input data directory used for this demo
-saveFile = 'N:\\ARLAnalysis\\NCTUPrep\\NCTU_LK_STLD2_Unfiltered\\dataStatistics.mat';
-issueFile = 'N:\\ARLAnalysis\\NCTUPrep\\NCTU_LK_STLD2_Unfiltered\\issues.txt';
+% indir = 'N:\\ARLAnalysis\\NCTUPrep\\NCTU_LK_STLD2_Unfiltered'; % Input data directory used for this demo
+% saveFile = 'N:\\ARLAnalysis\\NCTUPrep\\NCTU_LK_STLD2_Unfiltered\\dataStatistics.mat';
+% issueFile = 'N:\\ARLAnalysis\\NCTUPrep\\NCTU_LK_STLD2_Unfiltered\\issues.txt';
+
+indir  = 'N:\\ARLAnalysis\\NCTUPrepNew\\NCTU_LK_Level2_Unfiltered';
+saveFile = 'N:\\ARLAnalysis\\NCTUPrepNew\\NCTU_LK_Level2_Unfiltered\\dataStatistics.mat';
+issueFile = 'N:\\ARLAnalysis\\NCTUPrepNew\\NCTU_LK_Level2_Unfiltered\\issues.txt';
 collectionTitle = 'NCTU lane-keeping unfiltered';
 numDatasets = 80;
 %% Read in the NCTU preprocessed data and consolidate

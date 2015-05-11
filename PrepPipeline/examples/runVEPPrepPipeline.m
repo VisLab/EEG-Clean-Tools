@@ -35,12 +35,77 @@ params.lineNoiseChannels = 1:70;
 % params.keepFiltered = true;
 % basenameOut = [basename 'averageHP_cutoff' num2str(params.detrendCutoff)];
 
-outdir = 'N:\\ARLAnalysis\\VEPPrep\\VEPRobust_Unfiltered';
+% outdir = 'N:\\ARLAnalysis\\VEPPrep\\VEPTest';
+% params.detrendType = 'high pass';
+% params.detrendCutoff = 1;
+% params.referenceType = 'robust';
+% params.meanEstimateType = 'huber';
+% params.interpolationOrder = 'pre-reference';
+% %params.keepFiltered = false;
+% basenameOut = [basename 'robust_test'];
+
+% outdir = 'N:\\ARLAnalysis\\VEPPrepNew\\VEPRobust_Unfiltered';
+% params.detrendType = 'high pass';
+% params.detrendCutoff = 1;
+% params.referenceType = 'robust';
+% params.meanEstimateType = 'median';
+% params.interpolationOrder = 'post-reference';
+% params.keepFiltered = false;
+% basenameOut = [basename 'robust_median_post'];
+
+% outdir = 'N:\\ARLAnalysis\\VEPPrepNew\\VEPRobust_1Hz_Unfiltered';
+% params.detrendType = 'high pass';
+% params.detrendCutoff = 1;
+% params.referenceType = 'robust';
+% params.meanEstimateType = 'median';
+% params.interpolationOrder = 'post-reference';
+% params.keepFiltered = false;
+% basenameOut = [basename 'robust_1Hz_median_post'];
+
+% outdir = 'N:\\ARLAnalysis\\VEPPrepNew\\VEPRobust_0p3Hz_Unfiltered';
+% params.detrendType = 'high pass';
+% params.detrendCutoff = 0.3;
+% params.referenceType = 'robust';
+% params.meanEstimateType = 'median';
+% params.interpolationOrder = 'post-reference';
+% params.keepFiltered = false;
+% basenameOut = [basename 'robust_0p3Hz_median_post'];
+
+% outdir = 'N:\\ARLAnalysis\\VEPPrepNewTry\\VEPRobust_1Hz_Pre_Huber_Unfiltered';
+% params.detrendType = 'high pass';
+% params.detrendCutoff = 1;
+% params.referenceType = 'robust';
+% params.meanEstimateType = 'huber';
+% params.interpolationOrder = 'pre-reference';
+% params.keepFiltered = false;
+% basenameOut = [basename 'robust_1Hz_median_pre_huber_unfiltered'];
+
+% outdir = 'N:\\ARLAnalysis\\VEPPrepNewTry\\VEPRobust_1Hz_Post_Median_Unfiltered';
+% params.detrendType = 'high pass';
+% params.detrendCutoff = 1;
+% params.referenceType = 'robust';
+% params.meanEstimateType = 'median';
+% params.interpolationOrder = 'post-reference';
+% params.keepFiltered = false;
+% basenameOut = [basename 'robust_1Hz_post_median_unfiltered'];
+
+% outdir = 'N:\\ARLAnalysis\\VEPPrepNewTry\\VEPRobust_0p3Hz_Pre_Huber_Unfiltered';
+% params.detrendType = 'high pass';
+% params.detrendCutoff = 0.3;
+% params.referenceType = 'robust';
+% params.meanEstimateType = 'huber';
+% params.interpolationOrder = 'pre-reference';
+% params.keepFiltered = false;
+% basenameOut = [basename 'robust_1Hz_post_median_unfiltered'];
+
+outdir = 'N:\\ARLAnalysis\\VEPPrepNewTry\\VEPRobust_0p3Hz_Post_Median_Unfiltered';
 params.detrendType = 'high pass';
-params.detrendCutoff = 1;
+params.detrendCutoff = 0.3;
 params.referenceType = 'robust';
+params.meanEstimateType = 'median';
+params.interpolationOrder = 'post-reference';
 params.keepFiltered = false;
-basenameOut = [basename 'robust_unfiltered'];
+basenameOut = [basename 'robust_1Hz_post_median_unfiltered'];
 
 %% Run the pipeline
 for k = 1:18

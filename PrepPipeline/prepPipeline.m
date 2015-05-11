@@ -78,25 +78,12 @@ catch mex
     return;
 end
 
-%% Part I: Resampling
-fprintf('Resampling\n');
-try
-    tic
-    [EEG, resampling] = resampleEEG(EEG, params);
-    EEG.etc.noiseDetection.resampling = resampling;
-    computationTimes.resampling = toc;
-catch mex
-    errorMessages.resampling = ...
-        ['prepPipeline failed resampleEEG: ' getReport(mex)];
-    errorMessages.status = 'unprocessed';
-    EEG.etc.noiseDetection.errors = errorMessages;
-    return;
-end
 
 %% Part II:  HP the signal for detecting bad channels
 fprintf('Preliminary detrend to compute reference\n');
 try
     tic
+    EEG.data = double(EEG.data);   % Don't monkey around -- get into double
     [EEGNew, detrend] = removeTrend(EEG, params);
     EEG.etc.noiseDetection.detrend = detrend;
     computationTimes.detrend = toc;
@@ -131,8 +118,10 @@ end
 fprintf('Find reference\n');
 try
     tic
-    [EEG, referenceOut] = performReference(EEG, EEGClean, params);
-    clear EEGClean;
+    [EEG, referenceOut] = performReference(EEG, params);
+    if referenceOut.keepFiltered
+        EEG = removeTrend(EEG, referenceOut);
+    end
     EEG.etc.noiseDetection.reference = referenceOut;
     computationTimes.reference = toc;
 catch mex
@@ -143,6 +132,22 @@ catch mex
     EEG.etc.noiseDetection.errors = errorMessages;
     return;
 end
+
+%% Part I: Resampling
+fprintf('Resampling\n');
+try
+    tic
+    [EEG, resampling] = resampleEEG(EEG, params);
+    EEG.etc.noiseDetection.resampling = resampling;
+    computationTimes.resampling = toc;
+catch mex
+    errorMessages.resampling = ...
+        ['prepPipeline failed resampleEEG: ' getReport(mex)];
+    errorMessages.status = 'unprocessed';
+    EEG.etc.noiseDetection.errors = errorMessages;
+    return;
+end
+
 
 %% Report that there were no errors
 EEG.etc.noiseDetection.errors = errorMessages;

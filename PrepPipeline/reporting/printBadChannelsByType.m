@@ -12,6 +12,14 @@ function [] = printBadChannelsByType(fid, noisyStats, channelLabels, perRow, ind
             perRow, indent);
         fprintf(fid, '\nBad because data is constant:\n%s', badList);
     end
+    
+    %% Low SNR (low correlation, high HF in original signal
+    if isfield(noisyStats, 'badChannelsFromLowSNR')   % temporary      
+        badList = getLabeledList(noisyStats.badChannelsFromLowSNR, ...
+            channelLabels(noisyStats.badChannelsFromLowSNR), ...
+            perRow, indent);
+        fprintf(fid, '\nBad because of low SNR:\n%s', badList);
+    end
     %% Dropout criteria
     if isfield(noisyStats, 'badChannelsFromDropOuts')   % temporary    
         badList = getLabeledList(noisyStats.badChannelsFromDropOuts, ...
@@ -33,7 +41,7 @@ function [] = printBadChannelsByType(fid, noisyStats, channelLabels, perRow, ind
     %% HF SNR ratio criterion
     badList = getLabeledList(noisyStats.badChannelsFromHFNoise, ...
         channelLabels(noisyStats.badChannelsFromHFNoise), perRow, indent);
-    fprintf(fid, '\nBad because of HF noise (low SNR):\n%s', badList);
+    fprintf(fid, '\nBad because of HF noise:\n%s', badList);
       
     %% Ransac criteria
     badList = getLabeledList(noisyStats.badChannelsFromRansac, ...

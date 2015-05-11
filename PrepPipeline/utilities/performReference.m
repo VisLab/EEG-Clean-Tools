@@ -1,4 +1,4 @@
-function [signal, referenceOut] = performReference(signal, signalFiltered, referenceIn)
+function [signal, referenceOut] = performReference(signal, referenceIn)
 % Perform the specified reference
 %
 % In
@@ -24,18 +24,29 @@ referenceOut = getReferenceStructure();
 defaults = getPipelineDefaults(signal, 'reference');
 [referenceOut, errors] = checkDefaults(referenceIn, referenceOut, defaults);
 
+fprintf('To here 1\n');
 if ~isempty(errors)
     error('performReference:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end
 referenceOut.rereferencedChannels = sort(referenceOut.rereferencedChannels);
 referenceOut.referenceChannels = sort(referenceOut.referenceChannels);
 referenceOut.evaluationChannels = sort(referenceOut.evaluationChannels);
-if isfield(referenceOut, 'reportingLevel') && ...
-        strcmpi(referenceOut.reportingLevel, 'verbose');
-    referenceOut.noisyStatisticsOriginal = ...
-        findNoisyChannels(signalFiltered, referenceOut);
-end
+% if isfield(referenceOut, 'reportingLevel') && ...
+%         strcmpi(referenceOut.reportingLevel, 'verbose');
+%     referenceOut.noisyStatisticsOriginal = ...
+%         findNoisyChannels(signalFiltered, referenceOut);
+% end
 
+
+%% Calculate the reference for the original signal
+if isempty(referenceOut.referenceChannels) || ...
+        strcmpi(referenceOut.referenceType, 'none')  
+    referenceOut.referenceSignalOriginal = ...
+        zeros(1, size(signal.data, 2));
+else
+    referenceOut.referenceSignalOriginal = ...
+        nanmean(signal.data(referenceOut.referenceChannels, :), 1);
+end
 %% Make sure that reference channels have locations for interpolation
 chanlocs = referenceOut.channelLocations(referenceOut.evaluationChannels);
 if ~(length(cell2mat({chanlocs.X})) == length(chanlocs) && ...
@@ -47,70 +58,99 @@ if ~(length(cell2mat({chanlocs.X})) == length(chanlocs) && ...
          'evaluation channels must have locations');
 end
 
-%% The reference
-if strcmpi(referenceOut.referenceType, 'robust')
-    referenceOut = robustReference(signalFiltered, referenceOut);
-elseif strcmpi(referenceOut.referenceType, 'average')
-    u = union(referenceOut.referenceChannels, referenceOut.evaluationChannels);
-    if length(u) ~= length(referenceOut.referenceChannels) || ...
-            length(u) ~= length(referenceOut.evaluationChannels)
-        warning('performReference:averageReference', ...
-            'The evaluation channels for interpolation should be the reference channels');
-    end
-elseif strcmpi(referenceOut.referenceType, 'specific')
-    if length(union(referenceOut.referenceChannels, ...
-            referenceOut.evaluationChannels)) ...
-            == length(referenceOut.referenceChannels)
-        warning('performReference:specificReference', ...
-            'The evaluation channels for interpolation should not be reference channels');
-    end
-elseif ~strcmpi(referenceOut.referenceType, 'none') && ...
-        ~strcmpi(referenceOut.referenceType, 'none-nointerp')
-    error('performReference:NoReference', ...
-        [referenceOut.referenceType ' is not supported']);
-end
-
-if isempty(referenceOut.referenceChannels) || ...
-        strcmpi(referenceOut.referenceType, 'none') || ...
-        strcmpi(referenceOut.referenceType, 'none-nointerp') 
-     referenceOut.referenceSignalOriginal = ...
-        zeros(1, size(signal.data, 2));
+%% Now perform the particular combinations
+if  strcmpi(referenceOut.referenceType, 'robust') && ...
+        strcmpi(referenceOut.interpolationOrder, 'post-reference') 
+    doRobustPost();
+elseif  strcmpi(referenceOut.referenceType, 'robust') && ...
+        strcmpi(referenceOut.interpolationOrder, 'pre-reference') 
+    doRobustPre();
 else
-    referenceOut.referenceSignalOriginal = ...
-        nanmean(signal.data(referenceOut.referenceChannels, :), 1);
+    referenceOut.referenceSignal = referenceOut.referenceSignalOriginal;
 end
 
-noisyChannels = referenceOut.interpolatedChannels.all;
-if ~isempty(noisyChannels) && strcmpi(referenceOut.referenceType, 'robust')
-    sourceChannels = setdiff(referenceOut.evaluationChannels, noisyChannels);
-    signal = interpolateChannels(signal, noisyChannels, sourceChannels);
-    referenceSignal = ...
-        nanmean(signal.data(referenceOut.referenceChannels, :), 1);
-else
-    referenceSignal = referenceOut.referenceSignalOriginal;
-end
-signal = removeReference(signal, referenceSignal, ...
-    referenceOut.rereferencedChannels);
-referenceOut.referenceSignal = referenceSignal;
-signalClean = removeTrend(signal, referenceIn);
-referenceOut.noisyStatistics = findNoisyChannels(signalClean, referenceOut);
 
-% Interpolate bad channels after non-robust referencing
-if ~strcmpi(referenceOut.referenceType, 'robust') && ...
-   ~strcmpi(referenceOut.referenceType, 'none-nointerp')
-    referenceOut.interpolatedChannels = ...
-        updateBadChannels(referenceOut.interpolatedChannels, ...
-             referenceOut.noisyStatistics.noisyChannels);
-    noisyChannels = referenceOut.interpolatedChannels.all;
-    if ~isempty(noisyChannels)  % Redo interpolation and detrend
-        sourceChannels = setdiff(referenceOut.evaluationChannels, noisyChannels);
-        signal = interpolateChannels(signal, noisyChannels, sourceChannels);
-        signalClean = removeTrend(signal, referenceIn);
-        referenceOut.noisyStatistics = findNoisyChannels(signalClean, referenceOut);
-    end 
-end    
-if referenceOut.keepFiltered
-    signal = signalClean;
-end
-clear signalClean;
+    function [] = doRobustPre()
+        % Use the bad channels accumulated from reference search
+        referenceOut = robustReference(signal, referenceOut);
+        referenceOut.noisyStatisticsBeforeInterpolation = ...
+                                        referenceOut.noisyStatistics;
+        noisy = referenceOut.interpolatedChannels.all;
+        if isempty(noisy)   %No noisy channels -- ordinary ref
+            referenceOut.referenceSignal = ...
+                nanmean(signal.data(referenceOut.referenceChannels, :), 1);
+        else
+            bad = signal.data(noisy, :); 
+            sourceChannels = setdiff(referenceOut.evaluationChannels, noisy);
+            signal = interpolateChannels(signal, noisy, sourceChannels);
+            referenceOut.referenceSignal = ...
+                nanmean(signal.data(referenceOut.referenceChannels, :), 1);
+            referenceOut.badSignalsUninterpolated = ...
+                bad - repmat(referenceOut.referenceSignal, length(noisy), 1);
+        end
 
+        signal = removeReference(signal, referenceOut.referenceSignal, ...
+            referenceOut.rereferencedChannels);     
+        referenceOut.noisyStatistics = ...
+            findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
+    end
+
+   function [] = doRobustPost()
+        % Robust reference with interpolation afterwards
+        referenceOut = robustReference(signal, referenceOut);
+        noisy = referenceOut.interpolatedChannels.all;
+        if isempty(noisy)   %No noisy channels -- ordinary ref
+            referenceOut.referenceSignal = ...
+                nanmean(signal.data(referenceOut.referenceChannels, :), 1);
+        else
+            sourceChannels = setdiff(referenceOut.evaluationChannels, noisy);
+            signalNew = interpolateChannels(signal, noisy, sourceChannels);
+            referenceOut.referenceSignal = ...
+                nanmean(signalNew.data(referenceOut.referenceChannels, :), 1);
+            clear signalNew;
+        end
+        signal = removeReference(signal, referenceOut.referenceSignal, ...
+                                 referenceOut.rereferencedChannels);
+        referenceOut.noisyStatistics  = ...
+                findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
+ 
+        referenceOut.noisyStatisticsBeforeInterpolation = ...
+                referenceOut.noisyStatistics;
+        %% Bring forward unusable channels from original data
+        noisy = referenceOut.noisyStatisticsOriginal.noisyChannels;
+        unusableChans = union(noisy.badChannelsFromNaNs, ...
+             union(noisy.badChannelsFromNoData, ...
+             noisy.badChannelsFromLowSNR));
+        intChans = referenceOut.noisyStatistics.noisyChannels;
+        chans = union(intChans.all, unusableChans);
+        intChans.all = chans(:)';    
+        chans = union(intChans.badChannelsFromNaNs, noisy.badChannelsFromNaNs);
+        intChans.badChannelsFromNaNs = chans(:)';
+        chans = union(intChans.badChannelsFromNoData, noisy.badChannelsFromNoData);
+        intChans.badChannelsFromNoData = chans(:)';
+        chans = union(intChans.badChannelsFromLowSNR, noisy.badChannelsFromLowSNR);
+        intChans.badChannelsFromLowSNR = chans(:)';
+        referenceOut.interpolatedChannels = intChans;
+        
+        %% Now find the bad channels and interpolate
+        %referenceOut.noisyStatisticsForReference = noisyStatistics;
+        noisyChans = referenceOut.interpolatedChannels.all;
+        if isempty(noisyChans)
+            return;
+        end
+        bad = signal.data(noisyChans, :);
+        sourceChannels = setdiff(referenceOut.evaluationChannels, noisyChans);
+        signal = interpolateChannels(signal, noisyChans, sourceChannels);
+        newReference = nanmean(signal.data(referenceOut.referenceChannels, :), 1);
+        referenceOut.badSignalsUninterpolated = ...
+            bad - repmat(newReference, length(noisyChans), 1);
+        referenceOut.referenceSignal = referenceOut.referenceSignal + newReference;
+        signal = removeReference(signal, newReference, ...
+                                 referenceOut.rereferencedChannels);
+        referenceOut.noisyStatistics  = ...
+            findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
+   end
+
+
+
+end

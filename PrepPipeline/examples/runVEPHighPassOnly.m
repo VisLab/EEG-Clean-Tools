@@ -5,7 +5,6 @@
 %% Read in the file and set the necessary parameters
 basename = 'vep';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
-indir = 'E:\\CTAData\\VEP\'; % Input data directory used for this demo
 
 %% Parameters to preset
 params = struct();
@@ -16,11 +15,14 @@ params.rereferencedChannels = 1:70;
 params.detrendChannels = 1:70;
 params.lineNoiseChannels = 1:70;
 %% Specific setup
-outdir = 'N:\\ARLAnalysis\\VEPPrep\\VEPHighPass0p3Hz';
+% indir =  'N:\\ARLAnalysis\\VEPPrepNew\\VEPRobust_1Hz_Unfiltered';
+% outdir = 'N:\\ARLAnalysis\\VEPPrepNew\\VEPRobust_1Hz';
+indir =  'N:\\ARLAnalysis\\VEPPrepNew\\VEPRobust_0p3Hz_Unfiltered';
+outdir = 'N:\\ARLAnalysis\\VEPPrepNew\\VEPRobust_0p3Hz';
 params.detrendType = 'high pass';
-params.detrendCutoff = 1;
+params.detrendCutoff = 0.3;
 params.referenceType = 'robust';
-basenameOut = [basename 'HPOnly_cutoff' num2str(params.detrendCutoff)];
+basenameOut = 'vep_robust_post_median_0p3Hz';
 %% Run the pipeline
 for k = 1:18
     thisName = sprintf('%s_%02d', basename, k);

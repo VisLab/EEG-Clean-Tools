@@ -1,4 +1,4 @@
-function [EEG1, EEG2, computationTimes] = lineNoisePipeline(EEG, params)
+function [EEG1, EEG2, EEG3, computationTimes] = lineNoisePipeline(EEG, params)
 % Run filtering and line noise removal on EEG and return in EEG1 and EEG2
 % 
 % Input parameters:
@@ -71,20 +71,6 @@ catch mex
     return;
 end
 
-%% Part I: Resampling
-fprintf('Resampling\n');
-try
-    tic
-    [EEG, resampling] = resampleEEG(EEG, params);
-    EEG.etc.noiseDetection.resampling = resampling;
-    computationTimes.resampling = toc;
-catch mex
-    errorMessages.resampling = ...
-        ['prepPipeline failed resampleEEG: ' getReport(mex)];
-    errorMessages.status = 'unprocessed';
-    EEG.etc.noiseDetection.errors = errorMessages;
-    return;
-end
 
 %% Part II:  HP the signal for detecting bad channels
 fprintf('Preliminary detrend to compute reference\n');
@@ -101,6 +87,26 @@ catch mex
     return;
 end
  
+
+%% Part III: Remove line noise
+fprintf('Line noise removal\n');
+try
+    tic
+    [EEGClean, lineNoise] = cleanLineNoise(EEGNew, params);
+    EEG.etc.noiseDetection.lineNoise = lineNoise;
+    lineChannels = lineNoise.lineNoiseChannels;
+    EEG.data(lineChannels, :) = EEG.data(lineChannels, :) ...
+         - EEGNew.data(lineChannels, :) + EEGClean.data(lineChannels, :); 
+    clear EEGNew;
+    computationTimes.lineNoise = toc;
+catch mex
+    errorMessages.lineNoise = ...
+        ['prepPipeline failed cleanLineNoise: ' getReport(mex)];
+    errorMessages.status = 'unprocessed';
+    EEG.etc.noiseDetection.errors = errorMessages;
+    return;
+end 
+
 %% Part III: Remove line noise
 fprintf('Line noise removal\n');
 try
@@ -115,4 +121,3 @@ catch mex
     EEG2.etc.noiseDetection.errors = errorMessages;
     return;
 end 
-

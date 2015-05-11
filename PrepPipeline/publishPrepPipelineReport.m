@@ -65,8 +65,9 @@ end
     end
     writeSummaryItem(summaryFile, '', 'last');
     fclose(summaryFile);
-    close all
-    if publishOn
+   
+    if publishOn 
         movefile(tempReportLocation, actualReportLocation);
+        close all
     end
 end

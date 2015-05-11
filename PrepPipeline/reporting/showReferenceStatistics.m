@@ -310,4 +310,43 @@
         num2str(median(sdrRatio)) '(sdr)]']});
     legend('Dataset ratio', 'Median of dataset ratios', 'Location', 'NorthWest')
     hold off
-    end
+
+    
+%% Plot ratios sdr/med window channel deviations ref versus orig
+    baseTitle = 'Ref ratio of sdr/med channel deviations to orig ratio';
+    figure ('Name', baseTitle);
+    refRatio = statistics(:, s.rSDWinDevRef)./statistics(:, s.medWinDevRef);
+    origRatio = statistics(:, s.rSDWinDevOrig)./statistics(:, s.medWinDevOrig);
+    hold on
+    plot(refRatio, origRatio, 'ok')
+    xlabel('SDR/Median ref ratio');
+    ylabel('SDR/Median orig ratio');
+    plot(median(refRatio), median(origRatio), ...
+        '+r', 'MarkerSize', 14, 'LineWidth', 3);
+    title({collectionTitle; baseTitle; ...
+        ['[Window channel deviations SDR/Median ratios: ' num2str(median(refRatio)) '(ref) ' ...
+        num2str(median(origRatio)) '(orig)]']});
+    legend('Dataset ratios', 'Median of dataset ratios', 'Location', 'NorthWest')
+    hold off
+    
+%% Plot median window correlation versus ratio sdr/ref window channel deviations 
+    baseTitle = 'Comparison of channel deviation and correlation';
+    figure ('Name', baseTitle);
+    refRatio = statistics(:, s.rSDWinDevRef)./statistics(:, s.medWinDevRef);
+    origRatio = statistics(:, s.rSDWinDevOrig)./statistics(:, s.medWinDevOrig);
+    hold on
+    plot(statistics(:, s.medCorRef), refRatio, 'ok')
+        plot(median(statistics(:, s.medCorRef)), median(refRatio), ...
+        '+r', 'MarkerSize', 14, 'LineWidth', 3);
+    plot(statistics(:, s.medCorOrig), origRatio, 'sb')
+    plot( median(statistics(:, s.medCorOrig)), median(origRatio), ...
+        'xr', 'MarkerSize', 14, 'LineWidth', 3);
+    xlabel('Median min window correlation');
+    ylabel('SDR/Median ratio');
+    title({collectionTitle; baseTitle; ...
+        ['[Window channel deviations SDR/Median ratios: ' num2str(median(refRatio)) '(ref) ' ...
+        num2str(median(origRatio)) '(orig)]']});
+    legend('Referenced', 'Median referenced', 'Original', 'Median original', ...
+           'Location', 'NorthWest')
+    hold off
+    

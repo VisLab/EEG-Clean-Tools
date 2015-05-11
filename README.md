@@ -97,3 +97,9 @@ Version 0.4 (Not yet released - major change in strategy)
   repository is not high pass filtered
 * Added an option for removing global trend
 * Incorporated the different reference schemes into a single performReference
+
+Version 0.41 (Not released - version 0.40 with additional changes)
+* Replaced default method with channel forgetting and median initialization
+* Converted EEG to double at the beginning of the pipeline
+* Added a noisyStatisticsForInterpolation field to the reference reporting
+  structure.

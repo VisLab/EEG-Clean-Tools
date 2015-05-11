@@ -28,6 +28,7 @@ else
 end
 summaryHeader = [noiseDetection.name '[' ...
     num2str(size(EEG.data, 1)) ' channels, ' num2str(size(EEG.data, 2)) ' frames]'];
+fprintf(consoleFID, '%s\n', summaryHeader);
 summaryHeader = [summaryHeader ' <a href="' relativeReportLocation ...
     '">Report details</a>'];
 writeSummaryHeader(summaryFile,  summaryHeader);
@@ -64,13 +65,13 @@ end
 % Setup visualization parameters
 numbersPerRow = 10;
 indent = '  ';
-colors = [0, 0, 0; 1, 0, 0; 0, 1, 0];
-legendStrings = {'Original', 'Final'};
+%colorsNew = [0, 0, 0; 0.8, 0.8, 0.8; 1, 0, 0];
+colors = [0, 0, 0; 0, 1, 0; 1, 0, 0];
+legendStrings = {'Original', 'Before interp' 'Final'};
+symbols = {'+', 'x', 'o'};
+%colors = [0, 0, 0; 1, 0, 0; 0, 1, 0];
+%legendStrings = {'Original', 'Final'};
 scalpMapInterpolation = 'v4';
-
-%% Global trend removal step
-summary = reportGlobalDetrend(consoleFID, noiseDetection, numbersPerRow, indent);
-writeSummaryItem(summaryFile, summary);
 
 %% Line noise removal step
 summary = reportLineNoise(consoleFID, noiseDetection, numbersPerRow, indent);
@@ -79,22 +80,6 @@ writeSummaryItem(summaryFile, summary);
 %% Initial detrend for reference calculation
 summary = reportDetrend(consoleFID, noiseDetection, numbersPerRow, indent);
 writeSummaryItem(summaryFile, summary);
-
-%% Trend correlation evaluation channels relationships 
-if isfield(noiseDetection, 'globalTrend')
-  channels = noiseDetection.globalTrend.globalTrendChannels;
-  tString = 'Global trend (trend channels)';
-  if isfield(noiseDetection, 'reference')
-      channels = intersect(channels, noiseDetection.reference.evaluationChannels);
-      tString = 'Global trend (evaluation channels)';
-  end
-  fits = noiseDetection.globalTrend.linearFit(channels, :);
-  correlations = noiseDetection.globalTrend.channelCorrelations(channels);
-  showTrendCorrelation(fits, correlations, tString);
-else
-    fprintf(consoleFID, 'Global trend not evaluated\n');
-    EEGNew = EEG;
-end
 
 %% Spectrum after line noise and detrend
 if isfield(noiseDetection, 'lineNoise')
@@ -130,36 +115,64 @@ end
 %% Robust channel deviation (referenced)
 if isfield(noiseDetection, 'reference') && ~isempty(noiseDetection.reference) 
     reference = noiseDetection.reference;
+    noisyStatistics = reference.noisyStatistics;
     headColor = [0.7, 0.7, 0.7];
     elementColor = [0, 0, 0];
     showColorbar = true;   
     channelInformation = reference.channelInformation;
     nosedir = channelInformation.nosedir;
     channelLocations = reference.channelLocations;
+   
     [referencedLocations, evaluationChannels, noiseLegendString]= ...
-        getReportChannelInformation(channelLocations, noisyStatistics);
+        getReportChannelInformation(channelLocations, ...
+        noisyStatistics.evaluationChannels, noisyStatistics.noisyChannels);
+    
+
+    interpolatedLocations = getReportChannelInformation(channelLocations, ...
+        noisyStatistics.evaluationChannels, reference.interpolatedChannels);
+    % Original locations
     if ~isfield(reference, 'noisyStatisticsOriginal') || ...
             isempty(reference.noisyStatisticsOriginal)
         noisyStatisticsOriginal = noisyStatistics;
+        fprintf(consoleFID, 'No original statistics --- using final for both\n');
     else
         noisyStatisticsOriginal = reference.noisyStatisticsOriginal;
     end
-    fprintf(consoleFID, 'No original statistics --- using final for both\n');
+    % Original locations
+    if ~isfield(reference, 'noisyStatisticsBeforeInterpolation') || ...
+            isempty(reference.noisyStatisticsBeforeInterpolation)
+        noisyStatisticsBeforeInterpolation = noisyStatisticsOriginal;
+        fprintf(consoleFID, ...
+            'No statistics before interpolation --- using original for both\n');
+    else
+        noisyStatisticsBeforeInterpolation  = ...
+                             reference.noisyStatisticsBeforeInterpolation;
+    end
     originalLocations = getReportChannelInformation(channelLocations, ...
-        noisyStatisticsOriginal);
+        noisyStatistics.evaluationChannels, noisyStatisticsOriginal.noisyChannels);
     numberEvaluationChannels = length(evaluationChannels);
+    
     tString = 'Robust channel deviation';
     dataReferenced = noisyStatistics.robustChannelDeviation;
     dataOriginal = noisyStatisticsOriginal.robustChannelDeviation;
+    dataBeforeInterpolation = ...
+        noisyStatisticsBeforeInterpolation.robustChannelDeviation;
     medRef = noisyStatistics.channelDeviationMedian;
     sdnRef = noisyStatistics.channelDeviationSD;
+
     medOrig = noisyStatisticsOriginal.channelDeviationMedian;
     sdnOrig = noisyStatisticsOriginal.channelDeviationSD;
-    scale = max(max(abs(dataOriginal), max(abs(dataReferenced))));
+    
+    medInterp = noisyStatisticsBeforeInterpolation.channelDeviationMedian;
+    sdnInterp = noisyStatisticsBeforeInterpolation.channelDeviationSD;
+    
+    scale = max(max(abs(dataOriginal)), max(max(abs(dataBeforeInterpolation)), ...
+                max(abs(dataReferenced))));
+    %scale = max(max(abs(dataOriginal), abs(dataReferenced)));
     clim = [-scale, scale];    
     fprintf(consoleFID, '\nNoisy channel legend: ');
     for j = 1:length(noiseLegendString)
-        fprintf(consoleFID, '%s ', noiseLegendString{j});
+        fprintf(consoleFID, '%s\n', noiseLegendString{j});
     end
     fprintf(consoleFID, '\n\n');
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
@@ -170,30 +183,51 @@ end
 if isfield(noiseDetection, 'reference')
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
+end
+
+%% Robust channel deviation (marking interpolated)
+if isfield(noiseDetection, 'reference')
+    plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
 end  
+
+
 
 %% Robust deviation window statistics
 if isfield(noiseDetection, 'reference')
     beforeDeviationLevels = noisyStatisticsOriginal.channelDeviations(evaluationChannels, :);
     afterDeviationLevels = noisyStatistics.channelDeviations(evaluationChannels, :);
+    interpDeviationLevels = ...
+        noisyStatisticsBeforeInterpolation.channelDeviations(evaluationChannels, :);
     beforeDeviation = (beforeDeviationLevels - medOrig)./sdnOrig;
     afterDeviation = (afterDeviationLevels - medRef)./sdnRef;
+    interpDeviation = (interpDeviationLevels - medInterp)./sdnInterp;
     medianDeviationsOrig = median(beforeDeviationLevels(:));
     sdDeviationsOrig = mad(beforeDeviationLevels(:), 1)*1.4826;
     medianDeviationsRef = median(afterDeviationLevels(:));
-    sdDeviationsRef = mad(afterDeviationLevels(:), 1)*1.4826;
+    sdDeviationsRef = mad(afterDeviationLevels(:), 1)*1.4826;   
+    medianDeviationsInterp = median(interpDeviationLevels(:));
+    sdDeviationsInterp = mad(interpDeviationLevels(:), 1)*1.4826;
     thresholdName = 'Deviation score';
     theTitle = {char(noiseDetection.name); char([ thresholdName ' distribution'])};
-    showCumulativeDistributions({beforeDeviation(:), afterDeviation(:)}, ...
+    showCumulativeDistributions({beforeDeviation(:), interpDeviation(:), afterDeviation(:)}, ...
         thresholdName, colors, theTitle, legendStrings, [-5, 5]);
-    beforeDeviationCounts = sum(beforeDeviation >= noisyStatisticsOriginal.robustDeviationThreshold);
-    afterDeviationCounts = sum(afterDeviation >= noisyStatistics.robustDeviationThreshold);
- 
+    beforeDeviationCounts = ...
+        sum(beforeDeviation >= noisyStatisticsOriginal.robustDeviationThreshold);
+    afterDeviationCounts = ...
+        sum(afterDeviation >= noisyStatistics.robustDeviationThreshold);
+    interpDeviationCounts = ...
+        sum(interpDeviation >= noisyStatisticsBeforeInterpolation.robustDeviationThreshold);
     beforeTimeScale = (0:length(beforeDeviationCounts)-1)*noisyStatisticsOriginal.correlationWindowSeconds;
     afterTimeScale = (0:length(afterDeviationCounts)-1)*noisyStatistics.correlationWindowSeconds;
+    interpTimeScale = (0:length(interpDeviationCounts)-1)* ...
+        noisyStatisticsBeforeInterpolation.correlationWindowSeconds;
     fractionBefore = mean(beforeDeviationCounts)/numberEvaluationChannels;
     fractionAfter = mean(afterDeviationCounts)/numberEvaluationChannels;
-    showBadWindows(beforeDeviationCounts, afterDeviationCounts, beforeTimeScale, afterTimeScale, ...
+    fractionInterp = mean(interpDeviationCounts)/numberEvaluationChannels;
+    counts = {beforeDeviationCounts, interpDeviationCounts, afterDeviationCounts};
+    timeScales = {beforeTimeScale, interpTimeScale, afterTimeScale};
+    showBadWindows(counts, timeScales, colors, symbols, ...
         numberEvaluationChannels, legendStrings, noiseDetection.name, thresholdName);
     reports = cell(19, 1);
     reports{1} = ['Deviation window statistics (over ' ...
@@ -266,6 +300,17 @@ if isfield(noiseDetection, 'reference')
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 end 
 
+%% Median max abs correlation (marking interpolated)
+if isfield(noiseDetection, 'reference')
+    tString = 'Median max correlation';
+    dataBeforeInterpolation = ...
+        noisyStatisticsBeforeInterpolation.medianMaxCorrelation;
+    clim = [0, 1];
+    plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
+end 
+
+
 
 %% Mean max abs correlation (referenced)
 if isfield(noiseDetection, 'reference')
@@ -284,25 +329,78 @@ if isfield(noiseDetection, 'reference')
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 end  
+
+%% Mean max abs correlation (marking interpolated)
+if isfield(noiseDetection, 'reference')
+    tString = 'Mean max correlation';
+    dataBeforeInterpolation = ...
+        mean(noisyStatisticsBeforeInterpolation.maximumCorrelations, 2); 
+    clim = [0, 1];
+    plotScalpMap(dataOriginal, interpolatedLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
+end 
+
+%% Bad min max correlation fraction (referenced)
+if isfield(noiseDetection, 'reference')
+    tString = 'Min max corr fraction';
+    thresholdedCorrelations = noisyStatistics.maximumCorrelations ...
+               < noisyStatistics.correlationThreshold;
+    dataReferenced = mean(thresholdedCorrelations, 2);
+    thresholdedCorrelations = noisyStatisticsOriginal.maximumCorrelations ...
+               < noisyStatisticsOriginal.correlationThreshold;
+    dataOriginal = mean(thresholdedCorrelations, 2);
+    thresholdedCorrelations = noisyStatisticsBeforeInterpolation.maximumCorrelations ...
+               < noisyStatisticsBeforeInterpolation.correlationThreshold;
+    dataBeforeInterpolation = mean(thresholdedCorrelations, 2);
+    scale = max(max(max(max(dataReferenced), max(dataOriginal)), ...
+                max(dataBeforeInterpolation)), reference.badTimeThreshold);
+% %     clim = [0, reference.badTimeThreshold]; 
+%     clim = [0, scale];
+    clim = [0, 2*reference.badTimeThreshold]; 
+    plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
+end    
+%% Bad min max correlation fraction(original)
+if isfield(noiseDetection, 'reference')
+    plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
+end
+
+%% Bad min max correlation fraction (marking interpolated)
+if isfield(noiseDetection, 'reference')
+
+    plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
+end  
+
 %% Correlation window statistics
 if isfield(noiseDetection, 'reference')
-    beforeCorrelationLevels = noisyStatisticsOriginal.maximumCorrelations(evaluationChannels, :);
-    afterCorrelationLevels = noisyStatistics.maximumCorrelations(evaluationChannels, :);
+    beforeCorrelationLevels = ...
+        noisyStatisticsOriginal.maximumCorrelations(evaluationChannels, :);
+    afterCorrelationLevels = ...
+        noisyStatistics.maximumCorrelations(evaluationChannels, :);
+    interpCorrelationLevels = ...
+        noisyStatisticsBeforeInterpolation.maximumCorrelations(evaluationChannels, :);
     thresholdName = 'Maximum correlation';
     theTitle = {char(noiseDetection.name); char([thresholdName ' distribution'])};
-    showCumulativeDistributions({beforeCorrelationLevels(:), afterCorrelationLevels(:)}, ...
+    showCumulativeDistributions( ...
+        {beforeCorrelationLevels(:),interpCorrelationLevels(:), afterCorrelationLevels(:)}, ...
         thresholdName, colors, theTitle, legendStrings, [0, 1]);
-    
     beforeCorrelationCounts = sum(beforeCorrelationLevels <= ...
         noisyStatisticsOriginal.correlationThreshold);
     afterCorrelationCounts = sum(afterCorrelationLevels <= ...
         noisyStatistics.correlationThreshold);
+    interpCorrelationCounts = sum(interpCorrelationLevels <= ...
+        noisyStatisticsBeforeInterpolation.correlationThreshold);
     beforeTimeScale = (0:length(beforeCorrelationCounts)-1)* ...
         noisyStatisticsOriginal.correlationWindowSeconds;
     afterTimeScale = (0:length(afterCorrelationCounts)-1)* ...
         noisyStatistics.correlationWindowSeconds;
-    showBadWindows(beforeCorrelationCounts, afterCorrelationCounts, ...
-        beforeTimeScale, afterTimeScale, ...
+    interpTimeScale = (0:length(interpCorrelationCounts)-1)* ...
+        noisyStatisticsBeforeInterpolation.correlationWindowSeconds;
+    counts = {beforeCorrelationCounts, interpCorrelationCounts, afterCorrelationCounts};
+    timeScales = {beforeTimeScale, interpTimeScale, afterTimeScale};
+    showBadWindows(counts, timeScales, colors, symbols, ...
         numberEvaluationChannels, legendStrings, noiseDetection.name, thresholdName);
     fractionBefore = mean(beforeCorrelationCounts)/numberEvaluationChannels;
     fractionAfter = mean(afterCorrelationCounts)/numberEvaluationChannels;
@@ -342,37 +440,55 @@ end
 if isfield(noiseDetection, 'reference')
     tString = 'Ransac fraction failed';
     dataReferenced = noisyStatistics.ransacBadWindowFraction;
-
-    clim = [0, 1];
-    
+    clim = [0, 1];    
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
 end    
+
 %% Bad ransac fraction (original)
 if isfield(noiseDetection, 'reference')
         dataOriginal = noisyStatisticsOriginal.ransacBadWindowFraction;
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
-end    
+end
+
+%% Bad ransac fraction (marking interpolated)
+if isfield(noiseDetection, 'reference')
+        dataBeforeInterpolation = noisyStatisticsBeforeInterpolation.ransacBadWindowFraction;
+    plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
+end  
 %% Channels with poor ransac correlations
 if isfield(noiseDetection, 'reference')
-    beforeRansacLevels = noisyStatisticsOriginal.ransacCorrelations(evaluationChannels, :);
-    afterRansacLevels = noisyStatistics.ransacCorrelations(evaluationChannels, :);
+    beforeRansacLevels = ...
+        noisyStatisticsOriginal.ransacCorrelations(evaluationChannels, :);
+    afterRansacLevels = ...
+        noisyStatistics.ransacCorrelations(evaluationChannels, :);
+    interpRansacLevels = ...
+        noisyStatisticsBeforeInterpolation.ransacCorrelations(evaluationChannels, :);
     thresholdName = 'Ransac correlation';
     theTitle = {char([noiseDetection.name ': ' thresholdName ' distribution'])};
-    showCumulativeDistributions({beforeRansacLevels(:), afterRansacLevels(:)}, ...
+    showCumulativeDistributions({beforeRansacLevels(:), ...
+        interpRansacLevels(:), afterRansacLevels(:)}, ...
         thresholdName, colors, theTitle, legendStrings, [0, 1]);
     
     beforeRansacCounts = sum(beforeRansacLevels <= ...
         noisyStatisticsOriginal.ransacCorrelationThreshold);
     afterRansacCounts = sum(afterRansacLevels <= ...
         noisyStatistics.ransacCorrelationThreshold);
+    interpRansacCounts = sum(interpRansacLevels <= ...
+        noisyStatisticsBeforeInterpolation.ransacCorrelationThreshold);
     beforeTimeScale = (0:length(beforeRansacCounts)-1)* ...
         noisyStatisticsOriginal.ransacWindowSeconds;
     afterTimeScale = (0:length(afterRansacCounts)-1)* ...
-        noisyStatisticsOriginal.ransacWindowSeconds;
-    showBadWindows(beforeRansacCounts, afterRansacCounts, beforeTimeScale, afterTimeScale, ...
+        noisyStatistics.ransacWindowSeconds;
+    interpTimeScale = (0:length(interpRansacCounts)-1)* ...
+        noisyStatisticsBeforeInterpolation.ransacWindowSeconds;
+    counts = {beforeRansacCounts, interpRansacCounts, afterRansacCounts};
+    timeScales = {beforeTimeScale, interpTimeScale, afterTimeScale};
+    showBadWindows(counts, timeScales, colors, symbols, ...
         numberEvaluationChannels, legendStrings, noiseDetection.name, thresholdName);
+
     fractionBefore = mean(beforeRansacCounts)/numberEvaluationChannels;
     fractionAfter = mean(afterRansacCounts)/numberEvaluationChannels;
     reports = cell(9, 0);
@@ -408,47 +524,67 @@ if isfield(noiseDetection, 'reference')
     tString = 'Z-score HF SNR';
     dataReferenced = noisyStatistics.zscoreHFNoise;
     dataOriginal = noisyStatisticsOriginal.zscoreHFNoise;
+    dataBeforeInterpolation = noisyStatisticsBeforeInterpolation.zscoreHFNoise;
     medRef = noisyStatistics.noisinessMedian;
     sdnRef = noisyStatistics.noisinessSD;
     medOrig = noisyStatisticsOriginal.noisinessMedian;
     sdnOrig = noisyStatisticsOriginal.noisinessSD;
-    scale = max(max(abs(dataReferenced), max(abs(dataOriginal))));
+    scale = max(max(abs(dataOriginal)), max(max(abs(dataReferenced)), ...
+                max(abs(dataBeforeInterpolation))));
+    % scale = max(max(abs(dataOriginal), abs(dataReferenced)));
     clim = [-scale, scale];  
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
 end  
+
+
 %% HF noise Z-score (original)
 if isfield(noiseDetection, 'reference')
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
 end
 
+%% HF noise Z-score (marking interpolated)
+if isfield(noiseDetection, 'reference')
+    plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
+        showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
+end
 %% HF noise window stats
 if isfield(noiseDetection, 'reference')
     beforeNoiseLevels = noisyStatisticsOriginal.noiseLevels(evaluationChannels, :);
     afterNoiseLevels = noisyStatistics.noiseLevels(evaluationChannels, :);
+    interpNoiseLevels = ...
+        noisyStatisticsBeforeInterpolation.noiseLevels(evaluationChannels, :);
     medianNoiseOrig = median(beforeNoiseLevels(:));
     sdNoiseOrig = mad(beforeNoiseLevels(:), 1)*1.4826;
     medianNoiseRef = median(afterNoiseLevels(:));
     sdNoiseRef = mad(afterNoiseLevels(:), 1)*1.4826;
+    medianNoiseInterp = median(interpNoiseLevels(:));
+    sdNoiseInterp = mad(interpNoiseLevels(:), 1)*1.4826;
     beforeNoise = (beforeNoiseLevels - medianNoiseOrig)./sdNoiseOrig;
     afterNoise = (afterNoiseLevels - medianNoiseRef)./sdNoiseRef;
+    interpNoise = (interpNoiseLevels - medianNoiseInterp)./sdNoiseInterp;
     thresholdName = 'HF noise';
     theTitle = {char(noiseDetection.name); [thresholdName ' HF noise distribution']};
-    showCumulativeDistributions({beforeNoise(:), afterNoise(:)},  ...
+    showCumulativeDistributions({beforeNoise(:), interpNoise(:), afterNoise(:)},  ...
         thresholdName, colors, theTitle, legendStrings, [-5, 5]);
     beforeNoiseCounts = sum(beforeNoise  >= ...
         noisyStatisticsOriginal.highFrequencyNoiseThreshold);
     afterNoiseCounts = sum(afterNoise >= ...
         noisyStatistics.highFrequencyNoiseThreshold);
-   
+    interpNoiseCounts = sum(interpNoise >= ...
+        noisyStatisticsBeforeInterpolation.highFrequencyNoiseThreshold);
     beforeTimeScale = (0:length(beforeNoiseCounts)-1)* ...
         noisyStatisticsOriginal.correlationWindowSeconds;
     afterTimeScale = (0:length(afterNoiseCounts)-1)* ...
         noisyStatistics.correlationWindowSeconds;
-    showBadWindows(beforeNoiseCounts, afterNoiseCounts, beforeTimeScale, afterTimeScale, ...
-        length(evaluationChannels), legendStrings, noiseDetection.name, thresholdName);
-    
+    interpTimeScale = (0:length(interpNoiseCounts)-1)* ...
+        noisyStatisticsBeforeInterpolation.correlationWindowSeconds;
+    counts = {beforeNoiseCounts, interpNoiseCounts, afterNoiseCounts};
+    timeScales = {beforeTimeScale, interpTimeScale, afterTimeScale};
+    showBadWindows(counts, timeScales, colors, symbols, ...
+        numberEvaluationChannels, legendStrings, noiseDetection.name, thresholdName);
+ 
     fractionBefore = mean(beforeNoiseCounts)/numberEvaluationChannels;
     fractionAfter = mean(afterNoiseCounts)/numberEvaluationChannels;
     reports = cell(17,0);

@@ -32,6 +32,9 @@ resampleOut = struct('resampleFrequency', [], 'originalFrequency', EEG.srate);
 if ~isempty(errors)
     error('resampleEEG:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end
+if resampleOut.resampleOff
+    return;
+end
 
 %% Resample the EEG data
 if resampleOut.originalFrequency <= resampleOut.resampleFrequency  

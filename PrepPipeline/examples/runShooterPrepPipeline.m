@@ -8,7 +8,7 @@
 basename = 'shooter';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 inDir = 'E:\\CTAData\\Shooter\'; % Input data directory used for this demo
-outDir = 'N:\\ARLAnalysis\\ShooterPrep\\DataReducedThreshold';
+outDir = 'N:\\ARLAnalysis\\ShooterPrepNew\\ShooterRobust_1Hz_Unfiltered';
 frontChop = 6;   % Chop all but 6 seconds from front of first event
 backChop = 6;    % Chop all but 6 seconds from back of first event
 
