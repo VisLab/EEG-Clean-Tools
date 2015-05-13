@@ -103,5 +103,11 @@ Version 0.41 (Not released - version 0.40 with additional changes)
 * Converted EEG to double at the beginning of the pipeline
 * Added a noisyStatisticsForInterpolation field to the reference reporting
   structure.
+
 Version 0.42 (Not released - version 0.41 with additional changes)
 * Added default line frequencies as multiples of 60 up to half nyquist.
+
+Version 0.43 (Not released - version 0.42 with additional changes)
+* Corrected a minor issue with reporting -- mean scalp correlation map for
+  beforeInterpolation was plotting the Original data rather than the
+  beforeInterpolation data.
