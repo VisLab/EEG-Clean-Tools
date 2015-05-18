@@ -104,7 +104,7 @@ channelLocations = noisyOut.channelLocations;
 evaluationChannels = sort(noisyOut.evaluationChannels); % Make sure channels are sorted
 evaluationChannels = evaluationChannels(:)';            % Make sure row vector
 noisyOut.evaluationChannels = evaluationChannels;  
-
+originalChannels = 1:size(signal.data, 1);
 
 %% Extract the data required
 data = signal.data;
@@ -150,9 +150,10 @@ noisyOut.robustChannelDeviation(evaluationChannels) = ...
 
 % Find channels with unusually high deviation 
 badChannelsFromDeviation = ...
-    find(abs(noisyOut.robustChannelDeviation) > ...
+    abs(noisyOut.robustChannelDeviation) > ...
              noisyOut.robustDeviationThreshold | ...
-             isnan(noisyOut.robustChannelDeviation));
+             isnan(noisyOut.robustChannelDeviation);
+badChannelsFromDeviation = originalChannels(badChannelsFromDeviation);
 noisyOut.noisyChannels.badChannelsFromDeviation = badChannelsFromDeviation(:)';
 noisyOut.channelDeviationMedian = channelDeviationMedian;
 noisyOut.channelDeviationSD = channelDeviationSD;
@@ -219,11 +220,9 @@ fractionBadCorrelationWindows = mean(thresholdedCorrelations, 2);
 fractionBadDropOutWindows = mean(noisyOut.dropOuts, 2);
 
 % Remap channels to their original numbers
-badChannelsFromCorrelation = ...
-    find(fractionBadCorrelationWindows > noisyOut.badTimeThreshold);
-badChannelsFromDropOuts = ...
-    find(fractionBadDropOutWindows > noisyOut.badTimeThreshold);
+badChannelsFromCorrelation = find(fractionBadCorrelationWindows > noisyOut.badTimeThreshold);
 noisyOut.noisyChannels.badChannelsFromCorrelation = badChannelsFromCorrelation(:)';
+badChannelsFromDropOuts = find(fractionBadDropOutWindows > noisyOut.badTimeThreshold);
 noisyOut.noisyChannels.badChannelsFromDropOuts = badChannelsFromDropOuts(:)';
 noisyOut.medianMaxCorrelation =  median(noisyOut.maximumCorrelations, 2);
 
@@ -299,8 +298,7 @@ if noisyOut.ransacPerformed
     clear Xwin;
     noisyOut.ransacCorrelations(ransacChannels, :) = ransacCorrelationsT;
     flagged = noisyOut.ransacCorrelations < noisyOut.ransacCorrelationThreshold;
-    badChannelsFromRansac = ...
-        find(sum(flagged, 2)*ransacFrames > ransacUnbrokenFrames)';
+    badChannelsFromRansac = find(sum(flagged, 2)*ransacFrames > ransacUnbrokenFrames)';
     noisyOut.noisyChannels.badChannelsFromRansac = badChannelsFromRansac(:)';
     noisyOut.ransacBadWindowFraction = sum(flagged, 2)/size(flagged, 2);
 end
@@ -314,7 +312,7 @@ noisyChannels = union(noisyChannels, ...
           noisy.badChannelsFromHFNoise), ...
     union(noisy.badChannelsFromNaNs, ...
           noisy.badChannelsFromNoData)));
-noisyOut.noisyChannels.all = noisyChannels;
+noisyOut.noisyChannels.all = noisyChannels(:)';
 noisyOut.medianMaxCorrelation =  median(noisyOut.maximumCorrelations, 2);
 
 %% Helper functions for findNoisyChannels

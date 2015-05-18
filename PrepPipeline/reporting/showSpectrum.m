@@ -42,7 +42,7 @@ function [fref, sref, badChannels] = showSpectrum(EEG, channelLabels, ...
         displayChannels = setdiff(displayChannels, badChannels);
 
         colors = jet(length(displayChannels));
-        figure('Name', tString)
+        figure('Name', tString, 'Color', [1, 1, 1])
         hold on
         legends = cell(1, length(displayChannels));
         for c = 1:length(displayChannels)
@@ -55,6 +55,7 @@ function [fref, sref, badChannels] = showSpectrum(EEG, channelLabels, ...
         ylabel('Power 10*log(\muV^2/Hz)')
         legend(legends)
         title(tString1, 'Interpreter', 'none')
+        box on
         drawnow
     end
 end

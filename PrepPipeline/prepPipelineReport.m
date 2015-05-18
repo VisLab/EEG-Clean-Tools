@@ -72,7 +72,9 @@ symbols = {'+', 'x', 'o'};
 %colors = [0, 0, 0; 1, 0, 0; 0, 1, 0];
 %legendStrings = {'Original', 'Final'};
 scalpMapInterpolation = 'v4';
-
+darkElementColor = [0.5, 0.5, 0.5];
+headColor = [0.95, 0.95, 0.95];
+elementColor = [0, 0, 0];
 %% Line noise removal step
 summary = reportLineNoise(consoleFID, noiseDetection, numbersPerRow, indent);
 writeSummaryItem(summaryFile, summary);
@@ -116,8 +118,7 @@ end
 if isfield(noiseDetection, 'reference') && ~isempty(noiseDetection.reference) 
     reference = noiseDetection.reference;
     noisyStatistics = reference.noisyStatistics;
-    headColor = [0.7, 0.7, 0.7];
-    elementColor = [0, 0, 0];
+
     showColorbar = true;   
     channelInformation = reference.channelInformation;
     nosedir = channelInformation.nosedir;
@@ -154,9 +155,12 @@ if isfield(noiseDetection, 'reference') && ~isempty(noiseDetection.reference)
     
     tString = 'Robust channel deviation';
     dataReferenced = noisyStatistics.robustChannelDeviation;
+    dataReferenced = dataReferenced(evaluationChannels);
     dataOriginal = noisyStatisticsOriginal.robustChannelDeviation;
+    dataOriginal = dataOriginal(evaluationChannels);
     dataBeforeInterpolation = ...
         noisyStatisticsBeforeInterpolation.robustChannelDeviation;
+    dataBeforeInterpolation = dataBeforeInterpolation(evaluationChannels);
     medRef = noisyStatistics.channelDeviationMedian;
     sdnRef = noisyStatistics.channelDeviationSD;
 
@@ -286,6 +290,7 @@ end
 if isfield(noiseDetection, 'reference')
     tString = 'Median max correlation';
     dataReferenced = noisyStatistics.medianMaxCorrelation;
+    dataReferenced = dataReferenced(evaluationChannels);
     clim = [0, 1];
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
@@ -295,6 +300,7 @@ end
 if isfield(noiseDetection, 'reference')
     tString = 'Median max correlation';
     dataOriginal = noisyStatisticsOriginal.medianMaxCorrelation;
+    dataOriginal = dataOriginal(evaluationChannels);
     clim = [0, 1];
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
@@ -305,6 +311,7 @@ if isfield(noiseDetection, 'reference')
     tString = 'Median max correlation';
     dataBeforeInterpolation = ...
         noisyStatisticsBeforeInterpolation.medianMaxCorrelation;
+    dataBeforeInterpolation = dataBeforeInterpolation(evaluationChannels);
     clim = [0, 1];
     plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
@@ -315,7 +322,8 @@ end
 %% Mean max abs correlation (referenced)
 if isfield(noiseDetection, 'reference')
     tString = 'Mean max correlation';
-    dataReferenced = mean(noisyStatistics.maximumCorrelations, 2); 
+    dataReferenced = mean(noisyStatistics.maximumCorrelations, 2);
+    dataReferenced = dataReferenced(evaluationChannels);
     clim = [0, 1];
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
@@ -324,7 +332,8 @@ end
 %% Mean max abs correlation (original)
 if isfield(noiseDetection, 'reference')
     tString = 'Mean max correlation';
-    dataOriginal = mean(noisyStatisticsOriginal.maximumCorrelations, 2); 
+    dataOriginal = mean(noisyStatisticsOriginal.maximumCorrelations, 2);
+    dataOriginal = dataOriginal(evaluationChannels);
     clim = [0, 1];
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
@@ -335,6 +344,7 @@ if isfield(noiseDetection, 'reference')
     tString = 'Mean max correlation';
     dataBeforeInterpolation = ...
         mean(noisyStatisticsBeforeInterpolation.maximumCorrelations, 2); 
+    dataBeforeInterpolation = dataBeforeInterpolation(evaluationChannels);
     clim = [0, 1];
     plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
         showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
@@ -346,31 +356,31 @@ if isfield(noiseDetection, 'reference')
     thresholdedCorrelations = noisyStatistics.maximumCorrelations ...
                < noisyStatistics.correlationThreshold;
     dataReferenced = mean(thresholdedCorrelations, 2);
+    dataReferenced = dataReferenced(evaluationChannels);
     thresholdedCorrelations = noisyStatisticsOriginal.maximumCorrelations ...
                < noisyStatisticsOriginal.correlationThreshold;
     dataOriginal = mean(thresholdedCorrelations, 2);
+    dataOriginal = dataOriginal(evaluationChannels);
     thresholdedCorrelations = noisyStatisticsBeforeInterpolation.maximumCorrelations ...
                < noisyStatisticsBeforeInterpolation.correlationThreshold;
     dataBeforeInterpolation = mean(thresholdedCorrelations, 2);
+    dataBeforeInterpolation = dataBeforeInterpolation(evaluationChannels);
     scale = max(max(max(max(dataReferenced), max(dataOriginal)), ...
                 max(dataBeforeInterpolation)), reference.badTimeThreshold);
-% %     clim = [0, reference.badTimeThreshold]; 
-%     clim = [0, scale];
     clim = [0, 2*reference.badTimeThreshold]; 
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
-        showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
+        showColorbar, headColor, darkElementColor, clim, nosedir, [tString '(referenced)'])
 end    
 %% Bad min max correlation fraction(original)
 if isfield(noiseDetection, 'reference')
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
-        showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
+        showColorbar, headColor, darkElementColor, clim, nosedir, [tString '(original)'])
 end
 
 %% Bad min max correlation fraction (marking interpolated)
 if isfield(noiseDetection, 'reference')
-
     plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
-        showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
+        showColorbar, headColor, darkElementColor, clim, nosedir, [tString '(marking interpolated)'])
 end  
 
 %% Correlation window statistics
@@ -440,23 +450,26 @@ end
 if isfield(noiseDetection, 'reference')
     tString = 'Ransac fraction failed';
     dataReferenced = noisyStatistics.ransacBadWindowFraction;
+    dataReferenced = dataReferenced(evaluationChannels);
     clim = [0, 1];    
     plotScalpMap(dataReferenced, referencedLocations, scalpMapInterpolation, ...
-        showColorbar, headColor, elementColor, clim, nosedir, [tString '(referenced)'])
+        showColorbar, headColor, darkElementColor, clim, nosedir, [tString '(referenced)'])
 end    
 
 %% Bad ransac fraction (original)
 if isfield(noiseDetection, 'reference')
-        dataOriginal = noisyStatisticsOriginal.ransacBadWindowFraction;
+    dataOriginal = noisyStatisticsOriginal.ransacBadWindowFraction;
+    dataOriginal = dataOriginal(evaluationChannels);
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
-        showColorbar, headColor, elementColor, clim, nosedir, [tString '(original)'])
+        showColorbar, headColor, darkElementColor, clim, nosedir, [tString '(original)'])
 end
 
 %% Bad ransac fraction (marking interpolated)
 if isfield(noiseDetection, 'reference')
-        dataBeforeInterpolation = noisyStatisticsBeforeInterpolation.ransacBadWindowFraction;
+    dataBeforeInterpolation = noisyStatisticsBeforeInterpolation.ransacBadWindowFraction;
+    dataBeforeInterpolation = dataBeforeInterpolation(evaluationChannels);
     plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
-        showColorbar, headColor, elementColor, clim, nosedir, [tString '(marking interpolated)'])
+        showColorbar, headColor, darkElementColor, clim, nosedir, [tString '(marking interpolated)'])
 end  
 %% Channels with poor ransac correlations
 if isfield(noiseDetection, 'reference')
@@ -523,8 +536,11 @@ end
 if isfield(noiseDetection, 'reference')
     tString = 'Z-score HF SNR';
     dataReferenced = noisyStatistics.zscoreHFNoise;
+    dataReferenced = dataReferenced(evaluationChannels);
     dataOriginal = noisyStatisticsOriginal.zscoreHFNoise;
+    dataOriginal = dataOriginal(evaluationChannels);
     dataBeforeInterpolation = noisyStatisticsBeforeInterpolation.zscoreHFNoise;
+    dataBeforeInterpolation = dataBeforeInterpolation(evaluationChannels);
     medRef = noisyStatistics.noisinessMedian;
     sdnRef = noisyStatistics.noisinessSD;
     medOrig = noisyStatisticsOriginal.noisinessMedian;
@@ -665,8 +681,8 @@ end
 if isfield(noiseDetection, 'reference')
     EEGTemp = eeg_emptyset();
     EEGTemp.nbchan = 2;
-    a = reference.referenceSignalOriginal;
-    b = reference.referenceSignal;
+    a = reference.referenceSignal;
+    b = reference.referenceSignalOriginal;
     EEGTemp.pnts = length(a);
     EEGTemp.data = [a(:)'; b(:)'];
     EEGTemp.srate = EEG.srate;
@@ -688,7 +704,7 @@ if isfield(noiseDetection, 'reference')
     tString = { noiseDetection.name, 'ordinary - robust average reference signals'};
     t = (0:length(EEGTemp.data(2, :)) - 1)/EEG.srate;
     figure('Name', tString{2})
-    plot(t, EEGTemp.data(1, :) - EEGTemp.data(2, :), '.k');
+    plot(t, EEGTemp.data(2, :) - EEGTemp.data(1, :), '.k');
     xlabel('Seconds')
     ylabel('Average - robust');
     title(tString, 'Interpreter', 'None');

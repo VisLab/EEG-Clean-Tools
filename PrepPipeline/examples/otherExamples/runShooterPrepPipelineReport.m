@@ -1,8 +1,8 @@
 %% Read in the file and set the necessary parameters
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 basename = 'shooter';
-dataDir = 'N:\\ARLAnalysis\\ShooterPrepNew\\ShooterRobust_1Hz_Unfiltered';
-summaryFolder = 'N:\\ARLAnalysis\\ShooterPrepNew\\ShooterRobust_1Hz_Unfiltered_Report';
+dataDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered';
+summaryFolder = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered_Report';
 %% Get the directory list
 inList = dir(dataDir);
 inNames = {inList(:).name};

@@ -1,14 +1,14 @@
-%% Create composite data statistics and issues files for the VEP data
+%% Generates an issue report for EEG structures that have been robustly referenced.
+%
+%  Assumes EEG is in a single directory.
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
-saveFile = 'dataStatistics.mat';
 issueFile = 'issues.txt';
 
 %% Setup the directories and titles
 setupDir(1) = struct('inDir', [], 'outDir', [], 'title', []);
-setupDir(1).inDir = 'N:\\BCI2000Prep\\BCI2000Robust_Unfiltered';
-setupDir(1).outDir = 'N:\\BCI2000Prep\\BCI2000Robust_Unfiltered_Report';
-setupDir(1).title = 'BCI2000 robust';
-
+setupDir(1).inDir = 'N:\\ARLAnalysis\\Shooter\\ShooterRobust_1Hz_Unfiltered';
+setupDir(1).outDir = 'N:\\ARLAnalysis\\Shooter\\ShooterRobust_1Hz_Unfiltered_Report';
+setupDir(1).title = 'Shooter_Robust_1Hz';
 
 %% Get the directory list
 for k = 1:length(setupDir)
@@ -27,19 +27,17 @@ for k = 1:length(setupDir)
             inNames{j} = [setupDir(k).inDir filesep inNames{j}];
         end
     end
-    %% Consolidate the results in a single structure for comparative analysis
-    collectionStats = createCollectionStatistics(setupDir(k).title, inNames);
-    %% Save the statistics in the specified file
-    save([setupDir(k).outDir filesep saveFile], 'collectionStats', '-v7.3');
-
-    %% Display the reference statistics
-    showReferenceStatistics(collectionStats);
+    fileList = inNames(validNames);
     %% Generate an issue report for the collection
-    [badReport, badFiles] = getCollectionIssues(collectionStats);
+    [badFiles, badReasons] = getCollectionIssues(fileList);
 
     %% Generate an issue report for the collection
     fid = fopen([setupDir(k).outDir filesep issueFile], 'w');
-    fprintf(fid, '%s\n', badReport);
+    fprintf(fid, 'Issues for %s\n', setupDir(k).title);
+    if ~isempty(badFiles)
+        for j = 1:length(badFiles)
+           fprintf(fid, '%s\n   %s\n', badFiles{j}, badReasons{j});
+        end
+    end
     fclose(fid);
-    %close all
 end

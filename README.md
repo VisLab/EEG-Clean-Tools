@@ -111,3 +111,20 @@ Version 0.43 (Not released - version 0.42 with additional changes)
 * Corrected a minor issue with reporting -- mean scalp correlation map for
   beforeInterpolation was plotting the Original data rather than the
   beforeInterpolation data.
+
+Version 0.44 (Not released - version 0.43 with additional changes)
+* Corrected a minor issue with reporting -- difference between robust
+  and ordinary reference had axes reversed.
+* Updated to run with plotting compatible with MATLAB 2014b
+* Added box on to cummulative plots.
+
+Version 0.45 (Not released - version 0.44 with additional changes)
+* Refactored report to allow statistics to be gathered from noisy structures
+
+Version 0.46 (Not released - version 0.45 with additional changes)
+* Fixed remapping of bad evaluation channels into original channel numbers
+  (relevant when there are none EEG channels interspersed in the channel
+  locations.
+* Passed detrend information in reference structure to allow detrending 
+  with other than the defaults
+* Corrected several channel mapping issues in the reporting.

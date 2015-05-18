@@ -20,6 +20,13 @@ referenceOut.noisyStatisticsOriginal = findNoisyChannels( ...
 %                           referenceOut.noisyStatisticsOriginal;
 referenceOut.noisyStatistics = referenceOut.noisyStatisticsOriginal;  
 
+%% Warn if evaluation and reference channels are not the same for robust
+if ~isempty(intersect(referenceOut.evaluationChannels, ...
+        referenceOut.referenceChannels))
+    warning('robustReference:EvaluationChannels', ...
+    'Reference and evaluation channels should be same for robust reference');
+end
+    
 %% Determine unusable channels and remove them from the reference channels
 [badChannelsFromNaNs, badChannelsFromNoData] = ...
                findUnusableChannels(signal, referenceOut.referenceChannels); 
@@ -49,7 +56,7 @@ elseif strcmpi(referenceOut.meanEstimateType, 'huber')
 else
     signalTmp = signal;
 end
-fprintf('To here\n');
+
 %% Remove reference from signal iteratively interpolating bad channels
 iterations = 0;                         
 noisyChannelsOld = [];

@@ -1,28 +1,24 @@
-%% Example: Running the pipeline outside of ESS using the ARL shooter data.
+%% Example: Computing statistics of high pass with mastoid reference
+% using the ARL shooter data.  The original data was mastoid-referenced.
 % This data is organized into subdirectories by subject under the main
 % input directory. The data is in raw format, but has the channel
 % locations. However, the assignment to reference and evaluation channels
-% has to be be done manually.
+% has to be be done manually. We chop all but 6 seconds from before first
+% event and after last event.
 
 %% Read in the file and set the necessary parameters
 basename = 'shooter';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 inDir = 'E:\\CTAData\\Shooter\'; % Input data directory used for this demo
-outDir = 'N:\\ARLAnalysis\\ShooterPrepNew\\ShooterRobust_1Hz_Unfiltered';
+outDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Average_1Hz';
 frontChop = 6;   % Chop all but 6 seconds from front of first event
-backChop = 6;    % Chop all but 6 seconds from back of first event
+backChop = 6;    % Chop all but 6 seconds from back of last event
 
 %% Parameters that must be preset
 params = struct();
-params.lineFrequencies = [60, 120, 180, 200, 212, 240];
 params.detrendType = 'high pass';
 params.detrendCutoff = 1;
-params.referenceType = 'robust';
-params.keepFiltered = false;
-
-%% Parameters especially set for reduced threshold
-params.fScanBandWidth = 2;
-params.correlationThreshold = 0.35;
+params.referenceType = 'average';
 
 %% Get the directories
 inList = dir(inDir);
@@ -56,10 +52,10 @@ for k = 1:length(dirNames)
         badLabels = labels(x);
         fprintf('None EEG channels: ')
         for c = 1:length(badLabels)
-          fprintf('%s ', badLabels{c});
+            fprintf('%s ', badLabels{c});
         end
         fprintf('\n');
-        chans = 1:length(chanlocs);  
+        chans = 1:length(chanlocs);
         params.referenceChannels = chans(~x);
         params.evaluationChannels = params.referenceChannels;
         params.rereferencedChannels = chans;
@@ -69,11 +65,14 @@ for k = 1:length(dirNames)
         fprintf('Original length: %g seconds\n', EEG.pnts/EEG.srate);
         [EEG, choppedFront, choppedBack] = chop(EEG, frontChop, backChop);
         fprintf('Chopped %g from front and %g from back, new length:%g\n', ...
-                choppedFront, choppedBack, EEG.pnts/EEG.srate);
-        [EEG, computationTimes] = prepPipeline(EEG, params);
-        EEG.etc.noiseDetection.chopped = [choppedFront, choppedBack];
-        fprintf('Computation times (seconds):\n   %s\n', ...
-            getStructureString(computationTimes));
+            choppedFront, choppedBack, EEG.pnts/EEG.srate);
+        EEG.data = double(EEG.data);
+        refSignal = nanmean(EEG.data(params.referenceChannels, :), 1);
+        EEG = removeReference(EEG, refSignal, params.rereferencedChannels);    
+        [EEG, params.detrend]  = removeTrend(EEG, params);
+        params.averageReference = refSignal;
+        params.noisyOut = findNoisyChannels(EEG, params);
+        EEG.etc.averageReference = params;
         fname = [outDir filesep theseNames{j}];
         save(fname, 'EEG', '-mat', '-v7.3');
     end

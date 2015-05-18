@@ -1,60 +1,71 @@
-function report = generateIssueReport(collectionStats, datasetIndex)
-% Generates an issue report for datasetIndex from collection
-if nargin < 2
+function report = generateIssueReport(EEG)
+% Generates an issue report for an EEG structure that has been robustly referenced
+aveCorrThreshold = 0.91;
+medCorrThreshold = 0.95;
+if nargin < 1
     error('generateIssueReport:NotEnoughArgs', ...
-        'generateIssueReport requires collection statistics and index args');
-elseif datasetIndex < 1 || ...
-        datasetIndex > size(collectionStats.statistics, 1)
-    error('generateIssueReport:DataIndexOutOfBounds', ...
-        ['datasetIndex should be in [1, ' ...
-        num2str(size(collectionStats.statistics, 1)) ']']);
+        'generateIssueReport requires an EEG structure argument');
 end
 report = '';
 
-%% Report channels that couldn't be handled by the referencing
-badChans = collectionStats.noisyChannels(datasetIndex);
-if ~isempty(badChans.channelsStillBad)
+if ~isstruct(EEG)
+    report = 'Input not an EEG structure';
+    return;
+end
+
+nDetect = getFieldIfExists(EEG, {'etc', 'noiseDetection'});
+if isempty(nDetect)
+    report = 'Input EEG has not been robustly referenced';
+    return;
+end
+
+status = getFieldIfExists(nDetect, {'errors', 'status'});
+if ~isempty(status) && ~strcmpi(status, 'good');
+    report = ['EEG referencing has following errors: [' ...
+               getStructureString(nDetect.errors) ']'];
+    return;
+end
+
+badChans = getFieldIfExists(nDetect, ...
+    {'reference', 'noisyStatistics', 'noisyChannels' 'all'});
+if ~isempty(badChans)
     report = [report ...
         sprintf('Noisy channels not interpolated after referencing: %s\n', ...
-        getListString(badChans.channelsStillBad))];
+        getListString(badChans))];
 end
-if 0.25*badChans.numberReferenceChannels < ...
-        length(badChans.badChannelNumbers)
-     report = [report sprintf('Data set has %d of %d channels bad\n', ...
-               length(badChans.badChannelNumbers), ...
-                      badChans.numberReferenceChannels)];                      
+
+evaluationChans = length(getFieldIfExists(nDetect, ...
+    {'reference', 'noisyStatistics', 'evaluationChannels'}));
+if 0.25*evaluationChans < length(badChans)
+     report = [report sprintf('Data set has %d of %d EEG channels bad\n', ...
+               length(badChans), evaluationChannels)];                      
 end   
 
-%% Report unusual statistics
-stats = collectionStats.statistics(datasetIndex, :);
-s = collectionStats.statisticsIndex;
 
 %% Median 
-if stats(s.aveCorRef) > 0.91 && stats(s.medCorRef) > 0.95
-    report = [report ... 
-        sprintf('Max win correlation [median=%g, mean=%g]\n', ...
-                stats(s.medCorRef), stats(s.aveCorRef))];
+theCorr = getFieldIfExists(nDetect, ...
+         {'reference', 'noisyStatistics', 'maximumCorrelations'});
+if ~isempty(theCorr)
+    meanCorr = mean(theCorr(:));
+    medianCorr = median(theCorr(:));
+    if meanCorr> aveCorrThreshold || medianCorr > medCorrThreshold
+      report = [report ... 
+          sprintf('Max win correlation [median=%g, mean=%g]\n', ...
+                medianCorr, meanCorr)];
+    end
 end
 
-if stats(s.aveCorRef) > stats(s.medCorRef) > 0.9 || ...
-   stats(s.aveCorRef) < stats(s.medCorRef) < 0.95 
-   report = [report  ...
-        sprintf('Referencing did not improve max win correlation [ref=%g, orig=%g]\n', ...
-                stats(s.medCorRef), stats(s.medCorOrig))];
-end
-if stats(s.medDevRef) > stats(s.medDevOrig) 
+devRef = getFieldIfExists(nDetect, ...
+         {'reference', 'noisyStatistics', 'channelDeviations'});
+devOrig = getFieldIfExists(nDetect, ...
+         {'reference', 'noisyStatisticsOriginal', 'channelDeviations'});
+if ~isempty(devRef) && ~isempty(devOrig)
+   devRef = median(devRef(:));
+   devOrig = median(devOrig(:));
+   if devOrig < devRef
    report = [report  ...
         sprintf('Referencing did not improve amplitude [ref=%g, orig=%g]\n', ...
-                stats(s.medDevRef), stats(s.medDevOrig))];
-end
-if stats(s.medDevRef) > stats(s.medDevOrig) 
-   report = [report  ...
-        sprintf('Referencing did not improve overall amplitude [ref=%g, orig=%g]\n', ...
-                stats(s.medDevRef), stats(s.medDevOrig))];
-end
-if stats(s.medWinDevRef) > stats(s.medWinDevOrig) 
-   report = [report  ...
-        sprintf('Referencing did not improve window amplitude [ref=%g, orig=%g]\n', ...
-                stats(s.medWinDevRef), stats(s.medWinDevRef))];
+                devRev, devOrig)];
+   end
 end
 

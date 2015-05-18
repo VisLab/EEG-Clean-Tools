@@ -1,28 +1,24 @@
-%% Run the statistics for a version of the VEP 
+%% Run the statistics for a version of the BCI2000
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 saveFile = 'dataStatistics.mat';
 
 %% Setup the directories and titles
-setupDir(1) = struct('inDir', [], 'outDir', [], 'title', [], 'fieldPath', []);
-% setupDir(1).inDir = 'N:\ARLAnalysis\VEP\VEPAverage_1Hz';
-% setupDir(1).outDir = 'N:\ARLAnalysis\VEP\VEPAverage_1Hz_Report';
-% setupDir(1).title = 'VEP average 1Hz';
+setupDir(1) = struct('inDir', [], 'outDir', [], 'title', []);
+% setupDir(1).inDir = 'N:\\BCI2000\\BCI2000Robust_1Hz_Unfiltered';
+% setupDir(1).outDir = 'N:\\BCI2000\\BCI2000Robust_1Hz_Unfiltered_Report';
+% setupDir(1).title = 'BCI2000 robust 1Hz unfiltered';
+% setupDir(1).fieldPath = {'etc', 'noiseDetection', 'reference', 'noisyStatistics'};
+
+% setupDir(1).inDir = 'N:\\BCI2000\\BCI2000_Average_1Hz';
+% setupDir(1).outDir = 'N:\\BCI2000\\BCI2000_Average_1Hz_Report';
+% setupDir(1).title = 'BCI2000 average 1Hz';
 % setupDir(1).fieldPath = {'etc', 'averageReference', 'noisyOut'};
 
-% setupDir(1).inDir = 'N:\ARLAnalysis\VEP\VEP_1Hz';
-% setupDir(1).outDir = 'N:\ARLAnalysis\VEP\VEP_1Hz_Report';
-% setupDir(1).title = 'VEP HP 1Hz';
-% setupDir(1).fieldPath = {'etc', 'originalReference', 'noisyOut'};
+setupDir(1).inDir = 'N:\\BCI2000\\BCI2000_1Hz';
+setupDir(1).outDir = 'N:\\BCI2000\\BCI2000_1Hz_Report';
+setupDir(1).title = 'BCI2000 1Hz';
+setupDir(1).fieldPath = {'etc', 'originalReference', 'noisyOut'};
 
-% setupDir(1).inDir = 'N:\ARLAnalysis\VEP\VEPMastoid_1Hz';
-% setupDir(1).outDir = 'N:\ARLAnalysis\VEP\VEPMastoid_1Hz_Report';
-% setupDir(1).title = 'VEP mastoid 1Hz';
-% setupDir(1).fieldPath = {'etc', 'mastoidReference', 'noisyOut'};
-
-setupDir(1).inDir = 'N:\ARLAnalysis\VEP\VEPRobust_1Hz_Post_Median_Unfiltered';
-setupDir(1).outDir = 'N:\ARLAnalysis\VEP\VEPRobust_1Hz_Post_Median_Unfiltered_Report';
-setupDir(1).title = 'VEP robust 1Hz';
-setupDir(1).fieldPath = {'etc', 'noiseDetection', 'reference', 'noisyStatistics'};
 %% Get the directory list
 for k = 1:length(setupDir)
     inList = dir(setupDir(k).inDir);

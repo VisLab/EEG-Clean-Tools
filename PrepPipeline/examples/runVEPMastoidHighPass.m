@@ -1,4 +1,4 @@
-%% Example: Using Prep to high pass filter a collection of data.
+%% Example: Using Prep to high pass and reference to mastoids collection of data.
 % You can also use a script such as this to high pass a "Prep'ed"
 % collection before downstream processing.
 %

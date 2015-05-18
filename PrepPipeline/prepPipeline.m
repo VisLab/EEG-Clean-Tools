@@ -53,6 +53,7 @@ end
 EEG.etc.noiseDetection = ...
        struct('name', params.name, 'version', getPrepPipelineVersion, ...
               'errors', []);
+EEG.data = double(EEG.data);   % Don't monkey around -- get into double
 %% Check for boundary events
 try
     defaults = getPipelineDefaults(EEG, 'boundary');
@@ -83,9 +84,11 @@ end
 fprintf('Preliminary detrend to compute reference\n');
 try
     tic
-    EEG.data = double(EEG.data);   % Don't monkey around -- get into double
     [EEGNew, detrend] = removeTrend(EEG, params);
     EEG.etc.noiseDetection.detrend = detrend;
+    % Make sure detrend defaults are available for referencing
+    defaults = getPipelineDefaults(EEG, 'detrend');
+    params = checkDefaults(detrend, params, defaults); 
     computationTimes.detrend = toc;
 catch mex
     errorMessages.removeTrend = ...
@@ -118,6 +121,7 @@ end
 fprintf('Find reference\n');
 try
     tic
+
     [EEG, referenceOut] = performReference(EEG, params);
     if referenceOut.keepFiltered
         EEG = removeTrend(EEG, referenceOut);

@@ -1,5 +1,5 @@
 function collectionStats = ...
-    createCollectionStatistics(collectionTitle, fileList)
+    createCollectionStatistics(collectionTitle, fileList, fieldPath)
 % Extract collection statistics for EEG in fileList (full path file names)
 collectionStats = struct('collectionTitle', [] , ...
                          'dataTitles', [], ...
@@ -7,7 +7,7 @@ collectionStats = struct('collectionTitle', [] , ...
                          'statistics', [], ...
                          'channels', [], ...
                          'noisyChannels', []);
-[statisticsTitles, statisticsIndex, noisyStructure] = extractReferenceStatistics();
+[statisticsTitles, statisticsIndex, noisyStructure] = extractNoisyStatistics();
 dataTitles = cell(length(fileList), 1);
 channels = zeros(length(fileList), 1);
 statistics = zeros(length(fileList), length(statisticsTitles));
@@ -19,8 +19,9 @@ for k = 1:length(fileList)
     try    % Ignore non EEG files
         fprintf('%d: ', k);
         EEG = pop_loadset(fileList{k});
+        noisy = getFieldIfExists(EEG, fieldPath);
         [~, ~,  noisyChannels(k), statistics(k, :)] = ...
-            extractReferenceStatistics(EEG);
+            extractNoisyStatistics(noisy);
         channels(k) = size(EEG.data, 1);
     catch Mex
         badFiles{end+1} = fileList{k}; %#ok<AGROW>

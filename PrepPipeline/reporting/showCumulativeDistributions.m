@@ -12,6 +12,7 @@ ylabel('Cumulative probability')
 title(theTitle, 'Interpreter', 'None')
 legend(theLegends(1:length(items)), 'Location', 'NorthWest')
 set(gca, 'XLim', xRange, 'XLimMode', 'manual')
+box on
 hold off
 
 

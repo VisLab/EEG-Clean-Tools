@@ -1,6 +1,6 @@
-%% Example: Using Prep to high pass filter a collection of data.
-% You can also use a script such as this to high pass a "Prep'ed"
-% collection before downstream processing.
+%% Example: Calculate the average reference and highpass filter dataset
+%
+% Script assumes files in a single directory and writes to a new directory
 %
 %% Read in the file and set the necessary parameters
 basename = 'vep';
@@ -16,6 +16,7 @@ params.detrendType = 'high pass';
 params.detrendCutoff = 1;
 basenameOut = 'vep_average_1Hz';
 outdir = 'N:\\ARLAnalysis\\VEP\\VEPAverage_1Hz';
+
 %% Run the pipeline
 for k = 1:18
     thisName = sprintf('%s_%02d', basename, k);

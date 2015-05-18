@@ -1,263 +1,134 @@
-function showCollectionBoxplots(collectionStats, legendString, collectionColors)
+function showCollectionBoxplots(collections, legendString, collectionColors)
 % Displays the items in collectionStats using boxplots
 
-%% Overall ratio sdr/median channel deviations
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.refRatiosDev;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
-baseTitle = 'sdr/med ratio channel deviation';
-figure('Name', baseTitle, 'Color', [1, 1, 1]);
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
-set(gca, 'FontSize', 12)
-xlabel('SDR/Median channel deviation', 'FontSize', 12)
-
-%% Window ratio sdr/median channel deviations
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.refRatiosWinDev;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
-baseTitle = 'SDR/Median ratio channel deviations';
-figure('Name', baseTitle, 'Color', [1, 1, 1]);
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
-set(gca, 'FontSize', 12)
-xlabel('SDR/Median window channel deviation', 'FontSize', 12)
-
-%% Window ratio sdr/median original channel deviations
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.origRatiosWinDev;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
-baseTitle = 'SDR/Median ratio unreferenced window channel deviations';
-figure('Name', baseTitle, 'Color', [1, 1, 1]);
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
-set(gca, 'FontSize', 12)
-xlabel('SDR/Median unreferenced window channel deviation', 'FontSize', 12)
-
-%% Display the HF sdr/median HF ratios
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.refRatiosHF;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
-baseTitle = 'SDR/Median ratio channel HF scores';
-figure('Name', baseTitle, 'Color', [1, 1, 1]);
-set(gca, 'FontSize', 12)
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
-set(gca, 'FontSize', 12)
-xlabel('SDR/Median HF scores', 'FontSize', 12)
-
-%% Display the HF sdr/median ratios
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.refRatiosWinHF;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
-baseTitle = 'Window SDR/Median ratio channel HF scores';
-figure('Name', baseTitle, 'Color', [1, 1, 1]);
-set(gca, 'FontSize', 12)
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
-set(gca, 'FontSize', 12)
-xlabel('SDR/Median window HF scores', 'FontSize', 12)
-
-%% Display the mean max correlation
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.refCorrAve;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
-baseTitle = 'Window mean max correlation';
-figure('Name', baseTitle, 'Color', [1, 1, 1]);
-set(gca, 'FontSize', 12)
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
-set(gca, 'FontSize', 12)
-xlabel('Mean max correlation', 'FontSize', 12)
-
-
-%% Display the median deviation distribution
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.refDev;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
+%% Overall median channel deviations
+[dataGroups1, dataPoints1] = getDataGroups(collections, 'medDev');
 baseTitle = 'Median channel deviation';
 figure('Name', baseTitle, 'Color', [1, 1, 1]);
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', ...
-    collectionColors, 'datalim', [0, 20], 'extrememode', 'clip');
-xlabel('Median channel deviation', 'FontSize', 12)
-set(gca, 'XLim', [0, 21], 'XLimMode', 'manual')
+boxplot(dataPoints1, dataGroups1, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors, ...
+    'datalim', [0, 50]);
+set(gca, 'FontSize', 12)
+xlabel('Median overall channel deviation', 'FontSize', 12)
 
-%% Display the window median deviation distribution
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.refWinDev;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
+%% Overall rSD channel deviations
+[dataGroups2, dataPoints2] = getDataGroups(collections, 'rSDDev');
+baseTitle = 'Robust SD channel deviation';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints2, dataGroups2, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Overall robust SD channel deviation', 'FontSize', 12)
+
+%% Overall rSD/med channel deviation ratio
+baseTitle = 'Median overall channel deviation ratio';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints2./dataPoints1, dataGroups2, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Ratio rSD/med overall channel deviation', 'FontSize', 12)
+
+%% Window median channel deviations
+[dataGroups1, dataPoints1] = getDataGroups(collections, 'medWinDev');
 baseTitle = 'Median window channel deviation';
 figure('Name', baseTitle, 'Color', [1, 1, 1]);
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', ...
-    collectionColors, 'datalim', [0, 20], 'extrememode', 'clip');
+boxplot(dataPoints1, dataGroups1, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors, ...
+    'datalim', [0, 50]);
+set(gca, 'FontSize', 12)
 xlabel('Median window channel deviation', 'FontSize', 12)
-set(gca, 'XLim', [0, 21], 'XLimMode', 'manual')
 
-
-%% Display the original window median deviation distribution
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.origWinDev;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
-baseTitle = 'Unreferenced median window channel deviation';
+%% Window rSD channel deviations
+[dataGroups2, dataPoints2] = getDataGroups(collections, 'rSDWinDev');
+baseTitle = 'Robust SD window channel deviation';
 figure('Name', baseTitle, 'Color', [1, 1, 1]);
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', ...
-    collectionColors, 'datalim', [0, 20], 'extrememode', 'clip');
-xlabel('Unreferenced median window channel deviation', 'FontSize', 12)
-set(gca, 'XLim', [0, 21], 'XLimMode', 'manual')
+boxplot(dataPoints2, dataGroups2, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Robust SD window channel deviation', 'FontSize', 12)
 
-%% Display the HF distribution
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.refHF;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
-baseTitle = 'Median HF score';
-figure('Name', baseTitle, 'Color', [1, 1, 1]);
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', ...
-    collectionColors, 'extrememode', 'clip');
-xlabel('Median HF score', 'FontSize', 12)
 
-%% Display the HF distribution
-titles = legendString;
-totalPoints = 0;
-data = collectionStats.refWinHF;
-for k = 1:length(titles)
-    totalPoints = totalPoints + length(data{k});
-end
-dataGroups = zeros(totalPoints, 1);
-dataPoints = zeros(totalPoints, 1);
-startGroup = 1;
-for k = 1:length(titles)
-    endGroup = startGroup + length(data{k}) - 1;
-    dataGroups(startGroup:endGroup) = k;
-    dataPoints(startGroup:endGroup) = data{k}(:);
-    startGroup = endGroup + 1;
-end
-baseTitle = 'Median window HF score';
+%% Window rSD/med channel deviation ratio
+baseTitle = 'Median window channel deviation ratio';
 figure('Name', baseTitle, 'Color', [1, 1, 1]);
-boxplot(dataPoints, dataGroups, 'labels', titles, ...
-    'orientation', 'horizontal', 'notch', 'on', 'Colors', ...
-    collectionColors, 'extrememode', 'clip');
-xlabel('Median window HF score', 'FontSize', 12)
+boxplot(dataPoints2./dataPoints1, dataGroups2, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Ratio rSD/med window channel deviation', 'FontSize', 12)
+
+%% Window median maximum channel correlations
+[dataGroups, dataPoints] = getDataGroups(collections, 'medCor');
+baseTitle = 'Median maximum window channel correlation';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints, dataGroups, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Median maximum channel correlation', 'FontSize', 12)
+
+%% Window average maximum channel correlattions
+[dataGroups, dataPoints] = getDataGroups(collections, 'aveCor');
+baseTitle = 'Average maximum window channel correlation';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints, dataGroups, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Average maximum channel correlation', 'FontSize', 12)
+
+
+%% Overall median channel HF noise
+[dataGroups1, dataPoints1] = getDataGroups(collections, 'medHF');
+baseTitle = 'Median channel HF noise';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints1, dataGroups1, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Median overall channel HF noise', 'FontSize', 12)
+
+%% Overall rSD channel HF noise
+[dataGroups2, dataPoints2] = getDataGroups(collections, 'rSDHF');
+baseTitle = 'Overall robust SD channel HF noise';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints2, dataGroups2, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Overall robust SD channel HF noise', 'FontSize', 12)
+
+%% Overall rSD/med channel HF noise ratio
+baseTitle = 'Median overall channel HF noise ratio';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints2./dataPoints1, dataGroups2, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Ratio rSD/med overall channel HF noise', 'FontSize', 12)
+
+%% Window median channel HF noise
+[dataGroups1, dataPoints1] = getDataGroups(collections, 'medWinHF');
+baseTitle = 'Median window channel HF noise';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints1, dataGroups1, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors, ...
+    'datalim', [0, 50]);
+set(gca, 'FontSize', 12)
+xlabel('Median window channel HF noise', 'FontSize', 12)
+
+%% Window rSD channel HF noise
+[dataGroups2, dataPoints2] = getDataGroups(collections, 'rSDWinHF');
+baseTitle = 'Robust SD window channel HF noise';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints2, dataGroups2, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Robust SD window channel HF noise', 'FontSize', 12)
+
+
+%% Window rSD/med channel HF noise ratio
+baseTitle = 'Median window channel HF noise ratio';
+figure('Name', baseTitle, 'Color', [1, 1, 1]);
+boxplot(dataPoints2./dataPoints1, dataGroups2, 'labels', legendString, ...
+    'orientation', 'horizontal', 'notch', 'on', 'Colors', collectionColors);
+set(gca, 'FontSize', 12)
+xlabel('Ratio rSD/med window channel HF noise', 'FontSize', 12)
+
+
+
+end

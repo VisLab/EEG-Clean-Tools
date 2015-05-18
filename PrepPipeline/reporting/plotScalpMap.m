@@ -27,7 +27,7 @@ headRadius = 0.5;
     squeezeFactor, x, y, labels, values] = ...
     findLocations(startElement, headRadius, chanlocs, ...
     data);
-myFigure = figure('Name', titleString);
+myFigure = figure('Name', titleString, 'Color', [1, 1, 1]);
 mainAxes = axes('Parent', myFigure, ...
     'Box', 'on',  'ActivePositionProperty', 'Position', ...
     'Units', 'normalized', 'Tag', 'MainAxes');
@@ -280,9 +280,11 @@ redraw(myFigure, headAxes, mainAxes, colorbarAxes, showColorbar);
                     colorbarAxes = colorbar('peer', headAxes);
                     oldUnitsColor = get(colorbarAxes, 'Units');
                 end
-                set(colorbarAxes, 'ActivePositionProperty', 'Position', ...
-                    'Units', 'pixels');
-                cPosAll = get(colorbarAxes, 'TightInset');
+%                 set(colorbarAxes, 'ActivePositionProperty', 'Position', ...
+%                     'Units', 'pixels');
+                set(colorbarAxes, 'Units', 'pixels');
+%                 cPosAll = get(colorbarAxes, 'TightInset');
+                cPosAll = get(colorbarAxes, 'position');
                 if minimumGaps(3) + cPosAll(3) + mainPos(4) > workingWidth
                     colorbar(colorbarAxes, 'off');
                     colorbarAxes = [];

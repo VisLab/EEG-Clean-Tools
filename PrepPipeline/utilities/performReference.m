@@ -23,20 +23,17 @@ end
 referenceOut = getReferenceStructure();
 defaults = getPipelineDefaults(signal, 'reference');
 [referenceOut, errors] = checkDefaults(referenceIn, referenceOut, defaults);
-
-fprintf('To here 1\n');
+if ~isempty(errors)
+    error('performReference:BadParameters', ['|' sprintf('%s|', errors{:})]);
+end
+defaults = getPipelineDefaults(signal, 'detrend');
+[referenceOut, errors] = checkDefaults(referenceIn, referenceOut, defaults);
 if ~isempty(errors)
     error('performReference:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end
 referenceOut.rereferencedChannels = sort(referenceOut.rereferencedChannels);
 referenceOut.referenceChannels = sort(referenceOut.referenceChannels);
 referenceOut.evaluationChannels = sort(referenceOut.evaluationChannels);
-% if isfield(referenceOut, 'reportingLevel') && ...
-%         strcmpi(referenceOut.reportingLevel, 'verbose');
-%     referenceOut.noisyStatisticsOriginal = ...
-%         findNoisyChannels(signalFiltered, referenceOut);
-% end
-
 
 %% Calculate the reference for the original signal
 if isempty(referenceOut.referenceChannels) || ...
@@ -150,7 +147,5 @@ end
         referenceOut.noisyStatistics  = ...
             findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
    end
-
-
 
 end

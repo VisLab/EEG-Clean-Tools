@@ -1,14 +1,18 @@
-%% Run through the high pass and look at the spectrum afterwards
+%% Run the statistics for a version of the NCTU
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 saveFile = 'dataStatistics.mat';
-issueFile = 'issues.txt';
 
 %% Setup the directories and titles
 setupDir(1) = struct('inDir', [], 'outDir', [], 'title', []);
-setupDir(1).inDir = 'N:\\ARLAnalysis\\ShooterPrep\\DataReducedThreshold';
-setupDir(1).outDir = 'N:\\ARLAnalysis\\ShooterPrep\\ReportsReducedThreshold';
-setupDir(1).title = 'Shooter';
+% setupDir(1).inDir = 'N:\\ARLAnalysis\\NCTU\\NCTU_Average_1Hz';
+% setupDir(1).outDir = 'N:\\ARLAnalysis\\NCTU\\NCTU_Average_1Hz_Report';
+% setupDir(1).title = 'NCTU_Average_1Hz';
+% setupDir(1).fieldPath = {'etc', 'averageReference', 'noisyOut'};
 
+setupDir(1).inDir = 'N:\\ARLAnalysis\\NCTU\\NCTU_1Hz';
+setupDir(1).outDir = 'N:\\ARLAnalysis\\NCTU\\NCTU_1Hz_Report';
+setupDir(1).title = 'NCTU_1Hz';
+setupDir(1).fieldPath = {'etc', 'originalReference', 'noisyOut'};
 
 %% Get the directory list
 for k = 1:length(setupDir)
@@ -28,18 +32,11 @@ for k = 1:length(setupDir)
         end
     end
     %% Consolidate the results in a single structure for comparative analysis
-    collectionStats = createCollectionStatistics(setupDir(k).title, inNames);
+    collectionStats = createCollectionStatistics(setupDir(k).title, ...
+                                          inNames, setupDir(k).fieldPath);
     %% Save the statistics in the specified file
     save([setupDir(k).outDir filesep saveFile], 'collectionStats', '-v7.3');
 
     %% Display the reference statistics
-    showReferenceStatistics(collectionStats);
-    %% Generate an issue report for the collection
-    [badReport, badFiles] = getCollectionIssues(collectionStats);
-
-    %% Generate an issue report for the collection
-    fid = fopen([setupDir(k).outDir filesep issueFile], 'w');
-    fprintf(fid, '%s\n', badReport);
-    fclose(fid);
-    %close all
+    showNoisyStatistics(collectionStats);
 end

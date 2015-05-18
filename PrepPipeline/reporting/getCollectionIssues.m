@@ -1,17 +1,20 @@
-function [report, badFileNames] = getCollectionIssues(collectionStats)
-%% Generates issue reports for a collection
-     report = sprintf('Issue report for: %s\n', ...
-                      collectionStats.collectionTitle);
-     badFileNames = {};            
-     for k = 1:length(collectionStats.dataTitles)
-         dataReport = generateIssueReport(collectionStats, k);
-         if isempty(dataReport)
-             continue;
-         end
-         badFileNames{end + 1} = collectionStats.dataTitles{k}; %#ok<AGROW>
-         report = [report ...
-                  sprintf('\n%s:\n', collectionStats.dataTitles{k}) ...
-                  dataReport]; %#ok<AGROW>
-     end
-end
-          
+function [badFiles, badReasons] = getCollectionIssues(fileList)
+%% Generates issue reports for a collection of EEG files in inNames
+    badFiles = {};
+    badReasons = {};
+    for k = 1:length(fileList)
+        fileName = fileList{k};
+        try    % Ignore non EEG files
+            fprintf('%d: ', k);
+            EEG = pop_loadset(fileName);
+            report = generateIssueReport(EEG);
+            if ~isempty(report)
+                badFiles{end+1} = fileList{k}; %#ok<AGROW>
+                badReasons{end+1} = report; %#ok<AGROW>
+            end
+        catch Mex
+            badFiles{end+1} = fileList{k}; %#ok<AGROW>
+            badReasons{end+1} = Mex.message; %#ok<AGROW>
+            continue;
+        end
+    end
