@@ -9,9 +9,21 @@ basename = 'shooter';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 inDir = 'E:\\CTAData\\Shooter\'; % Input data directory used for this demo
 outDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered';
+dataDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered_Report';
 frontChop = 6;   % Chop all but 6 seconds from front of first event
 backChop = 6;    % Chop all but 6 seconds from back of last event
-
+doReport = true;
+%% Prepare if reporting
+if doReport
+    summaryReportName = [basename '_summary.html'];
+    sessionFolder = '.';
+    reportSummary = [dataDir filesep summaryReportName];
+    if exist(reportSummary, 'file')
+        delete(reportSummary);
+    end
+    summaryReportLocation = [dataDir filesep summaryReportName];
+    summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
+end
 %% Parameters that must be preset
 params = struct();
 %params.lineFrequencies = [60, 120, 180, 200, 212, 240];
@@ -29,7 +41,7 @@ inList = dir(inDir);
 dirNames = {inList(:).name};
 dirTypes = [inList(:).isdir];
 dirNames = dirNames(dirTypes);
-dirNames(strcmpi(dirNames, '.')| strcmpi(dirNames, '..')) = []; 
+dirNames(strcmpi(dirNames, '.')| strcmpi(dirNames, '..')) = [];
 
 %% Run the pipeline
 count = 0;
@@ -57,10 +69,10 @@ for k = 1:length(dirNames)
         badLabels = labels(x);
         fprintf('None EEG channels: ')
         for c = 1:length(badLabels)
-          fprintf('%s ', badLabels{c});
+            fprintf('%s ', badLabels{c});
         end
         fprintf('\n');
-        chans = 1:length(chanlocs);  
+        chans = 1:length(chanlocs);
         params.referenceChannels = chans(~x);
         params.evaluationChannels = params.referenceChannels;
         params.rereferencedChannels = chans;
@@ -70,12 +82,25 @@ for k = 1:length(dirNames)
         fprintf('Original length: %g seconds\n', EEG.pnts/EEG.srate);
         [EEG, choppedFront, choppedBack] = chop(EEG, frontChop, backChop);
         fprintf('Chopped %g from front and %g from back, new length:%g\n', ...
-                choppedFront, choppedBack, EEG.pnts/EEG.srate);
+            choppedFront, choppedBack, EEG.pnts/EEG.srate);
         [EEG, computationTimes] = prepPipeline(EEG, params);
         EEG.etc.noiseDetection.chopped = [choppedFront, choppedBack];
         fprintf('Computation times (seconds):\n   %s\n', ...
             getStructureString(computationTimes));
         fname = [outDir filesep theseNames{j}];
         save(fname, 'EEG', '-mat', '-v7.3');
+        if doReport
+            [fpath, name, fext] = fileparts(thisName);
+            sessionReportName = [name '.pdf'];
+            tempReportLocation = [dataDir filesep sessionFolder ...
+                filesep 'prepPipelineReport.pdf'];
+            actualReportLocation = [dataDir filesep sessionFolder ...
+                filesep sessionReportName];
+            
+            relativeReportLocation = [sessionFolder filesep sessionReportName];
+            consoleFID = 1;
+            publishPrepPipelineReport(EEG, dataDir, summaryReportName, ...
+                sessionFolder, sessionReportName, true);
+        end
     end
 end

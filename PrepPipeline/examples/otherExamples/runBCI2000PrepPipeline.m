@@ -9,14 +9,19 @@ inDir = 'E:\BCIProcessing\BCI2000Set';
 outDir = 'N:\BCI2000\BCI2000Robust_1Hz_Unfiltered';
 dataDir = 'N:\BCI2000\BCI2000Robust_1Hz_Unfiltered_Report';
 basename = 'BCI2000';
-summaryReportName = [basename '_summary.html'];
-sessionFolder = '.';
-reportSummary = [dataDir filesep summaryReportName];
-if exist(reportSummary, 'file') 
-   delete(reportSummary);
+doReport = true;
+
+%% Prepare if reporting
+if doReport
+    summaryReportName = [basename '_summary.html'];
+    sessionFolder = '.';
+    reportSummary = [dataDir filesep summaryReportName];
+    if exist(reportSummary, 'file')
+        delete(reportSummary);
+    end
+    summaryReportLocation = [dataDir filesep summaryReportName];
+    summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
 end
-summaryReportLocation = [dataDir filesep summaryReportName];
-summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
 
 %% Parameters that must be preset
 params = struct();
@@ -61,16 +66,18 @@ for k = 1:length(dirNames)
             getStructureString(computationTimes));
         fname = [outDir filesep theseNames{j}];
         save(fname, 'EEG', '-mat', '-v7.3');
-        sessionReportName = [thisName '.pdf'];
-        tempReportLocation = [dataDir filesep sessionFolder ...
-            filesep 'prepPipelineReport.pdf'];
-        actualReportLocation = [dataDir filesep sessionFolder ...
-            filesep sessionReportName];
-        
-        relativeReportLocation = [sessionFolder filesep sessionReportName];
-        consoleFID = 1;
-        publishPrepPipelineReport(EEG, dataDir, summaryReportName, ...
-            sessionFolder, sessionReportName, true);
+        if doReport
+            sessionReportName = [thisName '.pdf'];
+            tempReportLocation = [dataDir filesep sessionFolder ...
+                filesep 'prepPipelineReport.pdf'];
+            actualReportLocation = [dataDir filesep sessionFolder ...
+                filesep sessionReportName];
+            
+            relativeReportLocation = [sessionFolder filesep sessionReportName];
+            consoleFID = 1;
+            publishPrepPipelineReport(EEG, dataDir, summaryReportName, ...
+                sessionFolder, sessionReportName, true);
+        end
     end
 end
 fclose all;
