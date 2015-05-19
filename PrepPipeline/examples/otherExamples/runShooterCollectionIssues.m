@@ -6,8 +6,8 @@ issueFile = 'issues.txt';
 
 %% Setup the directories and titles
 setupDir(1) = struct('inDir', [], 'outDir', [], 'title', []);
-setupDir(1).inDir = 'N:\\ARLAnalysis\\Shooter\\ShooterRobust_1Hz_Unfiltered';
-setupDir(1).outDir = 'N:\\ARLAnalysis\\Shooter\\ShooterRobust_1Hz_Unfiltered_Report';
+setupDir(1).inDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered';
+setupDir(1).outDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered_Report';
 setupDir(1).title = 'Shooter_Robust_1Hz';
 
 %% Get the directory list

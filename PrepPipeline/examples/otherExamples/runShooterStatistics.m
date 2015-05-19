@@ -4,20 +4,20 @@ saveFile = 'dataStatistics.mat';
 
 %% Setup the directories and titles
 setupDir(1) = struct('inDir', [], 'outDir', [], 'title', []);
-% setupDir(1).inDir = 'N:\\ARLAnalysis\\Shooter\\ShooterRobust_1Hz_Unfiltered';
-% setupDir(1).outDir = 'N:\\ARLAnalysis\\Shooter\\ShooterRobust_1Hz_Unfiltered_Report';
-% setupDir(1).title = 'Shooter_Robust_1Hz';
-% setupDir(1).fieldPath = {'etc', 'noiseDetection', 'reference', 'noisyStatistics'};
+setupDir(1).inDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered';
+setupDir(1).outDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered_Report';
+setupDir(1).title = 'Shooter_Robust_1Hz';
+setupDir(1).fieldPath = {'etc', 'noiseDetection', 'reference', 'noisyStatistics'};
 
-setupDir(1).inDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Average_1Hz';
-setupDir(1).outDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Average_1Hz_Report';
-setupDir(1).title = 'Shooter_Average_1Hz';
-setupDir(1).fieldPath = {'etc', 'averageReference', 'noisyOut'};
-
-setupDir(1).inDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Mastoid_1Hz';
-setupDir(1).outDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Mastoid_1Hz_Report';
-setupDir(1).title = 'Shooter_Mastoid_1Hz';
-setupDir(1).fieldPath = {'etc', 'mastoidReference', 'noisyOut'};
+% setupDir(1).inDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Average_1Hz';
+% setupDir(1).outDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Average_1Hz_Report';
+% setupDir(1).title = 'Shooter_Average_1Hz';
+% setupDir(1).fieldPath = {'etc', 'averageReference', 'noisyOut'};
+% 
+% setupDir(1).inDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Mastoid_1Hz';
+% setupDir(1).outDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Mastoid_1Hz_Report';
+% setupDir(1).title = 'Shooter_Mastoid_1Hz';
+% setupDir(1).fieldPath = {'etc', 'mastoidReference', 'noisyOut'};
 
 %% Get the directory list
 for k = 1:length(setupDir)
