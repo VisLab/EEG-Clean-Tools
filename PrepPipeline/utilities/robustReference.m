@@ -22,8 +22,11 @@ if ~isempty( ...
     warning('robustReference:EvaluationChannels', ...
     'Reference and evaluation channels should be same for robust reference');
 end
-    
+   
 %% Determine unusable channels and remove them from the reference channels
+signal = removeTrend(signal, referenceOut);
+referenceOut.noisyStatisticsOriginal = findNoisyChannels(signal, referenceOut);
+referenceOut.noisyStatistics = referenceOut.noisyStatisticsOriginal;  
 [badChannelsFromNaNs, badChannelsFromNoData] = ...
                findUnusableChannels(signal, referenceOut.referenceChannels); 
 noisy = referenceOut.noisyStatisticsOriginal.noisyChannels;
@@ -38,11 +41,6 @@ referenceOut.interpolatedChannels.badChannelsFromNoData = ...
 referenceOut.interpolatedChannels.badChannelsFromLowSNR = ...
     badChannelsFromLowSNR(:)';
 referenceChannels = setdiff(referenceOut.referenceChannels, unusableChannels);
-signal = removeTrend(signal, referenceOut);
-
-%% Perform initial investigation of noisy channels
-referenceOut.noisyStatisticsOriginal = findNoisyChannels(signal, referenceOut);
-referenceOut.noisyStatistics = referenceOut.noisyStatisticsOriginal;  
 
 %% Get initial estimate of the mean by the specified method
 if strcmpi(referenceOut.meanEstimateType, 'median')
