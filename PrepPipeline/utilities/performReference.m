@@ -1,7 +1,12 @@
 function [signal, referenceOut] = performReference(signal, referenceIn)
 % Perform the specified reference
 %
-% In
+% Default for the PREP pipeline is:
+%    referenceType = 'robust'
+%    interpolationOrder = 'post'
+%    meanEstimateType = 'median'
+%
+%
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 %% Check the input parameters
 if nargin < 1

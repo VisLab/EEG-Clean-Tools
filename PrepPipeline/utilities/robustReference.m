@@ -13,12 +13,6 @@ function referenceOut = robustReference(signal, referenceOut)
 % Parameters (output):
 %     referenceOut  the referenceOut structure filled in  
 
-%% Perform initial investigation of noisy channels
-referenceOut.noisyStatisticsOriginal = findNoisyChannels( ...
-                        removeTrend(signal, referenceOut), referenceOut);
-% referenceOut.noisyStatisticsForReference = ...
-%                           referenceOut.noisyStatisticsOriginal;
-referenceOut.noisyStatistics = referenceOut.noisyStatisticsOriginal;  
 
 %% Warn if evaluation and reference channels are not the same for robust
 if ~isempty( ...
@@ -45,6 +39,10 @@ referenceOut.interpolatedChannels.badChannelsFromLowSNR = ...
     badChannelsFromLowSNR(:)';
 referenceChannels = setdiff(referenceOut.referenceChannels, unusableChannels);
 signal = removeTrend(signal, referenceOut);
+
+%% Perform initial investigation of noisy channels
+referenceOut.noisyStatisticsOriginal = findNoisyChannels(signal, referenceOut);
+referenceOut.noisyStatistics = referenceOut.noisyStatisticsOriginal;  
 
 %% Get initial estimate of the mean by the specified method
 if strcmpi(referenceOut.meanEstimateType, 'median')
@@ -91,7 +89,5 @@ while true  % Do at least 1 iteration
     fprintf('Iteration: %d\n', iterations);
 end
 referenceOut.actualReferenceIterations = iterations;
-%referenceOut.interpolatedChannelsForReference = referenceOut.interpolatedChannels;
 referenceOut.noisyStatistics = noisyStatistics;
-%referenceOut.noisyStatisticsForReference = noisyStatistics;
 fprintf('Robust reference done');

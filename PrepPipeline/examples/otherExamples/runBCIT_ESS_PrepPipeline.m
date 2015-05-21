@@ -1,7 +1,8 @@
 %% Example using ESS
-ess1Path = 'E:\\BCIT_ESS\\X1 Baseline RSVP';
-ess1File = 'E:\\BCIT_ESS\\X1 Baseline RSVP\\study_description.xml';
-ess2Dir = 'N:\\BCIT_ESS\\X1 Baseline RSVP';
+ess1Path = 'E:\\BCIT_ESS\\Experiment X2 Traffic Complexity';
+ess1File = 'E:\\BCIT_ESS\\Experiment X2 Traffic Complexity\\study_description.xml';
+ess2Dir = 'N:\\BCIT_ESS\\Experiment X2 Traffic Complexity';
+
 %% Validate level 1
 obj1 = level1Study(ess1File);
 obj1.validate();

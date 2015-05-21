@@ -128,3 +128,7 @@ Version 0.46 (Not released - version 0.45 with additional changes)
 * Passed detrend information in reference structure to allow detrending 
   with other than the defaults
 * Corrected several channel mapping issues in the reporting.
+
+Version 0.47 (Not released -- version 0.46 with additional changes)
+* Minor refactoring of performReference to avoid 1 extra filtering operation ---
+  should not reflect results.
