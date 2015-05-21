@@ -6,6 +6,7 @@ function [signal, referenceOut] = performReference(signal, referenceIn)
 %    interpolationOrder = 'post'
 %    meanEstimateType = 'median'
 %
+% Other possible reference types: average, specific, and none
 %
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 %% Check the input parameters
@@ -42,7 +43,7 @@ referenceOut.evaluationChannels = sort(referenceOut.evaluationChannels);
 
 %% Calculate the reference for the original signal
 if isempty(referenceOut.referenceChannels) || ...
-        strcmpi(referenceOut.referenceType, 'none')  
+        strcmpi(referenceOut.referenceType, 'none')
     referenceOut.referenceSignalOriginal = ...
         zeros(1, size(signal.data, 2));
 else
@@ -52,37 +53,41 @@ end
 %% Make sure that reference channels have locations for interpolation
 chanlocs = referenceOut.channelLocations(referenceOut.evaluationChannels);
 if ~(length(cell2mat({chanlocs.X})) == length(chanlocs) && ...
-     length(cell2mat({chanlocs.Y})) == length(chanlocs) && ...
-     length(cell2mat({chanlocs.Z})) == length(chanlocs)) && ...
-   ~(length(cell2mat({chanlocs.theta})) == length(chanlocs) && ...
-     length(cell2mat({chanlocs.radius})) == length(chanlocs))
-   error('performReference:NoChannelLocations', ...
-         'evaluation channels must have locations');
+        length(cell2mat({chanlocs.Y})) == length(chanlocs) && ...
+        length(cell2mat({chanlocs.Z})) == length(chanlocs)) && ...
+        ~(length(cell2mat({chanlocs.theta})) == length(chanlocs) && ...
+        length(cell2mat({chanlocs.radius})) == length(chanlocs))
+    error('performReference:NoChannelLocations', ...
+        'evaluation channels must have locations');
 end
 
 %% Now perform the particular combinations
 if  strcmpi(referenceOut.referenceType, 'robust') && ...
-        strcmpi(referenceOut.interpolationOrder, 'post-reference') 
+        strcmpi(referenceOut.interpolationOrder, 'post-reference')
     doRobustPost();
 elseif  strcmpi(referenceOut.referenceType, 'robust') && ...
-        strcmpi(referenceOut.interpolationOrder, 'pre-reference') 
+        strcmpi(referenceOut.interpolationOrder, 'pre-reference')
     doRobustPre();
+elseif strcmpi(referenceOut.referenceType, 'average')
+    doAverage();
+elseif strcmpi(referenceOut.referenceType, 'specific')
+    doSpecific();
 else
-    referenceOut.referenceSignal = referenceOut.referenceSignalOriginal;
+    doOther();
 end
 
 
     function [] = doRobustPre()
-        % Use the bad channels accumulated from reference search
+        % Use the bad channels accumulated from reference search to robust
         referenceOut = robustReference(signal, referenceOut);
         referenceOut.noisyStatisticsBeforeInterpolation = ...
-                                        referenceOut.noisyStatistics;
+            referenceOut.noisyStatistics;
         noisy = referenceOut.interpolatedChannels.all;
         if isempty(noisy)   %No noisy channels -- ordinary ref
             referenceOut.referenceSignal = ...
                 nanmean(signal.data(referenceOut.referenceChannels, :), 1);
         else
-            bad = signal.data(noisy, :); 
+            bad = signal.data(noisy, :);
             sourceChannels = setdiff(referenceOut.evaluationChannels, noisy);
             signal = interpolateChannels(signal, noisy, sourceChannels);
             referenceOut.referenceSignal = ...
@@ -90,14 +95,14 @@ end
             referenceOut.badSignalsUninterpolated = ...
                 bad - repmat(referenceOut.referenceSignal, length(noisy), 1);
         end
-
+        
         signal = removeReference(signal, referenceOut.referenceSignal, ...
-            referenceOut.rereferencedChannels);     
+            referenceOut.rereferencedChannels);
         referenceOut.noisyStatistics = ...
             findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
     end
 
-   function [] = doRobustPost()
+    function [] = doRobustPost()
         % Robust reference with interpolation afterwards
         referenceOut = robustReference(signal, referenceOut);
         noisy = referenceOut.interpolatedChannels.all;
@@ -112,20 +117,20 @@ end
             clear signalNew;
         end
         signal = removeReference(signal, referenceOut.referenceSignal, ...
-                                 referenceOut.rereferencedChannels);
+            referenceOut.rereferencedChannels);
         referenceOut.noisyStatistics  = ...
-                findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
- 
+            findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
+        
         referenceOut.noisyStatisticsBeforeInterpolation = ...
-                referenceOut.noisyStatistics;
+            referenceOut.noisyStatistics;
         %% Bring forward unusable channels from original data
         noisy = referenceOut.noisyStatisticsOriginal.noisyChannels;
         unusableChans = union(noisy.badChannelsFromNaNs, ...
-             union(noisy.badChannelsFromNoData, ...
-             noisy.badChannelsFromLowSNR));
+            union(noisy.badChannelsFromNoData, ...
+            noisy.badChannelsFromLowSNR));
         intChans = referenceOut.noisyStatistics.noisyChannels;
         chans = union(intChans.all, unusableChans);
-        intChans.all = chans(:)';    
+        intChans.all = chans(:)';
         chans = union(intChans.badChannelsFromNaNs, noisy.badChannelsFromNaNs);
         intChans.badChannelsFromNaNs = chans(:)';
         chans = union(intChans.badChannelsFromNoData, noisy.badChannelsFromNoData);
@@ -148,9 +153,45 @@ end
             bad - repmat(newReference, length(noisyChans), 1);
         referenceOut.referenceSignal = referenceOut.referenceSignal + newReference;
         signal = removeReference(signal, newReference, ...
-                                 referenceOut.rereferencedChannels);
+            referenceOut.rereferencedChannels);
         referenceOut.noisyStatistics  = ...
             findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
-   end
+    end
 
+ 
+    function [] = doOther()
+        % Do some type of non-robust referencing.
+        if strcmpi(referenceOut.referenceType, 'average') && ...
+          (~isempty( setdiff(referenceOut.evaluationChannels, ...
+            referenceOut.referenceChannels)) ...
+            || ~isempty( setdiff(referenceOut.referenceChannels, ...
+            referenceOut.evaluationChannels)))
+        warning('averageReference:EvaluationChannels', ...
+            'Reference and evaluation channels should be same for average reference');
+        elseif strcmpi(referenceOut.referenceType, 'specific') && ...
+            (isempty( setdiff(referenceOut.evaluationChannels, ...
+                              referenceOut.referenceChannels))  && ...
+             isempty( setdiff(referenceOut.referenceChannels, ...
+                              referenceOut.evaluationChannels)))
+        warning('specificReference:EvaluationChannels', ...
+            'Reference and evaluation channels should not be same for specific reference');
+        elseif ~strcmpi(referenceOut.referenceType, 'average') && ...
+            ~strcmpi(referenceOut.referenceType, 'specific') && ...
+            ~strcmpi(referenceOut.referenceType, 'none')
+        warning('specificReference:BadReferenceType', 'Unrecognized reference type');
+        end;
+        referenceOut.noisyStatisticsOriginal  = ...
+           findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
+        referenceOut.noisyStatisticsBeforeInterpolation = ...
+           referenceOut.noisyStatisticsOriginal;
+        referenceOut.referenceSignal = referenceOut.referenceSignalOriginal;
+        signal = removeReference(signal, referenceOut.referenceSignal, ...
+                                 referenceOut.rereferencedChannels);
+        if  ~strcmpi(referenceOut.referenceType, 'none')
+           referenceOut.noisyStatistics  = findNoisyChannels( ...
+                         removeTrend(signal, referenceOut), referenceOut);
+        else
+           referenceOut.noisyStatistics = referenceOut.noisyStatisticsOriginal;
+        end
+    end
 end

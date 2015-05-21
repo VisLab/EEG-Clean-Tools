@@ -132,3 +132,4 @@ Version 0.46 (Not released - version 0.45 with additional changes)
 Version 0.47 (Not released -- version 0.46 with additional changes)
 * Minor refactoring of performReference to avoid 1 extra filtering operation ---
   should not reflect results.
+* Also added average and specific referencing methods -- not tested as yet.
