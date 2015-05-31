@@ -32,10 +32,15 @@ pop_editoptions('option_single', false, 'option_savetwofiles', false);
 % basename = 'nctu-lk';
 % publishOn = false;
 
-dataFile = 'N:\ARLAnalysis\Shooter\Shooter_Robust_1Hz_Unfiltered\\ARIT_0131_CNT_events.set';
+% dataFile = 'N:\ARLAnalysis\Shooter\Shooter_Robust_1Hz_Unfiltered\\ARIT_0131_CNT_events.set';
+% summaryFolder = 'D:\\Temp';
+% basename = 'shooter-1';
+% publishOn = false;
+
+dataFile = 'N:\\ARLAnalysis\\RSVP_HeadIT\\RSVP_Robust_1Hz\\rsvp_01.set';
 summaryFolder = 'D:\\Temp';
-basename = 'shooter-1';
-publishOn = false;
+basename = 'rsvp-1';
+publishOn = true;
 
 %% Setup up the summary folder
 summaryReportName = [basename '_summary.html'];

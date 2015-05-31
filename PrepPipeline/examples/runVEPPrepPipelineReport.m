@@ -1,8 +1,8 @@
 %% Read in the file and set the necessary parameters
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
-dataDir = 'N:\\ARLAnalysis\\VEP\\VEPRobust_1Hz_Post_Median_Unfiltered';
-summaryFolder  = 'N:\\ARLAnalysis\\VEP\\VEPRobust_1Hz_Post_Median_Unfiltered';
+dataDir = 'N:\\ARLAnalysis\\VEP\\VEP_Robust_1Hz';
+summaryFolder  = 'N:\\ARLAnalysis\\VEP\\VEP_Robust_1Hz_Report';
 
 %% Get the directory list
 inList = dir(dataDir);
