@@ -1,5 +1,5 @@
 function [paramsOut] = lineNoiseGUI(hObject, callbackdata, inputData)%#ok<INUSL>
-    title = 'Clean Line Noise Parameters';
+    theTitle = 'Clean line noise parameters';
     defaultStruct = inputData.userData.lineNoise;
     
     while(true)
@@ -22,7 +22,7 @@ function [paramsOut] = lineNoiseGUI(hObject, callbackdata, inputData)%#ok<INUSL>
             textColorStruct.(fNamesDefault{k}) = 'k';
         end
   
-        closeOpenWindows(title);
+        closeOpenWindows(theTitle);
         geometry = {[1,4], [1,4], 1, [1, .5, 1, .5], [1, .5, 1, .5], ...
                     [1, .5, 1, .5], [1, .5, 1, .5], [1, .5, 1, .5]};
         geomvert = [];
@@ -96,7 +96,7 @@ function [paramsOut] = lineNoiseGUI(hObject, callbackdata, inputData)%#ok<INUSL>
             textColorStruct.maximumIterations}};
             [~, ~, ~, paramsOut] = ...
                 inputgui('geometry', geometry, 'geomvert', geomvert, ...
-                'uilist', uilist, 'title', title, 'helpcom', ...
+                'uilist', uilist, 'title', theTitle, 'helpcom', ...
                 'pophelp(''pop_prepPipeline'')');
         if(isempty(paramsOut))
             break;

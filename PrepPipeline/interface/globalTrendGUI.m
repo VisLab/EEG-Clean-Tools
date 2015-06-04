@@ -1,6 +1,6 @@
 function [paramsOut] = globalTrendGUI(hObject, callbackdata, inputData)%#ok<INUSL>
-    theTitle ='Global Trend Parameters';
-    defaultStruct = inputData.userData.detrend;
+    theTitle ='Global trend parameters';
+    defaultStruct = inputData.userData.globalTrend;
 
     while(true)
         mainFigure = findobj('Type', 'Figure', '-and', 'Name', inputData.name);
@@ -28,7 +28,7 @@ function [paramsOut] = globalTrendGUI(hObject, callbackdata, inputData)%#ok<INUS
         end
         
         %% starts the while loop, sets up the uilist and creates the GUI
-        closeOpenWindows(title);
+        closeOpenWindows(theTitle);
         geometry = {[1,4], 1, [3,1,3,1],[3,1,4]};
         geomvert = [];
         uilist={{'style', 'text', 'string', 'Global trend channels', ...

@@ -1,5 +1,5 @@
 function [paramsOut] = detrendGUI(hObject, callbackdata, inputData)%#ok<INUSL>
-    title='Detrend Parameters';
+    theTitle = 'Detrend parameters';
     defaultStruct = inputData.userData.detrend;
 
     while(true)
@@ -25,7 +25,7 @@ function [paramsOut] = detrendGUI(hObject, callbackdata, inputData)%#ok<INUSL>
         typeValue = typeMenuPosition(defaultStruct.detrendType.value);
 
         %% starts the while loop, sets up the uilist and creates the GUI
-        closeOpenWindows(title);
+        closeOpenWindows(theTitle);
         geometry = {[1,4.5],1,[3,1,3,1],[3,1,4]};
         geomvert = [];
         uilist={{'style', 'text', 'string', 'Detrend channels', ...
@@ -49,7 +49,7 @@ function [paramsOut] = detrendGUI(hObject, callbackdata, inputData)%#ok<INUSL>
             'tag', 'detrendStepSize', 'ForegroundColor', textColorStruct.detrendStepSize}...
             {'style', 'text', 'string', ''}};
         [~, ~, ~, paramsOut] = inputgui('geometry', geometry, ...
-            'geomvert', geomvert, 'uilist', uilist, 'title', title, ...
+            'geomvert', geomvert, 'uilist', uilist, 'title', theTitle, ...
             'helpcom', 'pophelp(''pop_prepPipeline'')');
         if isempty(paramsOut)
             break;

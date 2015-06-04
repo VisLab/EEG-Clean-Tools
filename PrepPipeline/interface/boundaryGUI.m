@@ -1,6 +1,6 @@
 function paramsOut = boundaryGUI(hObject, callbackdata, inputData)%#ok<INUSL>
     defaultStruct = inputData.userData.boundary;
-    title = 'Boundary Parameters';
+    theTitle = 'Boundary parameters';
     mainFigure = findobj('Type', 'Figure', '-and', 'Name', inputData.name);
     userdata = get(mainFigure, 'UserData');
     if isempty(userdata) || ~isfield(userdata, 'boundary')
@@ -19,7 +19,7 @@ function paramsOut = boundaryGUI(hObject, callbackdata, inputData)%#ok<INUSL>
         checkValue = 0;
     end
     %% starts the while loop, sets up the uilist and creates the GUI
-    closeOpenWindows(title);
+    closeOpenWindows(theTitle);
     geometry = {[1,0.9]};
     geomvert = [];
     uilist = {{'style', 'text', 'string', 'Ignore boundary events', ...
@@ -27,7 +27,7 @@ function paramsOut = boundaryGUI(hObject, callbackdata, inputData)%#ok<INUSL>
         {'style', 'checkbox',  'Value', checkValue, ...
         'tag', 'ignoreBoundaryEvents'}};
         [~, ~, ~, paramsOut] = inputgui('geometry', geometry, ...
-        'geomvert', geomvert, 'uilist', uilist, 'title', title, ...
+        'geomvert', geomvert, 'uilist', uilist, 'title', theTitle, ...
         'helpcom', 'pophelp(''pop_prepPipeline'')');
     if (isempty(paramsOut))  % Cancelled out
         return;
