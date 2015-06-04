@@ -133,3 +133,6 @@ Version 0.47 (Not released -- version 0.46 with additional changes)
 * Minor refactoring of performReference to avoid 1 extra filtering operation ---
   should not reflect results.
 * Also added average and specific referencing methods -- not tested as yet.
+
+Version 0.48 (Not released -- version 0.47 with EEGLAB integration)
+* 
