@@ -135,4 +135,6 @@ Version 0.47 (Not released -- version 0.46 with additional changes)
 * Also added average and specific referencing methods -- not tested as yet.
 
 Version 0.48 (Not released -- version 0.47 with EEGLAB integration)
-* 
+* Integrated EEGLAB 
+* Modified the resampling step to allow an option low pass filter to remove
+  downsampling artifacts just below Nyquist frequency.
