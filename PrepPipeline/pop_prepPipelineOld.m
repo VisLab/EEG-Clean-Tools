@@ -82,19 +82,17 @@ function [EEG, com] = pop_prepPipeline(EEG, params)
              'Callback', {@lineNoiseGUI, inputData}}...
             {'style', 'pushbutton', 'string', 'Reference', ...
              'Callback', {@referenceGUI, inputData}}};
-        [~, userData] = inputgui('geometry', geometry, 'geomvert', geomvert, ...
+        [~, userdata] = inputgui('geometry', geometry, 'geomvert', geomvert, ...
             'uilist', uilist, 'title', theName, ...
             'helpcom', 'pophelp(''pop_prepPipeline'')');
        
         params = struct();
-        if ~isempty(userData)
-            fNames = fieldnames(userData);
-            for k = 1:length(fNames)
-                nextStruct = userData.(fNames{k});
-                nextNames = fieldnames(nextStruct);
-                for j = 1:length(nextNames)
-                    params.(nextNames{j}) = nextStruct.(nextNames{j});
-                end
+        fNames = fieldnames(userdata);
+        for k = 1:length(fNames)
+            nextStruct = userdata.(fNames{k});
+            nextNames = fieldnames(nextStruct);
+            for j = 1:length(nextNames)
+                params.(nextNames{j}) = nextStruct.(nextNames{j});
             end
         end
         com = sprintf('pop_prepPipeline(%s, %s);', inputname(1));

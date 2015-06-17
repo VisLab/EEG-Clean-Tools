@@ -63,7 +63,7 @@ function [paramsOut] = globalTrendGUI(hObject, callbackdata, inputData)%#ok<INUS
         
         [paramsOut, typeErrors, fNamesErrors] = ...
             changeType(paramsOut, defaultStruct);
-        paramsOut.detrendType = typeMenuString(paramsOut.detrendType);
+        %paramsOut.detrendType = typeMenuString(paramsOut.detrendType);
         mainFigure = findobj('Type', 'Figure', '-and', 'Name', inputData.name);
         userdata = get(mainFigure, 'UserData');
         userdata.globalTrend = paramsOut;

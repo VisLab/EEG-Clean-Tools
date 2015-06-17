@@ -5,7 +5,7 @@ fNames = fieldnames(defaults);
 for k = 1:length(fNames)
     try
        nextValue = getStructureParameters(structIn, fNames{k}, ...
-                                          defaults.(fNames{k}).default);
+                                          defaults.(fNames{k}).value);
        validateattributes(nextValue, defaults.(fNames{k}).classes, ...
                          defaults.(fNames{k}).attributes);
        structOut.(fNames{k}) = nextValue;

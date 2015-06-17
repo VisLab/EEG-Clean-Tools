@@ -135,6 +135,10 @@ Version 0.47 (Not released -- version 0.46 with additional changes)
 * Also added average and specific referencing methods -- not tested as yet.
 
 Version 0.48 (Not released -- version 0.47 with EEGLAB integration)
-* Integrated EEGLAB 
+* Integrated EEGLAB plugin
+* Changed the default structure value field name from defaults.default to
+  default.value and propagated the change
+* Changed default names of line noise and global trend to linenoise and 
+  globaltrend
 * Modified the resampling step to allow an option low pass filter to remove
   downsampling artifacts just below Nyquist frequency.

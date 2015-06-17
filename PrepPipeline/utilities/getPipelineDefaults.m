@@ -234,11 +234,11 @@ function defaults = getPipelineDefaults(signal, type)
     end
 end
 
-function s = getRules(default, classes, attributes, description)
+function s = getRules(value, classes, attributes, description)
 % Construct the default structure
-    s = struct('default', [], 'classes', [], ...
+    s = struct('value', [], 'classes', [], ...
         'attributes', [], 'description', []);
-    s.default = default;
+    s.value = value;
     s.classes = classes;
     s.attributes = attributes;
     s.description = description;
