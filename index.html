@@ -32,10 +32,11 @@
 <h2>
 <a id="citing-the-prep-pipeline" class="anchor" href="#citing-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Citing the PREP pipeline</h2>
 
-<p>The PREP pipeline is freely available under the GUN General Public License. Please cite the following publication if using:
-    Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015) 
-    The PREP pipeline: standardized preprocessing for large-scale EEG analysis. 
-    Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016</p>
+<p>The PREP pipeline is freely available under the GUN General Public License. 
+Please cite the following publication if using:<br>
+    Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015)<br>
+    The PREP pipeline: standardized preprocessing for large-scale EEG analysis<br>
+    Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  </p>
 
 <h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
@@ -46,6 +47,27 @@
 <a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP Overview</h3>
 
 <p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+
+<h2>
+<a id="processing-steps" class="anchor" href="#processing-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Processing steps</h2>
+
+<ol>
+<li> Remove line-noise without committing to a filtering strategy.</li>
+<li> Robustly reference the signal relative to an estimate of the “true” average reference.</li>
+<li> Detect and interpolate bad channels relative to this reference.</li>
+<li> Retain sufficient information to allow users to re-reference using another method or to undo interpolation of a particular channel.</li>
+</ol>
+
+<h3>
+<a id="prep-as-an-eeglab-plugin" class="anchor" href="#prep-as-an-eeglab-plugin" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP as an EEGLAB plugin</h3>
+
+<p>You can install PREP as an EEGLAB plugin by unzipping the ...  </p>
+
+<h2>
+<a id="running-the-prep-pipeline" class="anchor" href="#running-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the PREP pipeline</h2>
+
+<p>Load an EEG dataset to be processed using the Load dataset submenu under the File menu of EEGLAB.  The PREP pipeline 
+can be found under the Tools submenu:  </p>
 
 <h3>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
