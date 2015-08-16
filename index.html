@@ -19,18 +19,25 @@
     </section>
 
     <section class="main-content">
-      <h3>
-<a id="introduction-to-the-prep-pipeline" class="anchor" href="#introduction-to-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction to the PREP pipeline</h3>
+      <h2>
+<a id="introduction-to-the-prep-pipeline" class="anchor" href="#introduction-to-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction to the PREP pipeline</h2>
 
-<p>The PREP pipeline is a standardized early-stage EEG processing pipeline that focuses on the identification of bad channels and the calculation of a robust average reference. PREP also has an extensive reporting facility. It is designed to be run in a completely automated way.</p>
+<p>The PREP pipeline is a standardized early-stage EEG processing pipeline that focuses on the identification of bad channels and the calculation of a robust average reference. PREP also has an extensive reporting facility. It is designed to be run in a completely automated way. The major sections of this document are:</p>
 
-<h2>
-<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
+<ul>
+<li>Introduction (requirements, citing, installation)</li>
+<li>Algorithm (steps, meaning of parameters for each step)</li>
+<li>Running as an EEGLAB plug-in</li>
+<li>Running as a script</li>
+</ul>
+
+<h3>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h3>
 
 <p>The PREP pipeline relies on the MATLAB Signal Processing toolbox and EEGLAB, a freely-available MATLAB toolbox for processing EEG. EEG is available from  <a href="http://scn.ucsd.edu/eeglab">http://scn.ucsd.edu/eeglab</a>. PREP assumes that the EEG data is provided as an EEGLAB EEG structure and that channel locations are provided in the EEG.chanlocs structure.</p>
 
-<h2>
-<a id="citing-the-prep-pipeline" class="anchor" href="#citing-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Citing the PREP pipeline</h2>
+<h3>
+<a id="citing-the-prep-pipeline" class="anchor" href="#citing-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Citing the PREP pipeline</h3>
 
 <p>The PREP pipeline is freely available under the GUN General Public License. 
 Please cite the following publication if using:  </p>
@@ -41,18 +48,18 @@ The PREP pipeline: standardized preprocessing for large-scale EEG analysis<br>
 Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  </p>
 </blockquote>
 
-<h2>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+<h3>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
 
 <p>The PREP pipeline can be run in two ways --- as a standalone toolbox or as an EEGLAB plugin. To run in standalone mode, simply download the PREP code, found the the EEG-Clean-Tools</p>
 
-<h3>
-<a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP Overview</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
 <h2>
-<a id="processing-steps" class="anchor" href="#processing-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Processing steps</h2>
+<a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP Overview</h2>
+
+<p>This section discusses the algorithm and the meeting of the various parameters.</p>
+
+<h3>
+<a id="processing-steps" class="anchor" href="#processing-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Processing steps</h3>
 
 <ol>
 <li> Remove line-noise without committing to a filtering strategy.</li>
