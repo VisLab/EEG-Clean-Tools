@@ -19,8 +19,8 @@
     </section>
 
     <section class="main-content">
-      <h2>
-<a id="introduction-to-the-prep-pipeline" class="anchor" href="#introduction-to-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction to the PREP pipeline</h2>
+      <h1>
+<a id="introduction-to-the-prep-pipeline" class="anchor" href="#introduction-to-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction to the PREP pipeline</h1>
 
 <p>The PREP pipeline is a standardized early-stage EEG processing pipeline that focuses on the identification of bad channels and the calculation of a robust average reference. PREP also has an extensive reporting facility. It is designed to be run in a completely automated way. The major sections of this document are:</p>
 
@@ -53,8 +53,8 @@ Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  </p>
 
 <p>The PREP pipeline can be run in two ways --- as a standalone toolbox or as an EEGLAB plugin. To run in standalone mode, simply download the PREP code, found the the EEG-Clean-Tools</p>
 
-<h2>
-<a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP Overview</h2>
+<h1>
+<a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP Overview</h1>
 
 <p>This section discusses the algorithm and the meeting of the various parameters.</p>
 
@@ -62,39 +62,48 @@ Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  </p>
 <a id="processing-steps" class="anchor" href="#processing-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Processing steps</h3>
 
 <ol>
-<li> Remove line-noise without committing to a filtering strategy.</li>
-<li> Robustly reference the signal relative to an estimate of the “true” average reference.</li>
-<li> Detect and interpolate bad channels relative to this reference.</li>
-<li> Retain sufficient information to allow users to re-reference using another method or to undo interpolation of a particular channel.</li>
+<li>Handle boundary events prior to processing</li>
+<li>Detrend temporarily to properly compute thresholds</li>
+<li>Remove line-noise without committing to a filtering strategy</li>
+<li>Robustly reference the signal relative to an estimate of the “true” average reference</li>
+<li>Detect and interpolate bad channels relative to this reference</li>
+<li>Produce reports if desired</li>
+<li>Post process if desired</li>
 </ol>
+
+<h2>
+<a id="boundary-event-handling" class="anchor" href="#boundary-event-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Boundary event handling</h2>
+
+<h2>
+<a id="detrend-high-pass-filtering" class="anchor" href="#detrend-high-pass-filtering" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detrend (high pass filtering)</h2>
 
 <h2>
 <a id="line-noise-removal" class="anchor" href="#line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Line noise removal</h2>
 
-<p>We use an interative version of the a method that estimates the amplitude and size of a deterministic sinusoid at a specified frequency embedded in locally white noise. The model is applied in sliding windows to adjust for non stationarity. The deterministic frequencies to be removed must be specified to within a small range. By default, the line noise removal (<code>cleanLineNoise</code>) attempts to removal multiples of 60 Hz. You might need to rerun with different frequencies if unusual spectral peaks are visible in the reports. </p>
+<p>We use an iterative version of the a method that estimates the amplitude and size of a deterministic sinusoid at a specified frequency embedded in locally white noise. The model is applied in sliding windows to adjust for non stationarity. The deterministic frequencies to be removed must be specified to within a small range. By default, the line noise removal (<code>cleanLineNoise</code>) attempts to removal multiples of 60 Hz. You might need to rerun with different frequencies if unusual spectral peaks are visible in the reports. </p>
 
-<h1>
-<a id="calling-sequence-for-line-noise-removal" class="anchor" href="#calling-sequence-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for line noise removal</h1>
+<h3>
+<a id="calling-sequence-for-line-noise-removal" class="anchor" href="#calling-sequence-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for line noise removal</h3>
 
 <p>The cleanLineNoise function takes two structures in and produces two output structures. The signal structure
 includes a .data field and an .srate field. The signal structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. </p>
 
-<p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.
-   [signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseIn)<br>
-   [signal, lineNoiseOut] = cleanLineNoise(signal)</p>
+<p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.<br>
+<code>[signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseIn)</code><br>
+<code>[signal, lineNoiseOut] = cleanLineNoise(signal)</code>  </p>
 
 <p>The output structure contains all of the input structure fields plus additional fields containing information on the
 tapers used to compute the spectral components.</p>
 
-<p>Example:
-<code>lineNoiseIn = struct('lineNoiseChannels', [1:32, 40:60], 'lineFrequencies', [60, 120, 180, 212, 240]);</code></p>
+<p><strong>Example:</strong><br>
+<code>lineNoiseIn = struct('lineNoiseChannels', [1:32, 40:60], 'lineFrequencies', [60, 120, 180, 212, 240]);</code>  </p>
 
-<h1>
-<a id="parameters-for-line-noise-removal" class="anchor" href="#parameters-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for line noise removal</h1>
+<h3>
+<a id="parameters-for-line-noise-removal" class="anchor" href="#parameters-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for line noise removal</h3>
 
 <p>The following parameters appear as subfields in a structure. </p>
 
-<p>lineNoiseChannels 
+<p><strong><code>lineNoiseChannels</code></strong><br>
    defaults = struct( ...
                'lineNoiseChannels', ...
                   getRules(1:size(signal.data, 1), {'numeric'}, ...
@@ -158,17 +167,23 @@ tapers used to compute the spectral components.</p>
 
 <p>Load an EEG dataset to be processed using the Load dataset submenu under the File menu of EEGLAB.  The PREP pipeline 
 can be found under the Tools submenu:<br>
-<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepMainMenu.png" alt="PREP main menu for EEGLAB plugin">  </p>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepFromEEGLAB.png" alt="PREP from EEGLAB">  </p>
 
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepMainMenu.png" alt="PREP main menu for EEGLAB plugin">  </p>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor’s GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepBoundary.png" alt="PREP boundary menu">  </p>
 
-<h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepDetrend.png" alt="PREP detrend menu">  </p>
 
-<p>Having trouble with Pages? Check out our <a href="https://help.github.com/pages">documentation</a> or <a href="https://github.com/contact">contact support</a> and we’ll help you sort it out.</p>
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepLineNoise.png" alt="PREP line noise menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReference.png" alt="PREP reference menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepResample.png" alt="PREP resample menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReport.png" alt="PREP report menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepPostProcess.png" alt="PREP post process menu">  </p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/VisLab/EEG-Clean-Tools">PREP Pipeline: EEG-Clean-Tools</a> is maintained by <a href="https://github.com/VisLab">VisLab</a>.</span>
