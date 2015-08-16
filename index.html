@@ -282,8 +282,187 @@ reports of the output of the bad channel detection. Details in the document on P
 
 <p>The following parameters appear as fields in the <code>referenceIn</code> structure:  </p>
 
-<p><strong><code>lineNoiseChannels</code></strong><br>
- A row vector specifying the channel numbers of the channels to remove line noise from.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use.</p>
+<p><strong><code>referenceChannels</code></strong><br>
+ A row vector specifying the channel numbers of the channels to use for referencing.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use. For standard robust referencing, you should specify only the EEG channels and not EOG channels or mastoids. All of the reference channels will be used to compute the reference. If the channel is bad, PREP uses its interpolated value.  </p>
+
+<p><strong><code>evaluationChannels</code></strong><br>
+ A row vector specifying the channel numbers of the channels to use for evaluating noisy channels.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use. These channels should only be EEG channels. The channels are used to compute thresholds and to perform
+estimates in the RANSAC algorithm. Often the reference channels and the evaluation channels are the same. However, if an EEG channel has NaNs, it will still be used as a reference channel, but will be excluded from evaluation channels.  </p>
+
+<p><strong><code>rereference</code></strong><br>
+ A row vector specifying the channel numbers of the channels from which to subtract the computed reference.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use. Channels such as mastoids and EOG channels are usually re-referenced but no used to 
+compute the robust reference.  </p>
+
+<p><strong><code>referenceType</code></strong><br>
+The type of reference to be performed. By default, PREP uses 'robust', which computes an average reference with
+iterative detection and interpolation of bad channels.  Other options include 'average', 'specific', and 'none'.
+The 'average' type removes the average of the reference channels with no interpolation, while 'specific' removes
+the average of the specified channels with no interpolation. If you mean to run the standardized PREP pipeline,
+you don't need to specify this field.  </p>
+
+<p><strong><code>interpoationOrder</code></strong><br>
+Specifies the when or whether PREP performs final channel interpolation. By default, PREP uses 'post-reference'. 
+In this case, after a final robust reference is computed, the channels are re-interpolated and the reference is corrected.
+In 'pre-reference', PREP adds to the bad channel list iteratively and interpolates before computing the reference.
+If the initial estimate of the reference is poor, this is not a good approach. In the 'none' option, PREP removes the
+reference but does not interpolate. If you mean to run the standardized PREP pipeline,
+you don't need to specify this field.  </p>
+
+<p><strong><code>meanEstimateType</code></strong><br>
+The method used to estimate the initial mean reference. By default, PREP takes the median of the channel values
+in each frame. Other options include 'mean', which is prone to outliers,  'huber' which is computationally expensive,
+or 'none'. If you mean to run the standardized PREP pipeline,
+you don't need to specify this field.  </p>
+
+<p><strong><code>channelLocations</code></strong><br>
+A structure containing the channel locations in EEGLAB <code>chanlocs</code> format. By default, PREP uses the <code>signal.chanlocs</code>
+structure unless this field is used to over ride. PREP must have channel locations in order to work.  </p>
+
+<p><strong><code>channelInfo</code></strong><br>
+A structure containing channel information in EEGLAB <code>chaninfo</code> format. By default, PREP uses the <code>signal.chaninfo</code>
+structure unless this field is used to over ride. PREP uses the nose direction for display purposes in the reports.</p>
+
+<p><strong><code>srate</code></strong><br>
+The sampling frequency of the signal in Hz. By default, PREP uses the sampling rate specified in <code>signal.srate</code>. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>samples</code></strong><br>
+The number of frames to use for the computation. By default, PREP uses <code>size(signal.data, 2)</code>. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>robustDeviationThreshold</code></strong><br>
+Z-score cutoff for robust channel deviation. If a channel has a robust deviation z-score above this value, 
+PREP considers the channel to be bad in that window. By default, PREP uses 5. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>highFrequencyNoiseThreshold</code></strong><br>
+Z-score cutoff for SNR (signal above 50 Hz). If a channel has a z-score of ratio above 50 Hz to below 50 Hz,
+PREP considers the channel to be bad in that window. By default, PREP uses 5. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>highFrequencyNoiseThreshold</code></strong><br>
+Z-score cutoff for SNR (signal above 50 Hz). If a channel has a z-score of ratio above 50 Hz to below 50 Hz,
+PREP considers the channel to be bad in that window. By default, PREP uses 5. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>correlationWindowSeconds</code></strong><br>
+Window size in seconds for computing correlations and other window values. By default, PREP uses 1. 
+Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>correlationWindowSeconds</code></strong><br>
+Max correlation absolute threshold for channel being bad in a window. In each window, PREP computes the
+maximum of the absolute value of the correlation with other channels and compares to this threshold. If
+the correlation falls below this threshold, PREP considers the channel to be bad-by-correlation in this window.
+PREP also uses this window size to evaluate windowed absolute deviation and SNR.
+By default, PREP uses 0.4. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>badTimeThreshold</code></strong><br>
+Threshold fraction of bad correlation windows for designating a channel to be bad.
+By default, PREP uses 0.01. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>ransacOff</code></strong><br>
+If true, RANSAC is not used for bad channel detection (useful for small headsets).
+By default, PREP uses false. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>ransacSampleSize</code></strong><br>
+Number of random matrices sampled to estimate RANSAC. By default, PREP uses 50 sample matrices. 
+Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>ransacChannelFraction</code></strong><br>
+Fraction of evaluation channels RANSAC uses to predict a channel. By default, PREP uses 0.25 of the
+evaluation channels. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>ransacCorrelationThreshold</code></strong><br>
+Cutoff correlation for unpredictability by neighbors. If the correlation of the channel with
+its RANSAC prediction in a window falls below this threshold, the channel is designated as 
+bad-by-RANSAC in this window. By default, PREP uses 0.75. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>ransacUnbrokenTime</code></strong><br>
+Threshold fraction of windows that a channel must be bad-by-RANSAC before it is designated as a
+channel that is bad-by-RANSAC. By default, PREP uses 0.4. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>ransacCorrelationThreshold</code></strong><br>
+Cutoff correlation for unpredictability by neighbors. If the correlation of the channel with
+its RANSAC prediction in a window falls below this threshold, the channel is designated as 
+bad-by-RANSAC in this window. By default, PREP uses 0.75. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>ransacWindowSeconds</code></strong><br>
+Size of windows in seconds over which to compute RANSAC predictions. By default, PREP uses 5. Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>maxReferenceIterations</code></strong><br>
+Maximum number of iterations in the reference-bad channel detection-interpolation cycle. 
+By default, PREP uses 4. If the actual iterations is 4, you may need to increase this or look carefully at your data set.  </p>
+
+<p><strong><code>reportingLevel</code></strong><br>
+How much information to store about referencing in the EEG structure. By default, PREP uses 'verbose', which causes
+the data structure to contain all of the window information for later processing and reporting. If you use
+'minimum', you will not be able to run the PREP reports.  Alternatively, you can choose to clean up the data structure
+after running the reports.  </p>
+
+<h2>
+<a id="reporting" class="anchor" href="#reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reporting</h2>
+
+<p>PREP has an extensive report facility that can be used provided that your reporting level was 'verbose'.</p>
+
+<h3>
+<a id="calling-sequence-for-reporting" class="anchor" href="#calling-sequence-for-reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for reporting</h3>
+
+<p>The <code>publishPrepReport</code> function takes an EEG structure that has been run through the PREP pipeline with
+report level of verbose. You need to furnish a summary directory name and a summary file name for an HTML file with summary information for all of the stuff.</p>
+
+<p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.  </p>
+
+<blockquote>
+<p><code>publishPrepReport(EEG, summaryFolder, summaryName, sessionFolder, sessionName, consoleFID, publishOn)</code>  </p>
+</blockquote>
+
+<p>The output structure contains all of the input structure fields plus additional fields including a string representation
+of the actual command used.</p>
+
+<p><strong>Example:</strong>  </p>
+
+<blockquote>
+<p><code>lineNoiseIn = struct('lineNoiseChannels', [1:32, 40:60], 'lineFrequencies', [60, 120, 180, 212, 240]);</code>  </p>
+</blockquote>
+
+<h3>
+<a id="parameters-for-removing-the-trend-1" class="anchor" href="#parameters-for-removing-the-trend-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for removing the trend</h3>
+
+<p>The following parameters appear as fields in the <code>detrendIn</code> structure:  </p>
+
+<p><strong><code>detrendChannels</code></strong><br>
+ A row vector specifying the channel numbers of the channels to remove the trend from.<br>
+By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). 
+If your signal has extraneous or unused channels, you should specify which channels to use.  </p>
+
+<pre><code>           'maxReferenceIterations', ...
+               getRules(4,  ...
+               {'numeric'}, {'positive', 'scalar'}, ...
+               'Maximum number of referencing interations'), ...
+            'keepFiltered', ...
+                getRules(false, {'logical'}, {}, ...
+                'If true, final output is filtered rather than unfiltered'), ...
+            'reportingLevel', ...
+               getRules('verbose',  ...
+               {'char'}, {}, ...
+               'How much information to store about referencing') ...
+               );
+</code></pre>
+
+<p>%        case 'reports'
+%              [~, EEGbase] = fileparts(signal.filename);
+%              defaults = struct( ...
+%                 'publishOn', ...
+%                    getRules(true, {'logical'}, {}, ...
+%                    'If true, use MATLAB publish to publish the results.'), ...
+%                'summaryName', ...
+%                   getRules([EEGbase 'Summary.html'], {'char'}, {}, ...
+%                    'File name for html summary file.'), ...
+%                 'summaryFolder', ...
+%                   getRules(['.' filesep], {'char'}, {}, ...
+%                    'Folder for html summary file.'), ...
+%                'reportName', ...
+%                   getRules([EEGbase 'Report.pdf'], {'char'}, {}, ...
+%                    'File name for html summary file.'), ...
+%                'reportFolder', ...
+%                   getRules(['.' filesep], {'char'}, {}, ...
+%                    'Folder for html summary file.') ...
+%                ); </p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/VisLab/EEG-Clean-Tools">PREP Pipeline: EEG-Clean-Tools</a> is maintained by <a href="https://github.com/VisLab">VisLab</a>.</span>
