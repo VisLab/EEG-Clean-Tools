@@ -54,6 +54,35 @@ Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  </p>
 <p>The PREP pipeline can be run in two ways --- as a standalone toolbox or as an EEGLAB plugin. To run in standalone mode, simply download the PREP code, found the the EEG-Clean-Tools</p>
 
 <h1>
+<a id="prep-as-an-eeglab-plugin" class="anchor" href="#prep-as-an-eeglab-plugin" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP as an EEGLAB plugin</h1>
+
+<p>You can install PREP as an EEGLAB plugin by unzipping the PREPPipeline directory into the plugins directory of
+your EEGLAB installation. </p>
+
+<h2>
+<a id="running-the-prep-pipeline-from-eeglab" class="anchor" href="#running-the-prep-pipeline-from-eeglab" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the PREP pipeline from EEGLAB</h2>
+
+<p>Load an EEG dataset to be processed using the Load dataset submenu under the File menu of EEGLAB.  The PREP pipeline 
+can be found under the Tools submenu:<br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepFromEEGLAB.png" alt="PREP from EEGLAB">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepMainMenu.png" alt="PREP main menu for EEGLAB plugin">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepBoundaryParameters.png" alt="PREP boundary menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepDetrendParameters.png" alt="PREP detrend menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepLineNoiseParameters.png" alt="PREP line noise menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReferenceParameters.png" alt="PREP reference menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepResampleParameters.png" alt="PREP resample menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReportParameters.png" alt="PREP report menu">  </p>
+
+<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepPostProcess.png" alt="PREP post process menu">  </p>
+
+<h1>
 <a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP Overview</h1>
 
 <p>This section discusses the algorithm and the meeting of the various parameters.</p>
@@ -63,8 +92,8 @@ Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  </p>
 
 <ol>
 <li>Handle boundary events prior to processing</li>
-<li>Detrend temporarily to properly compute thresholds</li>
-<li>Remove line-noise without committing to a filtering strategy</li>
+<li>Remove trend (high pass) temporarily to properly compute thresholds</li>
+<li>Remove line noise without committing to a filtering strategy</li>
 <li>Robustly reference the signal relative to an estimate of the “true” average reference</li>
 <li>Detect and interpolate bad channels relative to this reference</li>
 <li>Produce reports if desired</li>
@@ -75,10 +104,63 @@ Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  </p>
 <a id="boundary-marker-handling" class="anchor" href="#boundary-marker-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Boundary marker handling</h2>
 
 <p>PREP is meant to work on data obtained from a continuous recording session. However, sometimes researchers record multiple sessions in the same file (such as by temporarily suspending and resuming recording). EEGLAB uses boundary events to mark
-these discontinuities. Some (but not all) EEGLAB functions </p>
+these discontinuities. Some (but not all) EEGLAB functions respect these boundary markers. By default, the PREP pipeline will not process data sets with boundary markers. Because some researchers use these boundary markers for other purposes than for marking discontinuities, PREP allows the option of temporarily removing boundary markers before processing and then reinserting afterwards. <strong>You should not disregard boundary markers unless you are absolutely sure that these markers</strong>
+<strong>to not represent discontinuities.</strong></p>
 
 <h2>
 <a id="detrend-high-pass-filtering" class="anchor" href="#detrend-high-pass-filtering" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detrend (high pass filtering)</h2>
+
+<p>High pass filtering of some sort is needed in order for many of the algorithms, including line noise removal and
+referencing to perform correctly. However, the exact cutoff may dramatically effect downstream algorithms. By default, 
+PREP uses a 1 Hz cutoff, but only temporarily filters, so that the final signal is not high-pass filtered. This
+allows you to defer the final choice of high pass cutoff for downstream processing to later. </p>
+
+<h3>
+<a id="calling-sequence-for-removing-trends" class="anchor" href="#calling-sequence-for-removing-trends" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for removing trends</h3>
+
+<p>The <code>removeTrend</code> function takes two structures in and produces two output structures. The <code>signal</code> structure
+includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The <code>.data</code> field should be channels x frames. </p>
+
+<p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.  </p>
+
+<blockquote>
+<p><code>[signal, detrendOut] = removeTrend(signal, detrendIn)</code><br>
+<code>[signal, detrendOut] = removeTrend(signal)</code>  </p>
+</blockquote>
+
+<p>The output structure contains all of the input structure fields plus additional fields including a string representation
+of the actual command used.</p>
+
+<p><strong>Example:</strong>  </p>
+
+<blockquote>
+<p><code>lineNoiseIn = struct('lineNoiseChannels', [1:32, 40:60], 'lineFrequencies', [60, 120, 180, 212, 240]);</code>  </p>
+</blockquote>
+
+<h3>
+<a id="parameters-for-removing-the-trend" class="anchor" href="#parameters-for-removing-the-trend" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for removing the trend</h3>
+
+<p>The following parameters appear as fields in the <code>detrendIn</code> structure:  </p>
+
+<p><strong><code>detrendChannels</code></strong><br>
+ A row vector specifying the channel numbers of the channels to remove the trend from.<br>
+By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). 
+If your signal has extraneous or unused channels, you should specify which channels to use.  </p>
+
+<p><strong><code>detrendType'</code></strong><br>
+The type of detrending operation to perform. At this time the options are 'high pass', 'high pass sinc', 'linear', and
+'none'. By default, PREP uses 'high pass' by calling 'pop_eegfiltnew' with the default settings. The
+'high pass sinc' setting calls 'pop_firws' with a blackman window type. The 'linear' filter is adapted
+from the Chronux toolbox and uses local linear regression. The window size is <code>1.5/detrendCutoff</code>. Generally,
+the 'linear' option is much slower than simple high pass filtering and gives very similar results.
+Usually you don't have to specify this parameter.  </p>
+
+<p><strong><code>detrendCutoff'</code></strong><br>
+The cutoff frequency in Hz for high pass filtering or local detrending. By default, PREP uses 1 Hz. Usually you don't have to specify this parameter.</p>
+
+<p><strong><code>detrendStepSize</code></strong><br>
+The amount in seconds to slide the local detrending window when local linear regression is used for detrending. 
+By default, PREP uses 0.02 seconds. This parameter is not used unless the <code>detrendType</code> is 'linear'.  </p>
 
 <h2>
 <a id="line-noise-removal" class="anchor" href="#line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Line noise removal</h2>
@@ -88,8 +170,8 @@ these discontinuities. Some (but not all) EEGLAB functions </p>
 <h3>
 <a id="calling-sequence-for-line-noise-removal" class="anchor" href="#calling-sequence-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for line noise removal</h3>
 
-<p>The cleanLineNoise function takes two structures in and produces two output structures. The signal structure
-includes a .data field and an .srate field. The signal structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. </p>
+<p>The <code>cleanLineNoise</code> function takes two structures in and produces two output structures. The signal structure
+includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. </p>
 
 <p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.  </p>
 
@@ -99,7 +181,8 @@ includes a .data field and an .srate field. The signal structure is compatible w
 </blockquote>
 
 <p>The output structure contains all of the input structure fields plus additional fields containing information on the
-tapers used to compute the spectral components.</p>
+tapers used to compute the spectral components and additional fields including a string representation
+of the actual command used.</p>
 
 <p><strong>Example:</strong>  </p>
 
@@ -110,7 +193,7 @@ tapers used to compute the spectral components.</p>
 <h3>
 <a id="parameters-for-line-noise-removal" class="anchor" href="#parameters-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for line noise removal</h3>
 
-<p>The following parameters appear as fields in the structure that </p>
+<p>The following parameters appear as fields in the <code>lineNoiseIn</code> structure:  </p>
 
 <p><strong><code>lineNoiseChannels</code></strong><br>
  A row vector specifying the channel numbers of the channels to remove line noise from.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use.</p>
@@ -159,33 +242,48 @@ The maximum number of times that PREP applies the cleaning process to remove lin
 is not significantly above the background, it is removed from consideration. When no significant peaks remain, PREP
 stops the procedure. Most of the time, only a few iterations are required.  You should not have to override this parameter.  </p>
 
-<h1>
-<a id="running-prep-as-an-eeglab-plugin" class="anchor" href="#running-prep-as-an-eeglab-plugin" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running PREP as an EEGLAB plugin</h1>
+<h2>
+<a id="robust-referencing" class="anchor" href="#robust-referencing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Robust referencing</h2>
 
-<p>You can install PREP as an EEGLAB plugin by unzipping the ...  </p>
+<p>Referencing is the process of subtracting a common reference signal from all of the channels. Data sets collected
+from Biosemi headsets require referencing of some sort. Other headsets benefit as well. When comparing results across
+data sets it is important to use the same referencing strategy.  </p>
 
-<h1>
-<a id="running-the-prep-pipeline" class="anchor" href="#running-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the PREP pipeline</h1>
+<p>The PREP pipeline using robust average reference. This process is the same as average referencing (subtracting 
+the average of the channels from each channel in each frame) provided the data set does not have any bad
+channels.  However, if even if just a single channel has artifacts, the average reference can introduce
+errors.  To address this, the robust reference iteratively detects and interpolates bad channels to arrive at an
+average reference that is not affected by artifacts.  </p>
 
-<p>Load an EEG dataset to be processed using the Load dataset submenu under the File menu of EEGLAB.  The PREP pipeline 
-can be found under the Tools submenu:<br>
-<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepFromEEGLAB.png" alt="PREP from EEGLAB">  </p>
+<h3>
+<a id="calling-sequence-for-referencing" class="anchor" href="#calling-sequence-for-referencing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for referencing</h3>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepMainMenu.png" alt="PREP main menu for EEGLAB plugin">  </p>
+<p>The <code>performReference</code> function takes two structures in and produces two output structures. The signal structure
+includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepBoundaryParameters.png" alt="PREP boundary menu">  </p>
+<p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.  </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepDetrendParameters.png" alt="PREP detrend menu">  </p>
+<blockquote>
+<p><code>[signal, referenceOut] = performReference(signal, referenceIn)</code><br>
+<code>[signal, referenceOut] = performReference(signal)</code>  </p>
+</blockquote>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepLineNoiseParameters.png" alt="PREP line noise menu">  </p>
+<p>The output structure contains all of the input structure fields plus many additional fields containing the 
+reports of the output of the bad channel detection. Details in the document on PREP reporting.</p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReferenceParameters.png" alt="PREP reference menu">  </p>
+<p><strong>Example:</strong>  </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepResampleParameters.png" alt="PREP resample menu">  </p>
+<blockquote>
+<p><code>referenceIn = struct('referenceeChannels', [1:32, 40:60]);</code>  </p>
+</blockquote>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReportParameters.png" alt="PREP report menu">  </p>
+<h3>
+<a id="parameters-for-referencing" class="anchor" href="#parameters-for-referencing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for referencing</h3>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepPostProcess.png" alt="PREP post process menu">  </p>
+<p>The following parameters appear as fields in the <code>referenceIn</code> structure:  </p>
+
+<p><strong><code>lineNoiseChannels</code></strong><br>
+ A row vector specifying the channel numbers of the channels to remove line noise from.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use.</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/VisLab/EEG-Clean-Tools">PREP Pipeline: EEG-Clean-Tools</a> is maintained by <a href="https://github.com/VisLab">VisLab</a>.</span>
