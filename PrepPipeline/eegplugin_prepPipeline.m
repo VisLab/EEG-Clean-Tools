@@ -33,6 +33,9 @@ function eegplugin_prepPipeline(fig, trystrs, catchstrs)
  
 % create menu
 comprep = [trystrs.no_check '[EEG LASTCOM] = pop_prepPipeline(EEG);' catchstrs.new_and_hist];
-plotmenu = findobj(fig, 'tag', 'tools');
-uimenu( plotmenu, 'label', 'Prep pipeline', 'callback', comprep);
-
+menu = findobj(fig, 'tag', 'tools');
+uimenu( menu, 'Label', 'Run PREP pipeline', 'callback', comprep, ...
+    'separator', 'on');
+%comreport = [trystrs.no_check '[EEG LASTCOM] = pop_prepReport(EEG);' catchstrs.new_and_hist];
+% uimenu( submenu, 'label', 'Prep pipeline', 'callback', comprep);
+% uimenu( submenu, 'label', 'Prep reports', 'callback', comreport);

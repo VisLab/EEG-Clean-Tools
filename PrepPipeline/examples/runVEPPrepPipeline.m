@@ -13,7 +13,7 @@ params.rereferencedChannels = 1:70;
 params.detrendChannels = 1:70;
 params.lineNoiseChannels = 1:70;
 
-outdir = 'N:\\ARLAnalysis\\VEP\\VEP_Robust_1Hz';
+outdir = 'O:\\ARL_Data\\VEP\\VEP_Robust_1Hz';
 params.detrendType = 'high pass';
 params.detrendCutoff = 1;
 params.referenceType = 'robust';

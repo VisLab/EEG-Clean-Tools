@@ -1,5 +1,5 @@
-function [] = publishPrepPipelineReport(EEG, summaryFolder, summaryReportName, ...
-                 sessionFolder, sessionReportName, publishOn)
+function [] = publishPrepReport(EEG, summaryFolder, summaryName, ...
+                 sessionFolder, sessionName, consoleFID, publishOn)
 % Create a published report from the PREP pipeline.
 %
 % Note: In addition to creating a report for the EEG, it appends a 
@@ -40,22 +40,27 @@ end
 
 %% Setup up files and assign variables needed for publish in base workspace
 % Session folder is relative to the summary report location
-    assignin('base', 'EEG', EEG);
-    tempReportLocation = [summaryFolder filesep sessionFolder ...
-        filesep 'prepPipelineReport.pdf'];
-    actualReportLocation = [summaryFolder filesep sessionFolder ...
-        filesep sessionReportName];
-    summaryReportLocation = [summaryFolder filesep summaryReportName];
 
+    summaryFolder = getCanonicalPath(summaryFolder);
+    sessionFolder = getCanonicalPath(sessionFolder);
+    summaryReportLocation = [summaryFolder summaryName];
+    sessionReportLocation = [sessionFolder sessionName];
+    tempReportLocation = [sessionFolder 'prepPipelineReport.pdf'];
+    relativeReportLocation = getRelativePath(summaryFolder, sessionFolder, sessionName);
+    fprintf('Summary: %s   session: %s\n', summaryFolder, sessionFolder);
+    fprintf('Relative report location %s \n', relativeReportLocation);
     summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
-    relativeReportLocation = [sessionFolder filesep sessionReportName];
-    consoleFID = 1;
+    if summaryFile == -1;
+        error('publishPrepReport:BadSummaryFile', ...
+            'Failed to open summary file %s', summaryReportLocation);
+    end
+    assignin('base', 'EEG', EEG);
     assignin('base', 'summaryFile', summaryFile);
     assignin('base', 'consoleFID', consoleFID);
     assignin('base', 'relativeReportLocation', relativeReportLocation);
     script_name = 'prepPipelineReport.m';
     if publishOn
-        publish_options.outputDir = [summaryFolder filesep sessionFolder];
+        publish_options.outputDir = sessionFolder;
         publish_options.maxWidth = 800;
         publish_options.format = 'pdf';
         publish_options.showCode = false;
@@ -65,9 +70,30 @@ end
     end
     writeSummaryItem(summaryFile, '', 'last');
     fclose(summaryFile);
-   
     if publishOn 
-        movefile(tempReportLocation, actualReportLocation);
+        fprintf('temp report location %s\n', tempReportLocation);
+        fprintf('session report location %s\n', sessionReportLocation);
+        movefile(tempReportLocation, sessionReportLocation);
         close all
     end
+end
+
+function relativePath = getRelativePath(summaryFolder, sessionFolder, sessionName)
+      relativePath = relativize(summaryFolder, sessionFolder);
+      relativePath = getCanonicalPath(relativePath);
+      while(true)
+         relativePathNew = strrep(relativePath, '\\', '\');
+         if length(relativePathNew) == length(relativePath)
+             break;
+         end
+         relativePath = relativePathNew;
+      end
+      relativePath = strrep(relativePath, '\', '/');
+      relativePath = [relativePath sessionName];
+end
+
+function canonicalPath = getCanonicalPath(canonicalPath)
+       if canonicalPath(end) ~= filesep
+          canonicalPath = [canonicalPath, filesep];
+       end
 end

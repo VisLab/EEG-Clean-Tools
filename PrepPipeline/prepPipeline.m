@@ -36,10 +36,10 @@ function [EEG, computationTimes] = prepPipeline(EEG, params)
 % source.
 
 %% Setup the output structures and set the input parameters
-computationTimes= struct('resampling', 0, 'globalTrend', 0,  ...
+computationTimes= struct( ...
     'lineNoise', 0, 'reference', 0);
-errorMessages = struct('status', 'good', 'boundary', 0, 'resampling', 0, ...
-    'globalTrend', 0, 'detrend', 0, 'lineNoise', 0, 'reference', 0);
+errorMessages = struct('status', 'good', 'boundary', 0, ...
+               'detrend', 0, 'lineNoise', 0, 'reference', 0);
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 if isfield(EEG.etc, 'noiseDetection')
     warning('EEG.etc.noiseDetection already exists and will be cleared\n')
@@ -137,20 +137,20 @@ catch mex
     return;
 end
 
-%% Part I: Resampling
-fprintf('Resampling\n');
-try
-    tic
-    [EEG, resampling] = resampleEEG(EEG, params);
-    EEG.etc.noiseDetection.resampling = resampling;
-    computationTimes.resampling = toc;
-catch mex
-    errorMessages.resampling = ...
-        ['prepPipeline failed resampleEEG: ' getReport(mex)];
-    errorMessages.status = 'unprocessed';
-    EEG.etc.noiseDetection.errors = errorMessages;
-    return;
-end
+% %% Part I: Resampling
+% fprintf('Resampling\n');
+% try
+%     tic
+%     [EEG, resampling] = resampleEEG(EEG, params);
+%     EEG.etc.noiseDetection.resampling = resampling;
+%     computationTimes.resampling = toc;
+% catch mex
+%     errorMessages.resampling = ...
+%         ['prepPipeline failed resampleEEG: ' getReport(mex)];
+%     errorMessages.status = 'unprocessed';
+%     EEG.etc.noiseDetection.errors = errorMessages;
+%     return;
+% end
 
 
 %% Report that there were no errors

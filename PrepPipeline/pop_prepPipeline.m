@@ -7,12 +7,12 @@
 % Inputs:
 %   INEEG   - input EEG dataset
 %   params  - structure with parameters to override defaults
-%    
+%
 % Outputs:
 %   OUTEEG  - output dataset
 %
 % See also:
-%   prepPipeline, prepPipelineReport, EEGLAB 
+%   prepPipeline, prepPipelineReport, EEGLAB
 
 % Copyright (C) 2015  Kay Robbins with contributions from Nima
 % Bigdely-Shamlo, Christian Kothe, Tim Mullen, and Cassidy Matousek
@@ -32,76 +32,99 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function [EEG, com] = pop_prepPipeline(EEG, params)
-    com = ''; % Return something if user presses the cancel button
-    if nargin < 1  %% display help if not enough arguments
-        help pop_prepPipeline;
-        return;
-    elseif nargin < 2
-        params = struct();
-    end
-    
-    %% Add path to prepPipeline subdirectories if not in the list
-    tmp = which('getPipelineDefaults');      
-    if isempty(tmp)
-        myPath = fileparts(which('prepPipeline'));
-        addpath(genpath(myPath));
-    end;
-
-    %% Set up the default userData
-    userData = struct('boundary', [], 'resample', [], ...
-        'globalTrend', [], 'detrend', [], 'lineNoise', [], ...
-        'reference', []);
-    stepNames = fieldnames(userData);
-    for k = 1:length(stepNames)
-       defaults = getPipelineDefaults(EEG, stepNames{k});
-       [theseValues, errors] = checkStructureDefaults(params, defaults);
-       if ~isempty(errors)
-          error('pop_prepPipeline:BadParameters', ['|' ...
-                sprintf('%s|', errors{:})]);
-       end
-       userData.(stepNames{k}) = theseValues;
-    end
-    
-    %% pop up window
-    if nargin < 2
-        geometry = {1, [1, 1], [1, 1], [1, 1]};
-        geomvert = [];
-        theName = 'EEG Clean Tools Main Menu';
-        inputData = struct('signal', EEG, 'name', theName, 'userData', userData);
-        closeOpenWindows(inputData.name);
-        uilist= {{'style', 'text', 'string', 'Override default parameters for processing step:'}...
-            {'style', 'pushbutton', 'string', 'Boundary', ...
-             'Callback', {@boundaryGUI, inputData}} ...
-            {'style', 'pushbutton', 'string', 'Resample', ...
-             'Callback', {@resampleGUI, inputData}}...
-            {'style', 'pushbutton', 'string', 'Global Trend', ...
-             'Callback', {@globalTrendGUI, inputData}}...
-            {'style', 'pushbutton', 'string', 'Detrend', ...
-             'Callback', {@detrendGUI, inputData}}...
-            {'style', 'pushbutton', 'string', 'Line Noise', ...
-             'Callback', {@lineNoiseGUI, inputData}}...
-            {'style', 'pushbutton', 'string', 'Reference', ...
-             'Callback', {@referenceGUI, inputData}}};
-        [~, userData] = inputgui('geometry', geometry, 'geomvert', geomvert, ...
-            'uilist', uilist, 'title', theName, ...
-            'helpcom', 'pophelp(''pop_prepPipeline'')');
-       
-        params = struct();
-        if ~isempty(userData)
-            fNames = fieldnames(userData);
-            for k = 1:length(fNames)
-                nextStruct = userData.(fNames{k});
-                nextNames = fieldnames(nextStruct);
-                for j = 1:length(nextNames)
-                    params.(nextNames{j}) = nextStruct.(nextNames{j});
-                end
-            end
-        end
-        com = sprintf('pop_prepPipeline(%s, %s);', inputname(1));
-    else 
-        com = sprintf('pop_prepPipeline(%s, %s);', inputname(1), inputname(2));
-    end
-    
-    EEG = prepPipeline(EEG, params);
+com = ''; % Return something if user presses the cancel button
+if nargin < 1  %% display help if not enough arguments
+    help pop_prepPipeline;
+    return;
+elseif nargin < 2
+    params = struct();
 end
 
+%% Add path to prepPipeline subdirectories if not in the list
+tmp = which('getPipelineDefaults');
+if isempty(tmp)
+    myPath = fileparts(which('prepPipeline'));
+    addpath(genpath(myPath));
+end;
+
+%% Set up the default userData
+userData = struct('boundary', [], 'resample', [], ...
+    'globalTrend', [], 'reference', [], 'detrend', [], ...
+    'report', [], 'lineNoise', [], 'postProcess', []);
+stepNames = fieldnames(userData);
+for k = 1:length(stepNames)
+    defaults = getPipelineDefaults(EEG, stepNames{k});
+    [theseValues, errors] = checkStructureDefaults(params, defaults);
+    if ~isempty(errors)
+        error('pop_prepPipeline:BadParameters', ['|' ...
+            sprintf('%s|', errors{:})]);
+    end
+    userData.(stepNames{k}) = theseValues;
+end
+
+%% pop up window
+if nargin < 2
+    [params, okay] = MasterGUI([],[],userData, EEG);
+    if okay
+        com = createComStr(params);
+        EEG = prepPipeline(EEG, params);
+        [publishOn, sFold, sname, rFold, rname] = ...
+            getReportArguments(params, userData);
+        publishReport(publishOn, sFold, sname, rFold, rname);
+    end
+else
+    com = createComStr(params);
+    EEG = prepPipeline(EEG, params);
+    [publishOn, sFold, sname, rFold, rname] = ...
+        getUserDataReport(userData);
+    publishReport(publishOn, sFold, sname, rFold, rname);
+end
+
+    function com = createComStr(params)
+        % Creates a command string based on the parameters passed in
+        paramStr = struct2str(params);
+        com = sprintf('pop_prepPipeline(%s, %s);', inputname(1), paramStr);
+    end % createParamStr
+
+    function [publishOn, sFold, sname, rFold, rname] = ...
+            getReportArguments(params, userData)
+        % Gets the report argument values
+        if ~isempty(params) && isfield(params, 'publishOn')
+            [publishOn, sFold, sname, rFold, rname] = ...
+                getParamReport(params);
+        else
+            [publishOn, sFold, sname, rFold, rname] = ...
+                getUserDataReport(userData);
+        end
+    end % getReportArguments
+
+    function [publishOn, sFold, sname, rFold, rname] = ...
+            getParamReport(params)
+        % Gets the report argument values from the user parameters
+        publishOn = params.publishOn;
+        sFold = params.summaryFolder;
+        sname = params.summaryName;
+        rFold = params.reportFolder;
+        rname = params.reportName;
+    end % getParamReportArguments
+
+    function [publishOn, sFold, sname, rFold, rname] = ...
+            getUserDataReport(userData)
+        % Gets the report argument values from the default user data
+        publishOn = userData.report.publishOn.value;
+        sFold = userData.report.summaryFolder.value;
+        sname = userData.report.summaryName.value;
+        rFold = userData.report.reportFolder.value;
+        rname = userData.report.reportName.value;
+    end % getUserDataReportArguments
+
+    function publishReport(publishOn, sFold, sname, rFold, rname)
+        % If publishOn is true, then publish the report
+        if publishOn
+            consoleFID = 1;
+            publishPrepReport(EEG, sFold, sname, ...
+                rFold, rname, consoleFID, publishOn);
+        end
+    end % publishReport
+
+end % pop_prepPipeline

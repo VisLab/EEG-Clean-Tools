@@ -7,10 +7,9 @@
 % with an EEG.etc.noiseDetection structure containing the report. It
 % also expects the following variables in the base workspace:
 % 
-% * summaryReportName name of the summary report
-% * summaryFolder folder where summary report goes
-% * sessionFolder folder where specific report goes
-% * sessionReportName name of individual report
+% * summaryFile - variable containing the open file descriptor for summary
+% * consoleID  - variable with open file descriptor for console 
+%                (usually 1 unless the output is redirected).
 % * relativeReportLocation report location relative to summary
 %
 % The reporting function appends a summary to the summary report. 
@@ -18,6 +17,9 @@
 % Usually the prepPipelineReport script is called through the function:
 %
 %        publishPrepPipelineReport 
+%
+% It is not a function itself, to allow the MATLAB publish to dump a nice
+% output.
 %
 %% Write data status and report header
 noiseDetection = EEG.etc.noiseDetection;

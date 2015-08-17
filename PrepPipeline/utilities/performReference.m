@@ -69,9 +69,9 @@ elseif  strcmpi(referenceOut.referenceType, 'robust') && ...
         strcmpi(referenceOut.interpolationOrder, 'pre-reference')
     doRobustPre();
 elseif strcmpi(referenceOut.referenceType, 'average')
-    doAverage();
+    doOther();
 elseif strcmpi(referenceOut.referenceType, 'specific')
-    doSpecific();
+    doOther();
 else
     doOther();
 end
