@@ -121,9 +121,10 @@ end
 fprintf('Find reference\n');
 try
     tic
-
+    defaults = getPipelineDefaults(EEG, 'postprocess');
+    [postProcessOut, ~] = checkDefaults(params, struct(), defaults);
     [EEG, referenceOut] = performReference(EEG, params);
-    if referenceOut.keepFiltered
+    if postProcessOut.keepFiltered
         EEG = removeTrend(EEG, referenceOut);
     end
     EEG.etc.noiseDetection.reference = referenceOut;
