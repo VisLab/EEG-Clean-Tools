@@ -64,7 +64,7 @@ end
 
 %% pop up window
 if nargin < 2
-    [params, okay] = MasterGUI([],[],userData, EEG);
+    [params, okay] = MasterGUI(userData, EEG);
     if okay
         com = createComStr(params);
         EEG = prepPipeline(EEG, params);
