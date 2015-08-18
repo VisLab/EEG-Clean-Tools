@@ -74,7 +74,7 @@ running the pipeline.   </p>
 
 <p>Normally, PREP won't run on datasets that contain Boundary events. The PREP boundary menu allows you to change how
 PREP handles boundary events:<br>
-<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepBoundaryParameters.png" alt="PREP boundary menu"><br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepBoundary.png" alt="PREP boundary menu"><br>
 EEGLAB inserts Boundary events to mark discontinuities in the data from epoch rejection or when the data is imported. 
 Some, but not all, EEGLAB functions respect discontinuities. PREP expects the data set to be continuous. You should not
 override this default setting unless the Boundary events in your data set do not mark discontinuous recording, but 
@@ -82,7 +82,7 @@ other features.  </p>
 
 <p>PREP must detrend or high pass filter the data prior detecting line noise or referencing in order to properly
 calibrate the thresholds:
-<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepDetrendParameters.png" alt="PREP detrend menu"><br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepDetrend.png" alt="PREP detrend menu"><br>
 By default, PREP uses a high pass filter at 1 Hz for this purpose and does not retain the filtered version of the final
 output. This allows you to defer the decision of filtering strategy to downstream processing. Normally, the only default you might need to over ride is what channels to filter. By default, PREP filters all of the channels.  </p>
 
