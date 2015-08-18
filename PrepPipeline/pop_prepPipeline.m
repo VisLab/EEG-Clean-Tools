@@ -48,9 +48,9 @@ if isempty(tmp)
 end;
 
 %% Set up the default userData
-userData = struct('boundary', [], 'resample', [], ...
-    'globalTrend', [], 'reference', [], 'detrend', [], ...
-    'report', [], 'lineNoise', [], 'postProcess', []);
+userData = struct('boundary', [], 'detrend', [], ...
+                  'lineNoise', [], 'reference', [], ...
+                  'report', [],  'postProcess', []);
 stepNames = fieldnames(userData);
 for k = 1:length(stepNames)
     defaults = getPipelineDefaults(EEG, stepNames{k});
@@ -67,17 +67,23 @@ if nargin < 2
     [params, okay] = MasterGUI(userData, EEG);
     if okay
         com = createComStr(params);
-        EEG = prepPipeline(EEG, params);
-        [publishOn, sFold, sname, rFold, rname] = ...
+        [reportMode, publishOn, sFold, sname, rFold, rname] = ...
             getReportArguments(params, userData);
-        publishReport(publishOn, sFold, sname, rFold, rname);
     end
 else
     com = createComStr(params);
-    EEG = prepPipeline(EEG, params);
-    [publishOn, sFold, sname, rFold, rname] = ...
+    okay = true;
+    [reportMode, publishOn, sFold, sname, rFold, rname] = ...
         getUserDataReport(userData);
-    publishReport(publishOn, sFold, sname, rFold, rname);
+end
+
+if okay
+    if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'skipReport')
+        EEG = prepPipeline(EEG, params);
+    end
+    if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'reportOnly')
+        publishReport(publishOn, sFold, sname, rFold, rname);
+    end
 end
 
     function com = createComStr(params)
@@ -86,11 +92,12 @@ end
         com = sprintf('pop_prepPipeline(%s, %s);', inputname(1), paramStr);
     end % createParamStr
 
-    function [publishOn, sFold, sname, rFold, rname] = ...
+    function [reportMode, publishOn, sFold, sname, rFold, rname] = ...
             getReportArguments(params, userData)
         % Gets the report argument values
+        reportMode = 'normal';
         if ~isempty(params) && isfield(params, 'publishOn')
-            [publishOn, sFold, sname, rFold, rname] = ...
+            [reportMode, publishOn, sFold, sname, rFold, rname] = ...
                 getParamReport(params);
         else
             [publishOn, sFold, sname, rFold, rname] = ...
@@ -98,32 +105,34 @@ end
         end
     end % getReportArguments
 
-    function [publishOn, sFold, sname, rFold, rname] = ...
+    function [reportMode, publishOn, sFold, sName, rFold, rName] = ...
             getParamReport(params)
         % Gets the report argument values from the user parameters
+        reportMode = 'normal';
         publishOn = params.publishOn;
         sFold = params.summaryFolder;
-        sname = params.summaryName;
+        sName = params.summaryName;
         rFold = params.reportFolder;
-        rname = params.reportName;
+        rName = params.reportName;
     end % getParamReportArguments
 
-    function [publishOn, sFold, sname, rFold, rname] = ...
+    function [reportMode, publishOn, sFold, sName, rFold, rName] = ...
             getUserDataReport(userData)
         % Gets the report argument values from the default user data
+        reportMode = 'normal';
         publishOn = userData.report.publishOn.value;
         sFold = userData.report.summaryFolder.value;
-        sname = userData.report.summaryName.value;
+        sName = userData.report.summaryName.value;
         rFold = userData.report.reportFolder.value;
-        rname = userData.report.reportName.value;
+        rName = userData.report.reportName.value;
     end % getUserDataReportArguments
 
-    function publishReport(publishOn, sFold, sname, rFold, rname)
+    function publishReport(publishOn, sFold, sName, rFold, rName)
         % If publishOn is true, then publish the report
         if publishOn
             consoleFID = 1;
-            publishPrepReport(EEG, sFold, sname, ...
-                rFold, rname, consoleFID, publishOn);
+            publishPrepReport(EEG, sFold, sName, ...
+                rFold, rName, consoleFID, publishOn);
         end
     end % publishReport
 
