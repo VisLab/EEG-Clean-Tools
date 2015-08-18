@@ -13,6 +13,11 @@ end
 if ~isempty(errors)
     warning('postProcessGUI:bad parameters', getMessageString(errors)); %#ok<CTPCT>
 end
+if defaultStruct.cleanUpReference.value
+    cleanUpCheckValue = 1;
+else
+    cleanUpCheckValue = 0;
+end
 if defaultStruct.keepFiltered.value
     filteredCheckValue = 1;
 else
@@ -24,10 +29,11 @@ else
     removeCheckValue = 0;
 end
 closeOpenWindows(title);
-geometry = {[1, 1], [1, 1]};
+geometry = {[1, 1], [1, 1], [1, 1]};
 geomvert = [];
-uilist = {{'style', 'text', 'string', 'Keep filtered', ...
-    'TooltipString', ''}...
+uilist = {{'style', 'text', 'string', 'Clean up reporting fields', 'TooltipString', ''}...
+    {'style', 'checkbox', 'tag', 'cleanUpReference', 'Value', cleanUpCheckValue}...
+    {'style', 'text', 'string', 'Keep filtered', 'TooltipString', ''}...
     {'style', 'checkbox', 'tag', 'keepFiltered', 'Value', filteredCheckValue}...
     {'style', 'text',  'string', 'Remove bad interpolated channels'}...
     {'style', 'checkbox', 'tag', 'removeInterChan', 'Value', removeCheckValue}};
@@ -39,6 +45,11 @@ if (isempty(paramsOut))  % Cancelled out
 end
 mainFigure = findobj('Type', 'Figure', '-and', 'Name', inputData.name);
 userdata = get(mainFigure, 'UserData');
+if paramsOut.cleanUpReference
+    userdata.postProcess.cleanUpReference = true;
+else
+    userdata.postProcess.cleanUpReference = false;
+end
 if paramsOut.keepFiltered
     userdata.postProcess.keepFiltered = true;
 else
