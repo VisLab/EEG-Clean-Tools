@@ -86,6 +86,10 @@ if okay
     end
 end
 
+%%---JEREMY --- need to get postprocessing arguments here. Then I can write
+% The parameters are:
+%  removeInterpolationChannels, cleanUpReference, keepFiltering
+
     function com = createComStr(params)
         % Creates a command string based on the parameters passed in
         paramStr = struct2str(params);
