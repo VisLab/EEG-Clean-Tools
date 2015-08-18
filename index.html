@@ -80,20 +80,32 @@ Some, but not all, EEGLAB functions respect discontinuities. PREP expects the da
 override this default setting unless the Boundary events in your data set do not mark discontinuous recording, but 
 other features.  </p>
 
-<p>PREP must detrend or high pass filter the data prior detecting line noise or referencing in order for the thresholds
-to be properly calibrated:
+<p>PREP must detrend or high pass filter the data prior detecting line noise or referencing in order to properly
+calibrate the thresholds:
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepDetrendParameters.png" alt="PREP detrend menu"><br>
-By default,  </p>
+By default, PREP uses a high pass filter at 1 Hz for this purpose and does not retain the filtered version of the final
+output. This allows you to defer the decision of filtering strategy to downstream processing. Normally, the only default you might need to over ride is what channels to filter. By default, PREP filters all of the channels.  </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepLineNoiseParameters.png" alt="PREP line noise menu">  </p>
+<p>PREP tries to remove sharp spectral peaks representing line noise at this step:
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepLineNoiseParameters.png" alt="PREP line noise menu"><br>
+By default, PREP tries to remove multiples of 60 Hz up to the Nyquist frequency (half of the sampling frequency).
+You may need to override this if your data set has unusual spectral features. You might also need to specify
+which channels should have line noise removed. By default, PREP tries to remove line noise from all channels.  </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReferenceParameters.png" alt="PREP reference menu">  </p>
+<p>The PREP settings for the actual reference step are:<br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReferenceParameters.png" alt="PREP reference menu"><br>
+Normally, the only things you will need to override are the channel specifications. Usually, the reference channels and 
+the evaluation channels correspond to brain EEG channels. The re-referenced channels may include additional channels
+such as EOG channels and mastoids.  </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepResampleParameters.png" alt="PREP resample menu">  </p>
+<p>You can choose to generate a report using the PREP report generation facility:<br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReportParameters.png" alt="PREP report menu"><br>
+By default, the PREP does not produce a report. If you generate choose to generate a report, you can choose to
+publish it in PDF format. Otherwise, PREP displays the report on the command line. You can also choose to
+return at a later step and generate the report only.  </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReportParameters.png" alt="PREP report menu">  </p>
-
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepPostProcess.png" alt="PREP post process menu">  </p>
+<p>After running the PREP pipeline, you can perform additional processing steps:<br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepPostProcess.png" alt="PREP post process menu">  </p>
 
 <h1>
 <a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP Overview</h1>
