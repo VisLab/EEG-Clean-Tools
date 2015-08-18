@@ -63,14 +63,27 @@ your EEGLAB installation. </p>
 <a id="running-the-prep-pipeline-from-eeglab" class="anchor" href="#running-the-prep-pipeline-from-eeglab" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the PREP pipeline from EEGLAB</h2>
 
 <p>Load an EEG dataset to be processed using the Load dataset submenu under the File menu of EEGLAB.  The PREP pipeline 
-can be found under the Tools submenu:<br>
+can be found under the EEGLAB Tools submenu:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepFromEEGLAB.png" alt="PREP from EEGLAB">  </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepMainMenu.png" alt="PREP main menu for EEGLAB plugin">  </p>
+<p>The PREP main menu shows the processing steps:<br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepMainMenu.png" alt="PREP main menu for EEGLAB plugin"><br>
+Each button allows you to override the default parameters. When you press
+the Ok button (or unfortunately the Cancel button), PREP runs.  Use the x button on the upper right to quit without
+running the pipeline.   </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepBoundaryParameters.png" alt="PREP boundary menu">  </p>
+<p>Normally, PREP won't run on datasets that contain Boundary events. The PREP boundary menu allows you to change how
+PREP handles boundary events:<br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepBoundaryParameters.png" alt="PREP boundary menu"><br>
+EEGLAB inserts Boundary events to mark discontinuities in the data from epoch rejection or when the data is imported. 
+Some, but not all, EEGLAB functions respect discontinuities. PREP expects the data set to be continuous. You should not
+override this default setting unless the Boundary events in your data set do not mark discontinuous recording, but 
+other features.  </p>
 
-<p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepDetrendParameters.png" alt="PREP detrend menu">  </p>
+<p>PREP must detrend or high pass filter the data prior detecting line noise or referencing in order for the thresholds
+to be properly calibrated:
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepDetrendParameters.png" alt="PREP detrend menu"><br>
+By default,  </p>
 
 <p><img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepLineNoiseParameters.png" alt="PREP line noise menu">  </p>
 
