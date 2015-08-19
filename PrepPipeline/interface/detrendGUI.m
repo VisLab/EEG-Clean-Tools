@@ -26,7 +26,7 @@ while(true)
     
     %% starts the while loop, sets up the uilist and creates the GUI
     closeOpenWindows(theTitle);
-    geometry = {[1,4.5],[1,1,3.5],[1,1,3.5],[1,1,3.5]};
+    geometry = {[1,3.75],[1,1,2.75],[1,1,2.75],[1,1,2.75]};
     geomvert = [];
     uilist={{'style', 'text', 'string', 'Detrend channels', ...
         'TooltipString', defaultStruct.detrendChannels.description}...

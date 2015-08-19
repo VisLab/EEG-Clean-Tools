@@ -203,4 +203,20 @@ end
     function theString = typeMenuString(position, menuString)
         theString = menuString{position};
     end
+
+    function str = num2IncrementStr(num)
+        str = num(1);
+        incrementStart = true;
+        for a = 2:length(num)
+            if num(a) - num(a-1) == 1
+                if incrementStart
+                    str = [str ':']; %#ok<AGROW>
+                    incrementStart = false;
+                end
+            else
+                str = [str ',' num(a)];   %#ok<AGROW>
+                incrementStart = true;
+            end
+        end
+    end
 end

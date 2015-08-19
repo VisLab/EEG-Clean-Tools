@@ -49,8 +49,8 @@ end;
 
 %% Set up the default userData
 userData = struct('boundary', [], 'detrend', [], ...
-                  'lineNoise', [], 'reference', [], ...
-                  'report', [],  'postProcess', []);
+    'lineNoise', [], 'reference', [], ...
+    'report', [],  'postProcess', []);
 stepNames = fieldnames(userData);
 for k = 1:length(stepNames)
     defaults = getPipelineDefaults(EEG, stepNames{k});
@@ -89,6 +89,11 @@ end
 %%---JEREMY --- need to get postprocessing arguments here. Then I can write
 % The parameters are:
 %  removeInterpolationChannels, cleanUpReference, keepFiltering
+%%---Professor Robbins--- here are the parameters
+if okay
+    [cleanUpReference, keepFiltered, removeInterChan] = ...
+        getPostProcessArguments(params, userData);
+end
 
     function com = createComStr(params)
         % Creates a command string based on the parameters passed in
@@ -96,40 +101,67 @@ end
         com = sprintf('pop_prepPipeline(%s, %s);', inputname(1), paramStr);
     end % createParamStr
 
+    function [cleanUpReference, keepFiltered, removeInterChan] = ...
+            getPostProcessArguments(params, userData)
+        % Gets the post process argument values
+        if ~isempty(params) && isfield(params, 'keepFiltered')
+            [cleanUpReference, keepFiltered, removeInterChan] = ...
+                getParamPostProcess(params);
+        else
+            [cleanUpReference, keepFiltered, removeInterChan] = ...
+                getUserDataPostProcess(userData);
+        end
+    end % getPostProcessArguments
+
     function [reportMode, publishOn, sFold, sname, rFold, rname] = ...
             getReportArguments(params, userData)
         % Gets the report argument values
-        reportMode = 'normal';
         if ~isempty(params) && isfield(params, 'publishOn')
             [reportMode, publishOn, sFold, sname, rFold, rname] = ...
                 getParamReport(params);
         else
-            [publishOn, sFold, sname, rFold, rname] = ...
+            [reportMode, publishOn, sFold, sname, rFold, rname] = ...
                 getUserDataReport(userData);
         end
     end % getReportArguments
 
+    function [cleanUpReference, keepFiltered, removeInterChan] = ...
+            getParamPostProcess(params)
+        % Gets the post process argument values from the user parameters
+        cleanUpReference = params.cleanUpReference;
+        keepFiltered = params.keepFiltered;
+        removeInterChan = params.removeInterChan;
+    end % getParamPostProcess
+
     function [reportMode, publishOn, sFold, sName, rFold, rName] = ...
             getParamReport(params)
         % Gets the report argument values from the user parameters
-        reportMode = 'normal';
+        reportMode = params.reportMode;
         publishOn = params.publishOn;
         sFold = params.summaryFolder;
         sName = params.summaryName;
         rFold = params.reportFolder;
         rName = params.reportName;
-    end % getParamReportArguments
+    end % getParamReport
+
+    function [cleanUpReference, keepFiltered, removeInterChan] = ...
+            getUserDataPostProcess(userData)
+        % Gets the post process argument values from the default user data
+        cleanUpReference = userData.postProcess.cleanUpReference.value;
+        keepFiltered = userData.postProcess.keepFiltered.value;
+        removeInterChan = userData.postProcess.removeInterChan.value;
+    end % getUserDataPostProcess
 
     function [reportMode, publishOn, sFold, sName, rFold, rName] = ...
             getUserDataReport(userData)
         % Gets the report argument values from the default user data
-        reportMode = 'normal';
+        reportMode = userData.report.reportMode.value;
         publishOn = userData.report.publishOn.value;
         sFold = userData.report.summaryFolder.value;
         sName = userData.report.summaryName.value;
         rFold = userData.report.reportFolder.value;
         rName = userData.report.reportName.value;
-    end % getUserDataReportArguments
+    end % getUserDataReport
 
     function publishReport(publishOn, sFold, sName, rFold, rName)
         % If publishOn is true, then publish the report
