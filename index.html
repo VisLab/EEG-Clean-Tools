@@ -66,46 +66,48 @@ your EEGLAB installation. </p>
 can be found under the EEGLAB Tools submenu:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepFromEEGLAB.png" alt="PREP from EEGLAB">  </p>
 
-<p>The PREP main menu shows the processing steps:<br>
+<p><strong>[MAIN MENU]</strong> The PREP main menu shows the processing steps:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepMainMenu.png" alt="PREP main menu for EEGLAB plugin"><br>
 Each button allows you to override the default parameters. When you press
 the Ok button (or unfortunately the Cancel button), PREP runs.  Use the x button on the upper right to quit without
-running the pipeline.   </p>
+running the pipeline.  </p>
 
-<p>Normally, PREP won't run on datasets that contain Boundary events. The PREP boundary menu allows you to change how
-PREP handles boundary events:<br>
+<p><strong>[BOUNDARY MENU]</strong> Normally, PREP won't run on data sets that contain Boundary events. The PREP boundary menu allows you to change how PREP handles boundary events:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepBoundary.png" alt="PREP boundary menu"><br>
 EEGLAB inserts Boundary events to mark discontinuities in the data from epoch rejection or when the data is imported. 
 Some, but not all, EEGLAB functions respect discontinuities. PREP expects the data set to be continuous. You should not
 override this default setting unless the Boundary events in your data set do not mark discontinuous recording, but 
 other features.  </p>
 
-<p>PREP must detrend or high pass filter the data prior detecting line noise or referencing in order to properly
-calibrate the thresholds:
+<p><strong>[DETREND MENU]</strong> PREP must detrend or high pass filter the data prior detecting line noise or referencing in order to properly calibrate the thresholds:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepDetrend.png" alt="PREP detrend menu"><br>
 By default, PREP uses a high pass filter at 1 Hz for this purpose and does not retain the filtered version of the final
 output. This allows you to defer the decision of filtering strategy to downstream processing. Normally, the only default you might need to over ride is what channels to filter. By default, PREP filters all of the channels.  </p>
 
-<p>PREP tries to remove sharp spectral peaks representing line noise at this step:
+<p><strong>[LINE NOISE MENU]</strong> PREP tries to remove sharp spectral peaks representing line noise at this step:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepLineNoiseParameters.png" alt="PREP line noise menu"><br>
 By default, PREP tries to remove multiples of 60 Hz up to the Nyquist frequency (half of the sampling frequency).
 You may need to override this if your data set has unusual spectral features. You might also need to specify
 which channels should have line noise removed. By default, PREP tries to remove line noise from all channels.  </p>
 
-<p>The PREP settings for the actual reference step are:<br>
+<p><strong>[REFERENCE MENU]</strong> The PREP settings for the actual reference step are:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReferenceParameters.png" alt="PREP reference menu"><br>
 Normally, the only things you will need to override are the channel specifications. Usually, the reference channels and 
 the evaluation channels correspond to brain EEG channels. The re-referenced channels may include additional channels
 such as EOG channels and mastoids.  </p>
 
-<p>You can choose to generate a report using the PREP report generation facility:<br>
+<p><strong>[REPORT MENU]</strong> You can choose to generate a report using the PREP report generation facility:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepReportParameters.png" alt="PREP report menu"><br>
 By default, the PREP does not produce a report. If you generate choose to generate a report, you can choose to
 publish it in PDF format. Otherwise, PREP displays the report on the command line. You can also choose to
 return at a later step and generate the report only.  </p>
 
-<p>After running the PREP pipeline, you can perform additional processing steps:<br>
+<p><strong>[POSTPROCESS MENU]</strong> After running the PREP pipeline, you can perform additional processing steps:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepPostProcess.png" alt="PREP post process menu">  </p>
+
+<p><strong>[SAVE MENU]</strong> After PREP completes processing, reporting, and post processing, you are given the option of saving
+the processed EEG data set:<br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepSave.png" alt="PREP final save menu">  </p>
 
 <h1>
 <a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP Overview</h1>
@@ -172,7 +174,7 @@ of the actual command used.</p>
 By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). 
 If your signal has extraneous or unused channels, you should specify which channels to use.  </p>
 
-<p><strong><code>detrendType'</code></strong><br>
+<p><strong><code>detrendType</code></strong><br>
 The type of detrending operation to perform. At this time the options are 'high pass', 'high pass sinc', 'linear', and
 'none'. By default, PREP uses 'high pass' by calling 'pop_eegfiltnew' with the default settings. The
 'high pass sinc' setting calls 'pop_firws' with a blackman window type. The 'linear' filter is adapted
@@ -180,7 +182,7 @@ from the Chronux toolbox and uses local linear regression. The window size is <c
 the 'linear' option is much slower than simple high pass filtering and gives very similar results.
 Usually you don't have to specify this parameter.  </p>
 
-<p><strong><code>detrendCutoff'</code></strong><br>
+<p><strong><code>detrendCutoff</code></strong><br>
 The cutoff frequency in Hz for high pass filtering or local detrending. By default, PREP uses 1 Hz. Usually you don't have to specify this parameter.</p>
 
 <p><strong><code>detrendStepSize</code></strong><br>
@@ -442,37 +444,32 @@ of the actual command used.</p>
 <p><strong>Example:</strong>  </p>
 
 <blockquote>
-<p><code>lineNoiseIn = struct('lineNoiseChannels', [1:32, 40:60], 'lineFrequencies', [60, 120, 180, 212, 240]);</code>  </p>
+<p><code>publishPrepReport(EEG, '.', summaryName, sessionFolder, sessionName, consoleFID, publishOn);</code>  </p>
 </blockquote>
 
 <h3>
-<a id="parameters-for-removing-the-trend-1" class="anchor" href="#parameters-for-removing-the-trend-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for removing the trend</h3>
+<a id="parameters-for-reporting" class="anchor" href="#parameters-for-reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for reporting</h3>
 
-<p>The following parameters appear as fields in the <code>detrendIn</code> structure:  </p>
+<p>The following parameters appear in the publishReports:  </p>
 
-<p><strong><code>detrendChannels</code></strong><br>
- A row vector specifying the channel numbers of the channels to remove the trend from.<br>
+<p><strong>reportMode`</strong><br>
+Indicates whether reporting should be run. If the mode is 'normal' (the default), then PREP</p>
+
+<p><strong><code>PublishOn</code></strong><br>
+If true (the default) PREP produces a published PDF Report
 By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). 
-If your signal has extraneous or unused channels, you should specify which channels to use.  </p>
-
-<pre><code>           'maxReferenceIterations', ...
-               getRules(4,  ...
-               {'numeric'}, {'positive', 'scalar'}, ...
-               'Maximum number of referencing interations'), ...
-            'keepFiltered', ...
-                getRules(false, {'logical'}, {}, ...
-                'If true, final output is filtered rather than unfiltered'), ...
-            'reportingLevel', ...
-               getRules('verbose',  ...
-               {'char'}, {}, ...
-               'How much information to store about referencing') ...
-               );
-</code></pre>
+If your signal has extraneous or unused channels, you should specify which channels to use.<br>
+<strong><code>maxReferenceIterations</code></strong><br>
+Maximum number of iterations in the reference-bad channel detection-interpolation cycle. 
+By default, PREP uses 4. If the actual iterations is 4, you may need to increase this or look carefully at your data set.  </p>
 
 <p>%        case 'reports'
 %              [~, EEGbase] = fileparts(signal.filename);
 %              defaults = struct( ...
-%                 'publishOn', ...
+%                 '<strong><code>maxReferenceIterations</code></strong><br>
+Maximum number of iterations in the reference-bad channel detection-interpolation cycle. 
+By default, PREP uses 4. If the actual iterations is 4, you may need to increase this or look carefully at your data set.<br>
+', ...
 %                    getRules(true, {'logical'}, {}, ...
 %                    'If true, use MATLAB publish to publish the results.'), ...
 %                'summaryName', ...
