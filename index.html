@@ -156,13 +156,12 @@ includes a <code>.data</code> field and an <code>.srate</code> field. The <code>
 </blockquote>
 
 <p>The output structure contains all of the input structure fields plus additional fields including a string representation
-of the actual command used. Usually, the only field that a user might need to provide is <code>lineNoiseChannels</code> if the <code>signal</code> structure contains extra channels that represent items other than EEG signals. Users also need to provide a rough guess of the line frequencies that might be present. By default, PREP uses multiples of 60 Hz. If the dataset was recorded in a place where 50 Hz alternating current is used, users will need to provide the <code>lineFrequencies</code> parameter. Sometimes unusual frequencies appear due to aliasing and other recording artifacts. For example, a frequency spike at 212 Hz might appear as an aliasing artifact in a signal recorded at 512 Hz (212 = 512 - 300).   </p>
+of the actual command used. Usually, the only field that a user might need to provide is <code>detrendChannels</code> if the <code>signal</code> structure contains extra channels that represent items other than EEG signals. </p>
 
 <p><strong>Example:</strong>  </p>
 
 <blockquote>
-<p><code>lineNoiseIn = struct('lineNoiseChannels', [1:32, 40:60], ...  
-                      'lineFrequencies', [60, 120, 180, 212, 240]);</code>  </p>
+<p><code>detrendIn = struct('detrendChannels', [1:32, 40:60], 'detrendCutoff', 0.5);</code>  </p>
 </blockquote>
 
 <h3>
@@ -176,11 +175,11 @@ By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>).
 If your signal has extraneous or unused channels, you should specify which channels to use.  </p>
 
 <p><strong><code>detrendType</code></strong><br>
-The type of detrending operation to perform. At this time the options are 'high pass', 'high pass sinc', 'linear', and
-'none'. By default, PREP uses 'high pass' by calling 'pop_eegfiltnew' with the default settings. The
-'high pass sinc' setting calls 'pop_firws' with a blackman window type. The 'linear' filter is adapted
+The type of detrending operation to perform. At this time the options are <code>'high pass'</code>, <code>'high pass sinc'</code>, <code>'linear'</code>, and
+<code>'none'</code>. By default, PREP uses <code>'high pass'</code> by calling <code>pop_eegfiltnew</code> with the default settings. The
+<code>'high pass sinc'</code> setting calls <code>pop_firws</code> with a Blackman window type. The <code>'linear'</code> filter is adapted
 from the Chronux toolbox and uses local linear regression. The window size is <code>1.5/detrendCutoff</code>. Generally,
-the 'linear' option is much slower than simple high pass filtering and gives very similar results.
+the <code>'linear'</code> option is much slower than simple high pass filtering and gives very similar results.
 Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>detrendCutoff</code></strong><br>
@@ -188,12 +187,12 @@ The cutoff frequency in Hz for high pass filtering or local detrending. By defau
 
 <p><strong><code>detrendStepSize</code></strong><br>
 The amount in seconds to slide the local detrending window when local linear regression is used for detrending. 
-By default, PREP uses 0.02 seconds. This parameter is not used unless the <code>detrendType</code> is 'linear'.  </p>
+By default, PREP uses 0.02 seconds. This parameter is not used unless the <code>detrendType</code> is <code>'linear'</code>.  </p>
 
 <h2>
 <a id="line-noise-removal" class="anchor" href="#line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Line noise removal</h2>
 
-<p>We use an iterative version of the a method that estimates the amplitude and size of a deterministic sinusoid at a specified frequency embedded in locally white noise. The model is applied in sliding windows to adjust for non stationarity. The deterministic frequencies to be removed must be specified to within a small range. By default, the line noise removal (<code>cleanLineNoise</code>) attempts to removal multiples of 60 Hz. You might need to rerun with different frequencies if unusual spectral peaks are visible in the reports. </p>
+<p>We use an iterative version of a method that estimates the amplitude and size of a deterministic sinusoid at a specified frequency embedded in locally white noise. The model is applied in sliding windows to adjust for non stationarity. The algorithm requires a rough guess of the frequencies to be removed. By default, PREP uses multiples of 60 Hz. If the data set was recorded in a place where 50 Hz alternating current is used, you will need to provide the <code>lineFrequencies</code> parameter. Sometimes unusual frequencies appear due to aliasing and other recording artifacts. For example, a frequency spike at 212 Hz might appear as an aliasing artifact in a signal recorded at 512 Hz (212 = 512 - 300). You might need to rerun with different frequencies if unusual spectral peaks are visible in the reports. </p>
 
 <h3>
 <a id="calling-sequence-for-line-noise-removal" class="anchor" href="#calling-sequence-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for line noise removal</h3>
@@ -204,8 +203,8 @@ includes a <code>.data</code> field and an <code>.srate</code> field. The <code>
 <p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.  </p>
 
 <blockquote>
-<p><code>[signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseIn)</code><br>
-<code>[signal, lineNoiseOut] = cleanLineNoise(signal)</code>  </p>
+<p><code>[signal, lineNoiseOut] = cleanLineNoise(signal)</code><br>
+<code>[signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseIn)</code>  </p>
 </blockquote>
 
 <p>The output structure contains all of the input structure fields plus additional fields containing information on the
@@ -236,7 +235,7 @@ A vector of frequencies in Hz of the approximate locations of the line noise pea
 
 <p><strong><code>p</code></strong><br>
 A significance cutoff level for removing a spectral peak. By default, PREP uses a p-value of 0.01. The clean line noise
-procedure applies a F-test to determine whether a particular spectral peak is significantly higher than the background level in a small window. You should not have to override this parameter.  </p>
+procedure applies an F-test to determine whether a particular spectral peak is significantly higher than the background level in a small window. You should not have to override this parameter.  </p>
 
 <p><strong><code>fScanBandWidth</code></strong><br>
 Half of the width of the frequency band centered on each line frequency. This band is used to search
@@ -275,7 +274,7 @@ stops the procedure. Most of the time, only a few iterations are required.  You 
 
 <p>Referencing is the process of subtracting a common reference signal from all of the channels. Data sets collected
 from Biosemi headsets require referencing of some sort. Other headsets benefit as well. When comparing results across
-data sets it is important to use the same referencing strategy.  </p>
+data sets, it is important to use the same referencing strategy.  </p>
 
 <p>The PREP pipeline using robust average reference. This process is the same as average referencing (subtracting 
 the average of the channels from each channel in each frame) provided the data set does not have any bad
@@ -287,13 +286,13 @@ average reference that is not affected by artifacts.  </p>
 <a id="calling-sequence-for-referencing" class="anchor" href="#calling-sequence-for-referencing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for referencing</h3>
 
 <p>The <code>performReference</code> function takes two structures in and produces two output structures. The signal structure
-includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. </p>
+includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. On output, PREP stores metadata about the referencing in the <code>.etc.noiseDetection</code> field.</p>
 
-<p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.  </p>
+<p>As with all functions in the pipeline, the algorithm parameters are passed in a structure:  </p>
 
 <blockquote>
-<p><code>[signal, referenceOut] = performReference(signal, referenceIn)</code><br>
-<code>[signal, referenceOut] = performReference(signal)</code>  </p>
+<p><code>[signal, referenceOut] = performReference(signal)</code><br>
+<code>[signal, referenceOut] = performReference(signal, referenceIn)</code>  </p>
 </blockquote>
 
 <p>The output structure contains all of the input structure fields plus many additional fields containing the 
@@ -314,33 +313,31 @@ reports of the output of the bad channel detection. Details in the document on P
  A row vector specifying the channel numbers of the channels to use for referencing.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use. For standard robust referencing, you should specify only the EEG channels and not EOG channels or mastoids. All of the reference channels will be used to compute the reference. If the channel is bad, PREP uses its interpolated value.  </p>
 
 <p><strong><code>evaluationChannels</code></strong><br>
- A row vector specifying the channel numbers of the channels to use for evaluating noisy channels.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use. These channels should only be EEG channels. The channels are used to compute thresholds and to perform
-estimates in the RANSAC algorithm. Often the reference channels and the evaluation channels are the same. However, if an EEG channel has NaNs, it will still be used as a reference channel, but will be excluded from evaluation channels.  </p>
+ A row vector specifying the channel numbers of the channels to use for evaluating noisy channels.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use. These channels should only be EEG channels. These channels are used to compute thresholds and to perform
+estimates in the RANSAC algorithm. Often the reference channels and the evaluation channels are the same. However, if an EEG channel has NaNs or other unusable data, it will still be used as a reference channel, but will be excluded from the evaluation channels.  </p>
 
 <p><strong><code>rereference</code></strong><br>
- A row vector specifying the channel numbers of the channels from which to subtract the computed reference.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use. Channels such as mastoids and EOG channels are usually re-referenced but no used to 
+ A row vector specifying the channel numbers of the channels from which to subtract the computed reference.  By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). If your signal has extraneous or unused channels, you should specify which channels to use. Channels such as mastoids and EOG channels are usually re-referenced but are not used to 
 compute the robust reference.  </p>
 
 <p><strong><code>referenceType</code></strong><br>
-The type of reference to be performed. By default, PREP uses 'robust', which computes an average reference with
-iterative detection and interpolation of bad channels.  Other options include 'average', 'specific', and 'none'.
-The 'average' type removes the average of the reference channels with no interpolation, while 'specific' removes
+The type of reference to be performed. By default, PREP uses <code>'robust'</code>, which computes an average reference with
+iterative detection and interpolation of bad channels.  Other options include <code>'average'</code>, <code>'specific'</code>, and <code>'none'</code>.
+The <code>'average'</code> type removes the average of the reference channels with no interpolation, while <code>'specific'</code> removes
 the average of the specified channels with no interpolation. If you mean to run the standardized PREP pipeline,
 you don't need to specify this field.  </p>
 
-<p><strong><code>interpoationOrder</code></strong><br>
-Specifies the when or whether PREP performs final channel interpolation. By default, PREP uses 'post-reference'. 
+<p><strong><code>interpolationOrder</code></strong><br>
+Specifies whether PREP performs final channel interpolation. By default, PREP uses <code>'post-reference'</code>. 
 In this case, after a final robust reference is computed, the channels are re-interpolated and the reference is corrected.
-In 'pre-reference', PREP adds to the bad channel list iteratively and interpolates before computing the reference.
-If the initial estimate of the reference is poor, this is not a good approach. In the 'none' option, PREP removes the
-reference but does not interpolate. If you mean to run the standardized PREP pipeline,
-you don't need to specify this field.  </p>
+In <code>'pre-reference'</code>, PREP incrementally adds to the bad channel list and interpolates before computing the reference.
+If the initial estimate of the reference is poor, this is not a good approach. In the <code>'none'</code> option, PREP removes the
+reference but does not interpolate. Bad channels remain in the signal. You may choose to remove them during post-processing. If you mean to run the standardized PREP pipeline, you don't need to specify this field.  </p>
 
 <p><strong><code>meanEstimateType</code></strong><br>
 The method used to estimate the initial mean reference. By default, PREP takes the median of the channel values
-in each frame. Other options include 'mean', which is prone to outliers,  'huber' which is computationally expensive,
-or 'none'. If you mean to run the standardized PREP pipeline,
-you don't need to specify this field.  </p>
+in each frame. Other options include <code>'mean'</code>, which is prone to outliers,  <code>'huber'</code> which is computationally expensive,
+or <code>'none'</code>. If you mean to run the standardized PREP pipeline, you don't need to specify this field.  </p>
 
 <p><strong><code>channelLocations</code></strong><br>
 A structure containing the channel locations in EEGLAB <code>chanlocs</code> format. By default, PREP uses the <code>signal.chanlocs</code>
@@ -361,16 +358,10 @@ Z-score cutoff for robust channel deviation. If a channel has a robust deviation
 PREP considers the channel to be bad in that window. By default, PREP uses 5. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>highFrequencyNoiseThreshold</code></strong><br>
-Z-score cutoff for SNR (signal above 50 Hz). If a channel has a z-score of ratio above 50 Hz to below 50 Hz,
-PREP considers the channel to be bad in that window. By default, PREP uses 5. Usually you don't have to specify this parameter.  </p>
-
-<p><strong><code>highFrequencyNoiseThreshold</code></strong><br>
-Z-score cutoff for SNR (signal above 50 Hz). If a channel has a z-score of ratio above 50 Hz to below 50 Hz,
-PREP considers the channel to be bad in that window. By default, PREP uses 5. Usually you don't have to specify this parameter.  </p>
+Z-score cutoff for SNR (signal above 50 Hz). If a channel has a z-score of the ratio of signal above 50 Hz to that below 50 Hz, PREP considers the channel to be bad in that window. By default, PREP uses 5. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>correlationWindowSeconds</code></strong><br>
-Window size in seconds for computing correlations and other window values. By default, PREP uses 1. 
-Usually you don't have to specify this parameter.  </p>
+Window size in seconds for computing correlations and other window values. By default, PREP uses 1. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>correlationWindowSeconds</code></strong><br>
 Max correlation absolute threshold for channel being bad in a window. In each window, PREP computes the
