@@ -148,20 +148,21 @@ allows you to defer the final choice of high pass cutoff for downstream processi
 <p>The <code>removeTrend</code> function takes two structures in and produces two output structures. The <code>signal</code> structure
 includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The <code>.data</code> field should be channels x frames. </p>
 
-<p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.  </p>
+<p>As with all functions in the pipeline, the algorithm parameters are passed in a structure:  </p>
 
 <blockquote>
-<p><code>[signal, detrendOut] = removeTrend(signal, detrendIn)</code><br>
-<code>[signal, detrendOut] = removeTrend(signal)</code>  </p>
+<p><code>[signal, detrendOut] = removeTrend(signal)</code><br>
+<code>[signal, detrendOut] = removeTrend(signal, detrendIn)</code>  </p>
 </blockquote>
 
 <p>The output structure contains all of the input structure fields plus additional fields including a string representation
-of the actual command used.</p>
+of the actual command used. Usually, the only field that a user might need to provide is <code>lineNoiseChannels</code> if the <code>signal</code> structure contains extra channels that represent items other than EEG signals. Users also need to provide a rough guess of the line frequencies that might be present. By default, PREP uses multiples of 60 Hz. If the dataset was recorded in a place where 50 Hz alternating current is used, users will need to provide the <code>lineFrequencies</code> parameter. Sometimes unusual frequencies appear due to aliasing and other recording artifacts. For example, a frequency spike at 212 Hz might appear as an aliasing artifact in a signal recorded at 512 Hz (212 = 512 - 300).   </p>
 
 <p><strong>Example:</strong>  </p>
 
 <blockquote>
-<p><code>lineNoiseIn = struct('lineNoiseChannels', [1:32, 40:60], 'lineFrequencies', [60, 120, 180, 212, 240]);</code>  </p>
+<p><code>lineNoiseIn = struct('lineNoiseChannels', [1:32, 40:60], ...  
+                      'lineFrequencies', [60, 120, 180, 212, 240]);</code>  </p>
 </blockquote>
 
 <h3>
