@@ -44,7 +44,7 @@ end
     [sessionFolder, sessionName, sessionExt] = fileparts(sessionFilePath);
     summaryReportLocation = [summaryFolder filesep summaryName summaryExt];
     sessionReportLocation = [sessionFolder filesep sessionName sessionExt];
-    tempReportLocation = [sessionFolder 'prepPipelineReport.pdf'];
+    tempReportLocation = [sessionFolder filesep 'prepPipelineReport.pdf'];
     relativeReportLocation = getRelativePath(summaryFolder, sessionFolder, ...
         sessionName, sessionExt);
     fprintf('Summary: %s   session: %s\n', summaryFolder, sessionFolder);
