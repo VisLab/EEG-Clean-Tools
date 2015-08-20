@@ -243,8 +243,7 @@ for the exact value of the maximum amplitude frequency peak near the specified f
 By default, PREP uses 2 Hz. You should not have to override this parameter.  </p>
 
 <p><strong><code>taperBandWidth</code></strong><br>
-Bandwidth in Hz for the Sleppian tapers used to estimate the spectrum. By default, PREP
-uses 2 Hz. You should not have to override this parameter.  </p>
+Bandwidth in Hz for the Sleppian tapers used to estimate the spectrum. By default, PREP uses 2 Hz. You should not have to override this parameter.  </p>
 
 <p><strong><code>taperWindowSize</code></strong><br>
 Taper sliding window length in seconds. By default, PREP uses 4 seconds. You should not have to override this parameter.  </p>
@@ -256,9 +255,7 @@ Taper sliding window step length in seconds. By default, PREP uses 1 second. You
 The window overlap smoothing factor used in the exponent of the signmoidal smoothing functions. This sigmoidal smoothing function is used to patch results from sliding windows back together. By default, PREP uses a value of 100. You should not have to override this parameter.  </p>
 
 <p><strong><code>pad</code></strong><br>
-Padding factor for FFTs (-1= no padding, 0 = pad to next power of 2, 1 = pad to power of two after, etc.).
-By default, PREP uses a pad factor of 0. A larger positive value gives better spectral results, but requires
-much greater computation time. Using a pad value of -1 is not recommended. You should not have to override this parameter.  </p>
+Padding factor for FFTs (-1= no padding, 0 = pad to next power of 2, 1 = pad to power of two after, etc.). By default, PREP uses a pad factor of 0. A larger positive value gives better spectral results, but requires much greater computation time. Using a pad value of -1 is not recommended. You should not have to override this parameter.  </p>
 
 <p><strong><code>fPassBand</code></strong><br>
 The frequency band (in units of Hz) used to compute the spectral background. By default, PREP
@@ -363,42 +360,26 @@ Z-score cutoff for SNR (signal above 50 Hz). If a channel has a z-score of the r
 <p><strong><code>correlationWindowSeconds</code></strong><br>
 Window size in seconds for computing correlations and other window values. By default, PREP uses 1. Usually you don't have to specify this parameter.  </p>
 
-<p><strong><code>correlationWindowSeconds</code></strong><br>
-Max correlation absolute threshold for channel being bad in a window. In each window, PREP computes the
-maximum of the absolute value of the correlation with other channels and compares to this threshold. If
-the correlation falls below this threshold, PREP considers the channel to be bad-by-correlation in this window.
-PREP also uses this window size to evaluate windowed absolute deviation and SNR.
-By default, PREP uses 0.4. Usually you don't have to specify this parameter.  </p>
+<p><strong><code>correlationThreshold</code></strong><br>
+Max correlation absolute threshold for channel being bad in a window. In each window, PREP computes the maximum of the absolute value of the correlation with other channels and compares to this threshold. If the correlation falls below this threshold, PREP considers the channel to be bad-by-correlation in this window. PREP also uses this window size to evaluate windowed absolute deviation and SNR. By default, PREP uses 0.4. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>badTimeThreshold</code></strong><br>
-Threshold fraction of bad correlation windows for designating a channel to be bad.
-By default, PREP uses 0.01. Usually you don't have to specify this parameter.  </p>
+Threshold fraction of bad correlation windows for designating a channel to be bad-by-correlation. By default, PREP uses 0.01. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>ransacOff</code></strong><br>
-If true, RANSAC is not used for bad channel detection (useful for small headsets).
-By default, PREP uses false. Usually you don't have to specify this parameter.  </p>
+If true, RANSAC is not used for bad channel detection (useful for small headsets). By default, PREP uses false. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>ransacSampleSize</code></strong><br>
-Number of random matrices sampled to estimate RANSAC. By default, PREP uses 50 sample matrices. 
-Usually you don't have to specify this parameter.  </p>
+Number of random matrices sampled to estimate RANSAC. By default, PREP uses 50 sample matrices. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>ransacChannelFraction</code></strong><br>
-Fraction of evaluation channels RANSAC uses to predict a channel. By default, PREP uses 0.25 of the
-evaluation channels. Usually you don't have to specify this parameter.  </p>
+Fraction of evaluation channels RANSAC uses to predict a channel. By default, PREP uses 0.25 of the evaluation channels. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>ransacCorrelationThreshold</code></strong><br>
-Cutoff correlation for unpredictability by neighbors. If the correlation of the channel with
-its RANSAC prediction in a window falls below this threshold, the channel is designated as 
-bad-by-RANSAC in this window. By default, PREP uses 0.75. Usually you don't have to specify this parameter.  </p>
+Cutoff correlation for unpredictability by neighbors. If the absolute correlation of the channel with its RANSAC prediction in a window falls below this threshold, the channel is designated as bad in this window. By default, PREP uses 0.75. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>ransacUnbrokenTime</code></strong><br>
-Threshold fraction of windows that a channel must be bad-by-RANSAC before it is designated as a
-channel that is bad-by-RANSAC. By default, PREP uses 0.4. Usually you don't have to specify this parameter.  </p>
-
-<p><strong><code>ransacCorrelationThreshold</code></strong><br>
-Cutoff correlation for unpredictability by neighbors. If the correlation of the channel with
-its RANSAC prediction in a window falls below this threshold, the channel is designated as 
-bad-by-RANSAC in this window. By default, PREP uses 0.75. Usually you don't have to specify this parameter.  </p>
+Threshold fraction of windows that a channel must be bad before it is designated as a channel that is bad-by-RANSAC. By default, PREP uses 0.4. Usually you don't have to specify this parameter.  </p>
 
 <p><strong><code>ransacWindowSeconds</code></strong><br>
 Size of windows in seconds over which to compute RANSAC predictions. By default, PREP uses 5. Usually you don't have to specify this parameter.  </p>
@@ -408,15 +389,14 @@ Maximum number of iterations in the reference-bad channel detection-interpolatio
 By default, PREP uses 4. If the actual iterations is 4, you may need to increase this or look carefully at your data set.  </p>
 
 <p><strong><code>reportingLevel</code></strong><br>
-How much information to store about referencing in the EEG structure. By default, PREP uses 'verbose', which causes
-the data structure to contain all of the window information for later processing and reporting. If you use
-'minimum', you will not be able to run the PREP reports.  Alternatively, you can choose to clean up the data structure
+How much information to store about referencing in the EEG structure. By default, PREP uses <code>'verbose'</code>, which causes
+the data structure to contain all of the window information for later processing and reporting. If you use <code>'minimum'</code>, you will not be able to run the PREP reports.  Alternatively, you can choose to clean up the data structure
 after running the reports.  </p>
 
 <h2>
 <a id="reporting" class="anchor" href="#reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reporting</h2>
 
-<p>PREP has an extensive report facility that can be used provided that your reporting level was 'verbose'.</p>
+<p>PREP has an extensive report facility that can be used provided that your reporting level was <code>'verbose'</code>.</p>
 
 <h3>
 <a id="calling-sequence-for-reporting" class="anchor" href="#calling-sequence-for-reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for reporting</h3>
