@@ -18,7 +18,7 @@ handleLastIndex(num(length(num)), incrementStart);
         if ~incrementStart
             str = [str num2str(previous)];
         end
-        str = [str ',' num2str(current)];
+        str = [str ' ' num2str(current)];
         incrementStart = true;
     end % handleNonSequence
 
