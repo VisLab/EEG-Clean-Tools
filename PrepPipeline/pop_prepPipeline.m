@@ -67,13 +67,13 @@ if nargin < 2
     [params, okay] = MasterGUI([],[],userData, EEG);
     if okay
         com = createComStr(params);
-        [reportMode, publishOn, sFold, sname, rFold, rname] = ...
+        [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
             getReportArguments(params, userData);
     end
 else
     com = createComStr(params);
     okay = true;
-    [reportMode, publishOn, sFold, sname, rFold, rname] = ...
+    [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
         getUserDataReport(userData);
 end
 
@@ -82,7 +82,7 @@ if okay
         EEG = prepPipeline(EEG, params);
     end
     if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'reportOnly')
-        publishReport(publishOn, sFold, sname, rFold, rname);
+        publishReport(summaryFilePath, sessionFilePath, publishOn);
     end
 end
 
@@ -96,7 +96,7 @@ end
 %     if keepFiltered
 %         EEG = removeTrend(EEG, EEG.referenceOut);
 %     end
-%  
+%
 % end
 
     function com = createComStr(params)
@@ -117,14 +117,14 @@ end
 %         end
 %     end % getPostProcessArguments
 
-    function [reportMode, publishOn, sFold, sname, rFold, rname] = ...
+    function [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
             getReportArguments(params, userData)
         % Gets the report argument values
         if ~isempty(params) && isfield(params, 'publishOn')
-            [reportMode, publishOn, sFold, sname, rFold, rname] = ...
+            [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
                 getParamReport(params);
         else
-            [reportMode, publishOn, sFold, sname, rFold, rname] = ...
+            [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
                 getUserDataReport(userData);
         end
     end % getReportArguments
@@ -137,15 +137,13 @@ end
 %         removeInterChan = params.removeInterChan;
 %     end % getParamPostProcess
 
-    function [reportMode, publishOn, sFold, sName, rFold, rName] = ...
+    function [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
             getParamReport(params)
         % Gets the report argument values from the user parameters
         reportMode = params.reportMode;
         publishOn = params.publishOn;
-        sFold = params.summaryFolder;
-        sName = params.summaryName;
-        rFold = params.reportFolder;
-        rName = params.reportName;
+        summaryFilePath = [params.summaryFolder params.summaryName];
+        sessionFilePath = [params.reportFolder params.reportName];
     end % getParamReport
 
 %     function [cleanUpReference, keepFiltered, removeInterChan] = ...
@@ -156,23 +154,21 @@ end
 %         removeInterChan = userData.postProcess.removeInterChan.value;
 %     end % getUserDataPostProcess
 
-    function [reportMode, publishOn, sFold, sName, rFold, rName] = ...
+    function [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
             getUserDataReport(userData)
         % Gets the report argument values from the default user data
         reportMode = userData.report.reportMode.value;
         publishOn = userData.report.publishOn.value;
-        sFold = userData.report.summaryFolder.value;
-        sName = userData.report.summaryName.value;
-        rFold = userData.report.reportFolder.value;
-        rName = userData.report.reportName.value;
+        summaryFilePath = [userData.report.summaryFolder.value userData.report.summaryName.value];
+        sessionFilePath = [userData.report.reportFolder.value userData.report.reportName.value];
     end % getUserDataReport
 
-    function publishReport(publishOn, sFold, sName, rFold, rName)
+    function publishReport(summaryFilePath, sessionFilePath, publishOn)
         % If publishOn is true, then publish the report
         if publishOn
             consoleFID = 1;
-            publishPrepReport(EEG, sFold, sName, ...
-                rFold, rName, consoleFID, publishOn);
+            publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
+                consoleFID, publishOn);
         end
     end % publishReport
 
