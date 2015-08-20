@@ -1,5 +1,5 @@
-function [] = publishPrepReport(EEG, summaryFolder, summaryName, ...
-                 sessionFolder, sessionName, consoleFID, publishOn)
+function [] = publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
+                                consoleFID, publishOn)
 % Create a published report from the PREP pipeline.
 %
 % Note: In addition to creating a report for the EEG, it appends a 
@@ -40,13 +40,13 @@ end
 
 %% Setup up files and assign variables needed for publish in base workspace
 % Session folder is relative to the summary report location
-
-    summaryFolder = getCanonicalPath(summaryFolder);
-    sessionFolder = getCanonicalPath(sessionFolder);
-    summaryReportLocation = [summaryFolder summaryName];
-    sessionReportLocation = [sessionFolder sessionName];
+    [summaryFolder, summaryName, summaryExt] = fileparts(summaryFilePath);
+    [sessionFolder, sessionName, sessionExt] = fileparts(sessionFilePath);
+    summaryReportLocation = [summaryFolder filesep summaryName summaryExt];
+    sessionReportLocation = [sessionFolder filesep sessionName sessionExt];
     tempReportLocation = [sessionFolder 'prepPipelineReport.pdf'];
-    relativeReportLocation = getRelativePath(summaryFolder, sessionFolder, sessionName);
+    relativeReportLocation = getRelativePath(summaryFolder, sessionFolder, ...
+        sessionName, sessionExt);
     fprintf('Summary: %s   session: %s\n', summaryFolder, sessionFolder);
     fprintf('Relative report location %s \n', relativeReportLocation);
     summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
@@ -78,8 +78,10 @@ end
     end
 end
 
-function relativePath = getRelativePath(summaryFolder, sessionFolder, sessionName)
-      relativePath = relativize(summaryFolder, sessionFolder);
+function relativePath = getRelativePath(summaryFolder, sessionFolder, ...
+                        sessionName, sessionExt)
+      relativePath = relativize(getCanonicalPath(summaryFolder), ...
+                               getCanonicalPath(sessionFolder));
       relativePath = getCanonicalPath(relativePath);
       while(true)
          relativePathNew = strrep(relativePath, '\\', '\');
@@ -89,7 +91,7 @@ function relativePath = getRelativePath(summaryFolder, sessionFolder, sessionNam
          relativePath = relativePathNew;
       end
       relativePath = strrep(relativePath, '\', '/');
-      relativePath = [relativePath sessionName];
+      relativePath = [relativePath sessionName sessionExt];
 end
 
 function canonicalPath = getCanonicalPath(canonicalPath)

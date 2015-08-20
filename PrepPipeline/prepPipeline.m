@@ -121,12 +121,7 @@ end
 fprintf('Find reference\n');
 try
     tic
-    defaults = getPipelineDefaults(EEG, 'postprocess');
-    [postProcessOut, ~] = checkDefaults(params, struct(), defaults);
     [EEG, referenceOut] = performReference(EEG, params);
-    if postProcessOut.keepFiltered
-        EEG = removeTrend(EEG, referenceOut);
-    end
     EEG.etc.noiseDetection.reference = referenceOut;
     computationTimes.reference = toc;
 catch mex
@@ -138,21 +133,36 @@ catch mex
     return;
 end
 
-% %% Part I: Resampling
-% fprintf('Resampling\n');
-% try
-%     tic
-%     [EEG, resampling] = resampleEEG(EEG, params);
-%     EEG.etc.noiseDetection.resampling = resampling;
-%     computationTimes.resampling = toc;
-% catch mex
-%     errorMessages.resampling = ...
-%         ['prepPipeline failed resampleEEG: ' getReport(mex)];
-%     errorMessages.status = 'unprocessed';
-%     EEG.etc.noiseDetection.errors = errorMessages;
-%     return;
-% end
-
+%% Part V: Post process
+fprintf('Post-process\n')
+try
+    defaults = getPipelineDefaults(EEG, 'postprocess');
+    postProcessOut = checkDefaults(params, struct(), defaults);
+    if postProcessOut.keepFiltered
+        EEG = removeTrend(EEG, EEG.referenceOut);
+    end
+    if postProcessOut.removeInterpolatedChannels
+        interpolatedChannels = ...
+            EEG.etc.noiseDetection.reference.interpolatedChannels.all;
+        if ~isempty(interpolatedChannels)
+             EEG = pop_chanedit(EEG, 'delete', interpolatedChannels);
+        end
+        postProcessOut.interpolatedChannels = interpolatedChannels;
+    end
+    if postProcessOut.cleanupReference
+        reference = EEG.etc.noiseDetection.reference;
+        reference = cleanupReference(reference);
+        EEG.etc.noiseDetection.reference = reference;
+    end
+    EEG.etc.noiseDetection.postProcess = postProcessOut;
+catch mex
+    errorMessages.reference = ...
+        ['prepPipeline failed postProcess: ' ...
+        getReport(mex, 'basic', 'hyperlinks', 'off')];
+    errorMessages.status = 'unprocessed';
+    EEG.etc.noiseDetection.errors = errorMessages;
+    return;
+end
 
 %% Report that there were no errors
 EEG.etc.noiseDetection.errors = errorMessages;
