@@ -33,6 +33,7 @@
 
 function [EEG, com] = pop_prepPipeline(EEG, params)
 com = ''; % Return something if user presses the cancel button
+okay = true;
 if nargin < 1  %% display help if not enough arguments
     help pop_prepPipeline;
     return;
@@ -47,35 +48,19 @@ if isempty(tmp)
     addpath(genpath(myPath));
 end;
 
-%% Set up the default userData
-userData = struct('boundary', [], 'detrend', [], ...
-    'lineNoise', [], 'reference', [], ...
-    'report', [],  'postProcess', []);
-stepNames = fieldnames(userData);
-for k = 1:length(stepNames)
-    defaults = getPipelineDefaults(EEG, stepNames{k});
-    [theseValues, errors] = checkStructureDefaults(params, defaults);
-    if ~isempty(errors)
-        error('pop_prepPipeline:BadParameters', ['|' ...
-            sprintf('%s|', errors{:})]);
-    end
-    userData.(stepNames{k}) = theseValues;
-end
-
 %% pop up window
 if nargin < 2
+    userData = getUserData();
     [params, okay] = MasterGUI([],[],userData, EEG);
-    if okay
-        com = createComStr(params);
-        [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
-            getReportArguments(params, userData);
-    end
-else
-    com = createComStr(params);
-    okay = true;
-    [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
-        getUserDataReport(userData);
 end
+userData = getUserData();
+com = createComStr(params);
+reportMode = userData.report.reportMode.value;
+publishOn = userData.report.publishOn.value;
+summaryFilePath = [userData.report.summaryFolder.value ...
+    userData.report.summaryName.value];
+sessionFilePath = [userData.report.reportFolder.value ...
+    userData.report.reportName.value];
 
 if okay
     if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'skipReport')
@@ -89,82 +74,28 @@ if okay
     end
 end
 
-%%---JEREMY --- need to get postprocessing arguments here. Then I can write
-% The parameters are:
-%  removeInterpolationChannels, cleanUpReference, keepFiltering
-% %%---Professor Robbins--- here are the parameters
-% if okay
-%    [cleanUpReference, keepFiltered, removeInterpolatedChannels] = ...
-%         getPostProcessArguments(params, userData);
-%     if keepFiltered
-%         EEG = removeTrend(EEG, EEG.referenceOut);
-%     end
-%
-% end
-
-    function com = createComStr(params)
+    function com = createComStr()
         % Creates a command string based on the parameters passed in
         paramStr = struct2str(params);
         com = sprintf('pop_prepPipeline(%s, %s);', inputname(1), paramStr);
     end % createParamStr
 
-%     function [cleanUpReference, keepFiltered, removeInterChan] = ...
-%             getPostProcessArguments(params, userData)
-%         % Gets the post process argument values
-%         if ~isempty(params) && isfield(params, 'keepFiltered')
-%             [cleanUpReference, keepFiltered, removeInterChan] = ...
-%                 getParamPostProcess(params);
-%         else
-%             [cleanUpReference, keepFiltered, removeInterChan] = ...
-%                 getUserDataPostProcess(userData);
-%         end
-%     end % getPostProcessArguments
-
-    function [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
-            getReportArguments(params, userData)
-        % Gets the report argument values
-        if ~isempty(params) && isfield(params, 'publishOn')
-            [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
-                getParamReport(params);
-        else
-            [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
-                getUserDataReport(userData);
+    function userData = getUserData()
+        %% Gets the userData defaults and merges it with the parameters
+        userData = struct('boundary', [], 'detrend', [], ...
+            'lineNoise', [], 'reference', [], ...
+            'report', [],  'postProcess', []);
+        stepNames = fieldnames(userData);
+        for k = 1:length(stepNames)
+            defaults = getPipelineDefaults(EEG, stepNames{k});
+            [theseValues, errors] = checkStructureDefaults(params, defaults);
+            if ~isempty(errors)
+                error('pop_prepPipeline:BadParameters', ['|' ...
+                    sprintf('%s|', errors{:})]);
+            end
+            userData.(stepNames{k}) = theseValues;
         end
-    end % getReportArguments
-
-%     function [cleanUpReference, keepFiltered, removeInterChan] = ...
-%             getParamPostProcess(params)
-%         % Gets the post process argument values from the user parameters
-%         cleanUpReference = params.cleanUpReference;
-%         keepFiltered = params.keepFiltered;
-%         removeInterChan = params.removeInterChan;
-%     end % getParamPostProcess
-
-    function [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
-            getParamReport(params)
-        % Gets the report argument values from the user parameters
-        reportMode = params.reportMode;
-        publishOn = params.publishOn;
-        summaryFilePath = [params.summaryFolder params.summaryName];
-        sessionFilePath = [params.reportFolder params.reportName];
-    end % getParamReport
-
-%     function [cleanUpReference, keepFiltered, removeInterChan] = ...
-%             getUserDataPostProcess(userData)
-%         % Gets the post process argument values from the default user data
-%         cleanUpReference = userData.postProcess.cleanUpReference.value;
-%         keepFiltered = userData.postProcess.keepFiltered.value;
-%         removeInterChan = userData.postProcess.removeInterChan.value;
-%     end % getUserDataPostProcess
-
-    function [reportMode, publishOn, summaryFilePath, sessionFilePath] = ...
-            getUserDataReport(userData)
-        % Gets the report argument values from the default user data
-        reportMode = userData.report.reportMode.value;
-        publishOn = userData.report.publishOn.value;
-        summaryFilePath = [userData.report.summaryFolder.value userData.report.summaryName.value];
-        sessionFilePath = [userData.report.reportFolder.value userData.report.reportName.value];
-    end % getUserDataReport
+    end  % getUserData
 
     function publishReport(summaryFilePath, sessionFilePath, publishOn)
         % If publishOn is true, then publish the report
