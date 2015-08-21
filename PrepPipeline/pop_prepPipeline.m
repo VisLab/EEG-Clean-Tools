@@ -84,6 +84,9 @@ if okay
     if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'reportOnly')
         publishReport(summaryFilePath, sessionFilePath, publishOn);
     end
+    if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'skipReport')
+        EEG = prepPostProcess(EEG, params);
+    end
 end
 
 %%---JEREMY --- need to get postprocessing arguments here. Then I can write
