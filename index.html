@@ -197,7 +197,7 @@ By default, PREP uses 0.02 seconds. This parameter is not used unless the <code>
 <h3>
 <a id="calling-sequence-for-line-noise-removal" class="anchor" href="#calling-sequence-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for line noise removal</h3>
 
-<p>The <code>cleanLineNoise</code> function takes two structures in and produces two output structures. The signal structure
+<p>The <code>cleanLineNoise</code> function takes two structures in and produces two output structures. The <code>signal</code> structure
 includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. </p>
 
 <p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.  </p>
@@ -318,7 +318,7 @@ estimates in the RANSAC algorithm. Often the reference channels and the evaluati
 compute the robust reference.  </p>
 
 <p><strong><code>referenceType</code></strong><br>
-The type of reference to be performed. By default, PREP uses <code>'robust'</code>, which computes an average reference with
+The type of reference to be performed. By default, PREP uses `<code>robust'</code>, which computes an average reference with
 iterative detection and interpolation of bad channels.  Other options include <code>'average'</code>, <code>'specific'</code>, and <code>'none'</code>.
 The <code>'average'</code> type removes the average of the reference channels with no interpolation, while <code>'specific'</code> removes
 the average of the specified channels with no interpolation. If you mean to run the standardized PREP pipeline,
@@ -396,7 +396,7 @@ after running the reports.  </p>
 <h2>
 <a id="reporting" class="anchor" href="#reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reporting</h2>
 
-<p>PREP has an extensive report facility that can be used provided that your reporting level was <code>'verbose'</code>.</p>
+<p>PREP has an extensive report facility that can be used provided that your reporting level was <code>'verbose'</code>. The GUI version of the PREP pipeline (<code>pop_prepPipeline'</code>) has options in the report GUI for you to select whether or not to run the report. If the report mode is <code>'normal'</code> (the default), then PREP runs the processing pipeline followed by the report, followed by the post processing. If the report mode is <code>'skip'</code>, then PREP runs the processing pipeline followed by the post processing. If the report mode is <code>'reportOnly'</code>, then PREP only runs the report and skips both the processing and the post processing.  </p>
 
 <h3>
 <a id="calling-sequence-for-reporting" class="anchor" href="#calling-sequence-for-reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for reporting</h3>
@@ -407,56 +407,36 @@ report level of verbose. You need to furnish a summary directory name and a summ
 <p>As with all functions in the pipeline, the algorithm parameters are passed in a structure.  </p>
 
 <blockquote>
-<p><code>publishPrepReport(EEG, summaryFolder, summaryName, sessionFolder, sessionName, consoleFID, publishOn)</code>  </p>
+<p><code>publishPrepReport(signal, summaryFilePath, sessionFilePath, consoleFID, publishOn);</code>  </p>
 </blockquote>
 
 <p>The output structure contains all of the input structure fields plus additional fields including a string representation
 of the actual command used.</p>
 
-<p><strong>Example:</strong>  </p>
+<p><strong>Example:</strong><br>
+The following produces an HTML-formatted summary report in the current directory and publishes a detailed report in the s1 sub directory.  </p>
 
 <blockquote>
-<p><code>publishPrepReport(EEG, '.', summaryName, sessionFolder, sessionName, consoleFID, publishOn);</code>  </p>
+<p><code>publishPrepReport(EEG, 'vepSummary.html', '.\s1\vep01.pdf', 1, true);</code>  </p>
 </blockquote>
 
 <h3>
 <a id="parameters-for-reporting" class="anchor" href="#parameters-for-reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for reporting</h3>
 
-<p>The following parameters appear in the publishReports:  </p>
+<p><strong><code>signal</code></strong><br>
+The <code>signal</code> structure includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. In order to get reports, the EEG structure must have the <code>.etc.noiseDetection</code> as PREP generates the report from information stored there.  </p>
 
-<p><strong>reportMode`</strong><br>
-Indicates whether reporting should be run. If the mode is 'normal' (the default), then PREP</p>
+<p><strong><code>summaryFilePath</code></strong><br>
+The file name for the HTML summary file that PREP produces for the report. The name should include path information when needed. If <code>publishOn</code> is <code>false</code>, PREP writes the summary information to the file indicated by <code>consoleFID</code>.</p>
+
+<p><strong><code>sessionFilePath</code></strong><br>
+The file name for the detailed PDF report that PREP produces. The name should include path information when needed. If <code>publishOn</code> is <code>false</code>, PREP doesn't produce a report.  </p>
+
+<p><strong><code>consoleFID</code></strong><br>
+An open file descriptor for writing reporting information. Usually, this is 1, indicating that output should be directed to the command window. Give an open file descriptor to another file to record the report in a log.  </p>
 
 <p><strong><code>PublishOn</code></strong><br>
-If true (the default) PREP produces a published PDF Report
-By default, PREP uses all of the channels (<code>1:size(signal.data, 1)</code>). 
-If your signal has extraneous or unused channels, you should specify which channels to use.<br>
-<strong><code>maxReferenceIterations</code></strong><br>
-Maximum number of iterations in the reference-bad channel detection-interpolation cycle. 
-By default, PREP uses 4. If the actual iterations is 4, you may need to increase this or look carefully at your data set.  </p>
-
-<p>%        case 'reports'
-%              [~, EEGbase] = fileparts(signal.filename);
-%              defaults = struct( ...
-%                 '<strong><code>maxReferenceIterations</code></strong><br>
-Maximum number of iterations in the reference-bad channel detection-interpolation cycle. 
-By default, PREP uses 4. If the actual iterations is 4, you may need to increase this or look carefully at your data set.<br>
-', ...
-%                    getRules(true, {'logical'}, {}, ...
-%                    'If true, use MATLAB publish to publish the results.'), ...
-%                'summaryName', ...
-%                   getRules([EEGbase 'Summary.html'], {'char'}, {}, ...
-%                    'File name for html summary file.'), ...
-%                 'summaryFolder', ...
-%                   getRules(['.' filesep], {'char'}, {}, ...
-%                    'Folder for html summary file.'), ...
-%                'reportName', ...
-%                   getRules([EEGbase 'Report.pdf'], {'char'}, {}, ...
-%                    'File name for html summary file.'), ...
-%                'reportFolder', ...
-%                   getRules(['.' filesep], {'char'}, {}, ...
-%                    'Folder for html summary file.') ...
-%                ); </p>
+If <code>true</code> (the default) PREP produces a published PDF Report and an HTML summary. If <code>false</code>, the PREP runs reporting, but keeps the figures displayed and outputs the reporting information to the command window. This mode is useful for closer examination of the figures.  </p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/VisLab/EEG-Clean-Tools">PREP Pipeline: EEG-Clean-Tools</a> is maintained by <a href="https://github.com/VisLab">VisLab</a>.</span>
