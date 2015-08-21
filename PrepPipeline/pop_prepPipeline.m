@@ -54,31 +54,27 @@ if nargin < 2
     [params, okay] = MasterGUI([],[],userData, EEG);
 end
 userData = getUserData();
-com = createComStr(params);
+com = sprintf('pop_prepPipeline(%s, %s);', inputname(1), ...
+    struct2str(params));
 reportMode = userData.report.reportMode.value;
+consoleFID = userData.report.consoleFID.value;
 publishOn = userData.report.publishOn.value;
-summaryFilePath = [userData.report.summaryFolder.value ...
-    userData.report.summaryName.value];
-sessionFilePath = [userData.report.reportFolder.value ...
-    userData.report.reportName.value];
+summaryFilePath = userData.report.summaryFilePath.value;
+sessionFilePath = userData.report.sessionFilePath.value;
 
 if okay
     if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'skipReport')
         EEG = prepPipeline(EEG, params);
     end
-    if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'reportOnly')
-        publishReport(summaryFilePath, sessionFilePath, publishOn);
+    if strcmpi(reportMode, 'normal') || ...
+            strcmpi(reportMode, 'reportOnly') && publishOn
+        publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
+            consoleFID, publishOn);
     end
     if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'skipReport')
         EEG = prepPostProcess(EEG, params);
     end
 end
-
-    function com = createComStr()
-        % Creates a command string based on the parameters passed in
-        paramStr = struct2str(params);
-        com = sprintf('pop_prepPipeline(%s, %s);', inputname(1), paramStr);
-    end % createParamStr
 
     function userData = getUserData()
         %% Gets the userData defaults and merges it with the parameters
@@ -88,7 +84,8 @@ end
         stepNames = fieldnames(userData);
         for k = 1:length(stepNames)
             defaults = getPipelineDefaults(EEG, stepNames{k});
-            [theseValues, errors] = checkStructureDefaults(params, defaults);
+            [theseValues, errors] = checkStructureDefaults(params, ...
+                defaults);
             if ~isempty(errors)
                 error('pop_prepPipeline:BadParameters', ['|' ...
                     sprintf('%s|', errors{:})]);
@@ -96,14 +93,5 @@ end
             userData.(stepNames{k}) = theseValues;
         end
     end  % getUserData
-
-    function publishReport(summaryFilePath, sessionFilePath, publishOn)
-        % If publishOn is true, then publish the report
-        if publishOn
-            consoleFID = 1;
-            publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
-                consoleFID, publishOn);
-        end
-    end % publishReport
 
 end % pop_prepPipeline
