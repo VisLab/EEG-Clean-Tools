@@ -1,7 +1,7 @@
 function [paramsOut] = referenceGUI(hObject, callbackdata, inputData)%#ok<INUSL>
 title = 'Reference parameters';
 defaultStruct = inputData.userData.reference;
-referenceTypeMenu = {'Robust'; 'Average'; 'Specific'};
+referenceTypeMenu = {'Robust'; 'Average'; 'Specific'; 'None'};
 reportingLevelMenu = {'Minimum'; 'Verbose'};
 meanEstimateTypeMenu = {'Huber'; 'Median'; 'Mean'; 'None'};
 interpolationOrderMenu = {'Post-reference'; 'Pre-reference'; 'None'};

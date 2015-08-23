@@ -17,8 +17,10 @@ function [EEG, computationTimes] = prepPipeline(EEG, params)
 %     lineFrequencies        A list of line frequencies to be removed
 %                            [default: 60, 120, 180, 240]
 %  
-% Prep allows many other parameters to be over-ridden, but is meant to
-% be used in a fully automated fashion.
+% Prep allows many other parameters to be overridden, but is meant to
+% be used in a fully automated fashion. For a full listing of the 
+% defaults for each step in the pipeline, execute:
+%     showPrepDefaults(EEG).
 %
 % Output parameters:
 %   EEG                      An EEGLAB structure with the data processed
