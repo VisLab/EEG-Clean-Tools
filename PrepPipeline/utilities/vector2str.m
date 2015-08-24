@@ -1,40 +1,40 @@
-function str = num2IncStr(num)
-% Converts a number to string with colon operators
+function str = vector2str(num)
+% Converts a vector to string with colon operators
 str = num2str(num(1));
 incrementStart = true;
 for a = 2:length(num)
     if num(a) - num(a-1) == 1
-        incrementStart = handleSequence(incrementStart);
+        incrementStart = handleConsecutive(incrementStart);
     else
-        incrementStart = handleNonSequence(num(a-1), num(a), ...
+        incrementStart = handleNonConsecutive(num(a-1), num(a), ...
             incrementStart);
     end
 end
 handleLastIndex(num(length(num)), incrementStart);
 
-    function incrementStart = handleNonSequence(previous, current, ...
+    function incrementStart = handleNonConsecutive(previous, current, ...
             incrementStart)
-        % Handles a number that is not in a sequence
+        % Handles a number that is not a consecutive number
         if ~incrementStart
             str = [str num2str(previous)];
         end
         str = [str ' ' num2str(current)];
         incrementStart = true;
-    end % handleNonSequence
+    end % handleNonConsecutive
 
     function handleLastIndex(last, incrementStart)
-        % Handles the last number that is in a sequence or not
+        % Handles the last number in the vecor
         if ~incrementStart
             str = [str num2str(last)];
         end
     end % handleLastIndex
 
-    function incrementStart = handleSequence(incrementStart)
-        % Handles a number that is the start of a sequence
+    function incrementStart = handleConsecutive(incrementStart)
+        % Handles a number that is a consecutive number
         if incrementStart
             str = [str ':'];
             incrementStart = false;
         end
-    end % handleSequence
+    end % handleConsecutive
 
-end % num2IncStr
+end % vector2str
