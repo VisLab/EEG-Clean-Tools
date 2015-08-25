@@ -41,7 +41,7 @@ catch mex
 
 %% Remove interpolated channels if requested
  try
-    interpolatedChannels = EEG.etc.noiseDetection.interpolated.all;
+    interpolatedChannels = EEG.etc.noiseDetection.reference.interpolatedChannels.all;
     if postOut.removeInterpolatedChannels &&~isempty(interpolatedChannels)
       channels = 1:size(EEG.data, 1);
       channels = setdiff(channels, interpolatedChannels);

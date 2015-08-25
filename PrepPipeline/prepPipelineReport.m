@@ -3,8 +3,8 @@
 % Calling directly:
 %      prepPipelineReport
 %
-% This helper reporting script expects that EEG will be in the base workspace
-% with an EEG.etc.noiseDetection structure containing the report. It
+% This helper reporting script expects that EEGReporting will be in the base workspace
+% with an EEGReporting.etc.noiseDetection structure containing the report. It
 % also expects the following variables in the base workspace:
 % 
 % * summaryFile - variable containing the open file descriptor for summary
@@ -22,14 +22,14 @@
 % output.
 %
 %% Write data status and report header
-noiseDetection = EEG.etc.noiseDetection;
+noiseDetection = EEGReporting.etc.noiseDetection;
 if isfield(noiseDetection, 'reference')
     reference = noiseDetection.reference;
 else
     reference = struct();
 end
 summaryHeader = [noiseDetection.name '[' ...
-    num2str(size(EEG.data, 1)) ' channels, ' num2str(size(EEG.data, 2)) ' frames]'];
+    num2str(size(EEGReporting.data, 1)) ' channels, ' num2str(size(EEGReporting.data, 2)) ' frames]'];
 fprintf(consoleFID, '%s\n', summaryHeader);
 summaryHeader = [summaryHeader ' <a href="' relativeReportLocation ...
     '">Report details</a>'];
@@ -43,16 +43,16 @@ fprintf(consoleFID, '%s \n', errorStatus);
 writeSummaryItem(summaryFile, {errorStatus});
 
 % Versions
-versions = EEG.etc.noiseDetection.version;
-versionString = getStructureString(EEG.etc.noiseDetection.version);
+versions = EEGReporting.etc.noiseDetection.version;
+versionString = getStructureString(EEGReporting.etc.noiseDetection.version);
 writeSummaryItem(summaryFile, {['Versions: ' versionString]});
 fprintf(consoleFID, 'Versions:\n%s\n', versionString);
 
 % Events
-srateMsg = ['Sampling rate: ' num2str(EEG.srate) 'Hz'];
+srateMsg = ['Sampling rate: ' num2str(EEGReporting.srate) 'Hz'];
 writeSummaryItem(summaryFile, {srateMsg});
 fprintf(consoleFID, '%s\n', srateMsg);
-[summary, hardFrames] = reportEvents(consoleFID, EEG);
+[summary, hardFrames] = reportEvents(consoleFID, EEGReporting);
 writeSummaryItem(summaryFile, summary);
 
 % Interpolated channels for referencing
@@ -91,12 +91,12 @@ if isfield(noiseDetection, 'lineNoise')
     numChans = min(6, length(lineChannels));
     indexchans = floor(linspace(1, length(lineChannels), numChans));
     displayChannels = lineChannels(indexchans);
-    channelLabels = {EEG.chanlocs(lineChannels).labels};
+    channelLabels = {EEGReporting.chanlocs(lineChannels).labels};
     tString = noiseDetection.name;
     if isfield(noiseDetection, 'detrend') 
-       EEGNew = removeTrend(EEG, noiseDetection.detrend);
+       EEGNew = removeTrend(EEGReporting, noiseDetection.detrend);
     else
-       EEGNew = EEG;
+       EEGNew = EEGReporting;
     end
     [fref, sref, badChannels] = showSpectrum(EEGNew, channelLabels, ...
         lineChannels, displayChannels, tString);
@@ -114,7 +114,7 @@ if isfield(noiseDetection, 'reference') && ~isempty(noiseDetection.reference)
    [summary, noisyStatistics] = reportReference(consoleFID,  ...
                                   noiseDetection, numbersPerRow, indent);
     writeSummaryItem(summaryFile, summary);
-   EEG.etc.noiseDetection.reference.noisyStatistics = noisyStatistics;
+   EEGReporting.etc.noiseDetection.reference.noisyStatistics = noisyStatistics;
 end
 %% Robust channel deviation (referenced)
 if isfield(noiseDetection, 'reference') && ~isempty(noiseDetection.reference) 
@@ -671,7 +671,7 @@ if isfield(noiseDetection, 'reference') && ...
     isfield(reference, 'referenceSignal') && ...
      ~isempty(reference.referenceSignal)
     tString = { noiseDetection.name, 'ordinary - robust average reference signals'};
-    t = (0:length(reference.referenceSignal) - 1)/EEG.srate;
+    t = (0:length(reference.referenceSignal) - 1)/EEGReporting.srate;
     figure('Name', tString{2})
     plot(t, reference.referenceSignalOriginal - reference.referenceSignal, '.k');
     xlabel('Seconds')
@@ -687,7 +687,7 @@ if isfield(noiseDetection, 'reference')
     b = reference.referenceSignalOriginal;
     EEGTemp.pnts = length(a);
     EEGTemp.data = [a(:)'; b(:)'];
-    EEGTemp.srate = EEG.srate;
+    EEGTemp.srate = EEGReporting.srate;
     EEGTemp = pop_eegfiltnew(EEGTemp, noiseDetection.detrend.detrendCutoff, []);
     corrAverage = corr(EEGTemp.data(1, :)', EEGTemp.data(2, :)');
     tString = { noiseDetection.name, ...
@@ -704,10 +704,11 @@ end
 %% Noisy average reference - robust average reference by time
 if isfield(noiseDetection, 'reference') 
     tString = { noiseDetection.name, 'ordinary - robust average reference signals'};
-    t = (0:length(EEGTemp.data(2, :)) - 1)/EEG.srate;
+    t = (0:length(EEGTemp.data(2, :)) - 1)/EEGReporting.srate;
     figure('Name', tString{2})
     plot(t, EEGTemp.data(2, :) - EEGTemp.data(1, :), '.k');
     xlabel('Seconds')
     ylabel('Average - robust');
     title(tString, 'Interpreter', 'None');
 end
+clear EEGReporting summaryFile consoleFID relativeReportLocation;

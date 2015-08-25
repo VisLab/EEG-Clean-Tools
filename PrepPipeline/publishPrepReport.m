@@ -54,7 +54,7 @@ end
         error('publishPrepReport:BadSummaryFile', ...
             'Failed to open summary file %s', summaryReportLocation);
     end
-    assignin('base', 'EEG', EEG);
+    assignin('base', 'EEGReporting', EEG);
     assignin('base', 'summaryFile', summaryFile);
     assignin('base', 'consoleFID', consoleFID);
     assignin('base', 'relativeReportLocation', relativeReportLocation);
