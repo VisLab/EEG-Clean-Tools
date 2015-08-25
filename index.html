@@ -59,6 +59,18 @@ Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  </p>
 <p>You can install PREP as an EEGLAB plugin by unzipping the PREPPipeline directory into the plugins directory of
 your EEGLAB installation. </p>
 
+<h1>
+<a id="using-parallel-processing-with-prep" class="anchor" href="#using-parallel-processing-with-prep" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using parallel processing with PREP</h1>
+
+<p>The PREP pipeline can execute fairly slowly on headsets with a lot of channels. However, many of the steps are embarassingly parallel --- that is the PREP can perform operations separately on individual channels or individual windows.
+If you have the MATLAB Parallel Processing Toolbox, you just need to make sure that it is enabled. The following screenshot
+of the MATLAB IDE shows the Parallel Processing Toolbox icon on the lower left of the status bar at the very bottom of the window.<br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/MATLABWorkspace.png" alt="MATLAB IDE">  </p>
+
+<p>To configure your parallel processing toolbox, you should start the worker pool or set MATLAB to automatically start
+the pool when needed:<br>
+<img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/ParallelProcessing.png" alt="MATLAB Parallel processing">  </p>
+
 <h2>
 <a id="running-the-prep-pipeline-from-eeglab" class="anchor" href="#running-the-prep-pipeline-from-eeglab" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the PREP pipeline from EEGLAB</h2>
 
