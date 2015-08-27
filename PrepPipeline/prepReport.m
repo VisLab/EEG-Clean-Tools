@@ -1,7 +1,7 @@
 %% Visualize the EEG output from the PREP processing pipeline.
 %
 % Calling directly:
-%      prepPipelineReport
+%      prepReport
 %
 % This helper reporting script expects that EEGReporting will be in the base workspace
 % with an EEGReporting.etc.noiseDetection structure containing the report. It
@@ -14,9 +14,9 @@
 %
 % The reporting function appends a summary to the summary report. 
 %
-% Usually the prepPipelineReport script is called through the function:
+% Usually the prepReport script is called through the function:
 %
-%        publishPrepPipelineReport 
+%        publishPrepReport 
 %
 % It is not a function itself, to allow the MATLAB publish to dump a nice
 % output.

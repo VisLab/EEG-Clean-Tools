@@ -28,6 +28,6 @@ for k = 1:length(inNames)
     summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
     relativeReportLocation = [sessionFolder filesep sessionReportName];
     consoleFID = 1;
-    publishPrepPipelineReport(EEG, summaryFolder, summaryReportName, ...
-                      sessionFolder, sessionReportName, true);
+    publishPrepReport(EEG, summaryReportLocation, ...
+        relativeReportLocation, 1,  true);
 end

@@ -23,10 +23,8 @@ for k = 1:2%length(inNames)
     sessionReportName = [inNames{k}(1:(end-4)) '.pdf'];
     fname = [dataDir filesep inNames{k}];
     load(fname, '-mat');
-    sessionFolder = 'O:\ARL_Data\VEP\VEP_TRY\TRy1';
-    %summaryReportLocation = [summaryFolder filesep summaryReportName];
-    %summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
+    session = ['O:\ARL_Data\VEP\VEP_TRY\TRy1' filesep sessionReportName];
     consoleFID = 1;
     publishPrepReport(EEG, summaryFolder, summaryReportName, ...
-                      sessionFolder, sessionReportName, consoleFID, publishOn);
+                      session, consoleFID, publishOn);
 end

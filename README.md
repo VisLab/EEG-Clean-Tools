@@ -142,3 +142,6 @@ Version 0.48 (Not released -- version 0.47 with EEGLAB integration)
   globaltrend
 * Modified the resampling step to allow an option low pass filter to remove
   downsampling artifacts just below Nyquist frequency.
+
+Version 0.50 Released
+* Made several cleanup modifications to ready for release.
