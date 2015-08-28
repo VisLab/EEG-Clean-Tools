@@ -8,33 +8,33 @@ function [] = publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
 % of the collection.
 %
 % Parameters:
-%     EEG           EEGLAB structure with the EEG.etc.noiseDetection
-%                   structure created by the PREP pipeline
-%     summaryFolder Directory where collection summary is stored.
-%     summaryReportName   Name of the collection summary report.
-%     sessionFolder       Directory where individual EEG PREP report
-%                         should be stored
-%     sessionReportName   Name of the report for the session represented
-%                         by EEG.
-%     publishOn           (optional) if true or omitted, the MATLAB
-%                         publish feature will create an actual published
-%                         report.
+%     EEG                 EEGLAB structure with the EEG.etc.noiseDetection
+%                         structure created by the PREP pipeline
+%     summaryFilePath     File name including path of the summary file
+%     sessionFilePath     File name including path of the individual report
+%     consoleID           Open file descriptor for echoing output (usually 1
+%                         indication the Command Window).
+%     publishOn           If true (default), report is published and 
+%                         figures are closed. If false, output and figures
+%                         are displayed in the normal way. The figures
+%                         are not closed. This option is useful when
+%                         you want to manipulate the figures in some way.
 %
 %  Output:
 %     If the publish option is on, this function will create a report
 %     for the EEG and will append a summary to a specified summary file.
 %     If the publish option is off, the function will just run the
-%     prepPipelineReport script.
+%     prepReport script.
 %
 %  Author:  Kay Robbins, UTSA, March 2015.
 %
 %
 %% Handle the parameters
 if (nargin < 5)
-    error('publishPrepPipelineReport:NotEnoughParameters', ...
-        ['Usage: publishPrepPipelineReport(EEG, summaryFolder, ' ...
-        'summaryReportName, sessionFolder, sessionReportName, publishOn)']);
-elseif nargin < 6 || isempty(publishOn)
+    error('publishPrepReport:NotEnoughParameters', ...
+        ['Usage: publishPrepReport(EEG, summaryFilePath, ' ...
+        'sessionFilePath, consoleId, publishOn)']);
+elseif nargin < 5 || isempty(publishOn)
     publishOn = true;
 end
 
@@ -44,7 +44,7 @@ end
     [sessionFolder, sessionName, sessionExt] = fileparts(sessionFilePath);
     summaryReportLocation = [summaryFolder filesep summaryName summaryExt];
     sessionReportLocation = [sessionFolder filesep sessionName sessionExt];
-    tempReportLocation = [sessionFolder filesep 'prepPipelineReport.pdf'];
+    tempReportLocation = [sessionFolder filesep 'prepReport.pdf'];
     relativeReportLocation = getRelativePath(summaryFolder, sessionFolder, ...
         sessionName, sessionExt);
     fprintf('Summary: %s   session: %s\n', summaryFolder, sessionFolder);
@@ -58,7 +58,7 @@ end
     assignin('base', 'summaryFile', summaryFile);
     assignin('base', 'consoleFID', consoleFID);
     assignin('base', 'relativeReportLocation', relativeReportLocation);
-    script_name = 'prepPipelineReport.m';
+    script_name = 'prepReport.m';
     if publishOn
         publish_options.outputDir = sessionFolder;
         publish_options.maxWidth = 800;
@@ -66,7 +66,7 @@ end
         publish_options.showCode = false;
         publish(script_name, publish_options);
     else
-        prepPipelineReport;
+        prepReport;
     end
     writeSummaryItem(summaryFile, '', 'last');
     fclose(summaryFile);

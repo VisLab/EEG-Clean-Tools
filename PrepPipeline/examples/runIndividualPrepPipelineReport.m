@@ -62,8 +62,7 @@ summaryReportLocation = [summaryFolder filesep summaryReportName];
 summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
 relativeReportLocation = [sessionFolder filesep sessionReportName];
 consoleFID = 1;
-publishPrepPipelineReport(EEG, summaryFolder, summaryReportName, ...
-    sessionFolder, sessionReportName, publishOn);
+publishPrepReport(EEG, reportSummary, actualReportLocation, 1, publishOn);
 
 %% Calculate the mean correlations
 meanBefore = EEG.etc.noiseDetection.reference.noisyStatisticsOriginal.maximumCorrelations;
