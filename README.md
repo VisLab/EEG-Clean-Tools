@@ -3,7 +3,19 @@ EEG-Clean-Tools
 
 Contains tools for the PREP pipeline for standardized preprocessing of EEG. You can
 find user documention at: 
-   http://vislab.github.io/EEG-Clean-Tools/ 
+   http://vislab.github.io/EEG-Clean-Tools/   
+   
+**Note:** For convenience, EEGLABPlugin directory contains the latest released version of the
+PREP that can be unzipped into your EEGLAB plugins directory.  
+
+### Citing the PREP pipeline
+The PREP pipeline is freely available under the GUN General Public License. 
+Please cite the following publication if using:  
+> Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015)  
+> The PREP pipeline: standardized preprocessing for large-scale EEG analysis  
+> Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  
+
+### Releases   
 
 Version 0.50 Released
 * Made several cleanup modifications to ready for release.
