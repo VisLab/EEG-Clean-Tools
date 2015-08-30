@@ -2,7 +2,7 @@ EEG-Clean-Tools
 ===============
 
 Contains tools for the PREP pipeline for standardized preprocessing of EEG. You can
-find user documentionat at: 
+find user documention at: 
    http://vislab.github.io/EEG-Clean-Tools/ 
 
 Version 0.50 Released
