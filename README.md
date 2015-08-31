@@ -17,6 +17,9 @@ Please cite the following publication if using:
 
 ### Releases   
 
+Version 0.51 Not released
+* Developing bad window visualization plugin for EEGLAB
+
 Version 0.50 Released
 * Made several cleanup modifications to ready for release.
 

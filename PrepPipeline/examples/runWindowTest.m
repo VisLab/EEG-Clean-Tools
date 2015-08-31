@@ -1,0 +1,13 @@
+%% Test the getBadWindows function. The EEG structure has the PREP run.
+filename = 'O:\ARL_Data\VEP\VEP_Robust_1Hz\vep_01.set';
+EEG = pop_loadset(filename);
+
+%% Test the windows
+[windowValuesDev, windowSecondsDev, threshholdDev] = ...
+                                          getBadWindows(EEG, 'deviation');
+[windowValuesCor, windowSecondsCor, threshholdCor] = ...
+                                          getBadWindows(EEG, 'correlation');
+[windowValuesHF, windowSecondsHF, threshholdHF] = ...
+                                          getBadWindows(EEG, 'highfrequency');
+[windowValuesRan, windowSecondsRan, threshholdRan] = ...
+                                          getBadWindows(EEG, 'ransac');
