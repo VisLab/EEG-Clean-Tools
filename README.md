@@ -20,7 +20,7 @@ The PREP pipeline incorporates many algorithms that were developed at
 USCS SCCN over many years by Nima Bigdely-Shamlo, Tim Mullen and Christian Kothe.
 Kyung Min Su performed most of the machine learning evaluation of PREP. Cassidy
 Matousek and Jeremy Cockfield worked on the interfaces for the EEGLAB plugin as
-well as associated visualization tools. Kay Robbins is the lead developer and
+well as associated visualization tools. Kay Robbins of UTSA is the lead developer and
 maintainer of PREP.
 
 ### Releases   
