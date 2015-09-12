@@ -15,6 +15,14 @@ Please cite the following publication if using:
 > The PREP pipeline: standardized preprocessing for large-scale EEG analysis  
 > Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  
 
+### People
+The PREP pipeline incorporates many algorithms that were developed at
+USCS SCCN over many years by Nima Bigdely-Shamlo, Tim Mullen and Christian Kothe.
+Kyung Min Su performed most of the machine learning evaluation of PREP. Cassidy
+Matousek and Jeremy Cockfield worked on the interfaces for the EEGLAB plugin as
+well as associated visualization tools. Kay Robbins is the lead developer and
+maintainer of PREP.
+
 ### Releases   
 
 Version 0.51 Not released
