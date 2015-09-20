@@ -26,9 +26,9 @@ try
             ['extended infomax with pca Dim ' num2str(pcaDim)];
         EEG.etc.noiseDetection.reference = ...
                    cleanupReference(EEG.etc.noiseDetection.reference);
-    else
-        EEG = pop_runica(EEG, 'icatype', 'runica', 'extended', 1);
-        EEG.etc.highPassAndICA.ICA = 'runica extended infomax';
+%     else
+%         EEG = pop_runica(EEG, 'icatype', 'runica', 'extended', 1);
+%         EEG.etc.highPassAndICA.ICA = 'runica extended infomax';
     end
     
 catch mex

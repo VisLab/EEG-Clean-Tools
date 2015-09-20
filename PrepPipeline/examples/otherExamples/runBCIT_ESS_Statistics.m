@@ -33,9 +33,9 @@ saveFile = 'dataStatistics.mat';
 % theTitle = 'Experiment XC Calibration Driving';
 % fieldPath = {'etc', 'noiseDetection', 'reference', 'noisyStatistics'};
 
-ess2Dir = 'N:\BCIT_ESS\X4 Advanced Guard Duty';
-outDir = 'N:\BCIT_ESS\X4 Advanced Guard Duty';
-theTitle = 'X4 Advanced Guard Duty';
+ess2Dir = 'O:\ARL_Data\BCIT_ESS\X2 RSVP Expertise';
+outDir = 'O:\ARL_Data\BCIT_ESS\X2 RSVP Expertise';
+theTitle = 'X2 RSVP Expertise';
 fieldPath = {'etc', 'noiseDetection', 'reference', 'noisyStatistics'};
 
 %% Create a level 2 study

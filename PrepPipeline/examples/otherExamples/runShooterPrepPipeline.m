@@ -7,12 +7,9 @@
 %% Read in the file and set the necessary parameters
 basename = 'shooter';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
-inDir = 'E:\\CTAData\\Shooter\'; % Input data directory used for this demo
-outDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered';
-dataDir = 'N:\\ARLAnalysis\\Shooter\\Shooter_Robust_1Hz_Unfiltered_Report';
-frontChop = 6;   % Chop all but 6 seconds from front of first event
-backChop = 6;    % Chop all but 6 seconds from back of last event
-doReport = true;
+inDir = 'C:\Users\research\data\Shooter_Robust_1Hz_Unfiltered'; % Input data directory used for this demo
+outDir = 'C:\Users\research\data\Shooter_Robust_0p5HzHP_ICA_Extended';
+
 %% Prepare if reporting
 if doReport
     summaryReportName = [basename '_summary.html'];
