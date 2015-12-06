@@ -25,6 +25,10 @@ maintainer of PREP.
 
 ### Releases   
 
+Version 0.52 Released
+* Modified code to handle EEG structures with empty EEG.error.
+* Performed additional minor cleanup.
+
 Version 0.51 Not released
 * Developing bad window visualization plugin for EEGLAB
 

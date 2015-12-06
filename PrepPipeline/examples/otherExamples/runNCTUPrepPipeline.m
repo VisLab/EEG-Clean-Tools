@@ -9,4 +9,4 @@ obj1.validate();
 clear obj1;
 %% Create a level 2 study
 obj2 = level2Study('level1XmlFilePath', ess1File);
-obj2.createLevel2Study(ess2Dir, 'sessionSubset', [1, 2]);
+obj2.createLevel2Study(ess2Dir);
