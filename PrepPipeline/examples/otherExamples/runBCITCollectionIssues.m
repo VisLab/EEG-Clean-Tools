@@ -3,9 +3,13 @@ pop_editoptions('option_single', false, 'option_savetwofiles', false);
 issueFile = 'issues.txt';
 
 %% Setup the directories and titles
-% ess2Dir = 'N:\BCIT_ESS\X2 RSVP Expertise';
-% outDir = 'N:\BCIT_ESS\X2 RSVP Expertise';
+% ess2Dir = 'O:\ARL_Data\BCIT_ESS\X2 RSVP Expertise';
+% outDir = 'O:\ARL_Data\BCIT_ESS\X2 RSVP Expertise';
 % theTitle = 'X2 RSVP Expertise';
+
+ess2Dir = 'O:\ARL_Data\BCIT_ESS\X1 Baseline RSVP second run';
+outDir = 'O:\ARL_Data\BCIT_ESS\X1 Baseline RSVP second run';
+theTitle = 'X1 Baseline RSVP';
 
 % ess2Dir = 'N:\BCIT_ESS\X4 Advanced Guard Duty';
 % outDir = 'N:\BCIT_ESS\X4 Advanced Guard Duty';
@@ -27,9 +31,9 @@ issueFile = 'issues.txt';
 % outDir = 'N:\BCIT_ESS\Experiment X2 Traffic Complexity';
 % theTitle = 'Experiment X2 Traffic Complexity';
 
-ess2Dir = 'N:\BCIT_ESS\Experiment X6 Speed Control';
-outDir = 'N:\BCIT_ESS\Experiment X6 Speed Control';
-theTitle = 'Experiment X6 Speed Control';
+% ess2Dir = 'N:\BCIT_ESS\Experiment X6 Speed Control';
+% outDir = 'N:\BCIT_ESS\Experiment X6 Speed Control';
+% theTitle = 'Experiment X6 Speed Control';
 
 %% Create a level 2 study
 obj2 = level2Study('level2XmlFilePath', ess2Dir);

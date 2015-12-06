@@ -69,7 +69,7 @@ end
         prepReport;
     end
     writeSummaryItem(summaryFile, '', 'last');
-    fclose(summaryFile);
+    fclose('all');
     if publishOn 
         fprintf('temp report location %s\n', tempReportLocation);
         fprintf('session report location %s\n', sessionReportLocation);

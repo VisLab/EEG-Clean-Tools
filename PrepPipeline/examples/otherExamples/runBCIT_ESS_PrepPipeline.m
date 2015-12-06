@@ -20,9 +20,13 @@
 % ess1File = 'E:\BCIT_ESS\X1 Baseline RSVP\\study_description.xml';
 % ess2Dir = 'N:\BCIT_ESS\X1 Baseline RSVP';
 
-ess1Path = 'E:\BCIT_ESS\X3 Baseline Guard Duty';
-ess1File = 'E:\BCIT_ESS\X3 Baseline Guard Duty\\study_description.xml';
-ess2Dir = 'N:\BCIT_ESS\X3 Baseline Guard Duty';
+ess1Path = 'E:\BCIT_ESS\level_1\X1 Baseline RSVP second run';
+ess1File = 'E:\BCIT_ESS\level_1\X1 Baseline RSVP second run\study_description.xml';
+ess2Dir = 'O:\ARL_Data\BCIT_ESS\X1 Baseline RSVP second run';
+
+% ess1Path = 'E:\BCIT_ESS\X3 Baseline Guard Duty';
+% ess1File = 'E:\BCIT_ESS\X3 Baseline Guard Duty\\study_description.xml';
+% ess2Dir = 'N:\BCIT_ESS\X3 Baseline Guard Duty';
 
 % obj2 = level2Study('level2XmlFilePath', ess2Dir);
 % obj2 = obj2.validate();
@@ -31,6 +35,6 @@ ess2Dir = 'N:\BCIT_ESS\X3 Baseline Guard Duty';
 obj1 = level1Study(ess1File);
 obj1.validate();
 clear obj1;
-% %% Create a level 2 study
-% obj2 = level2Study('level1XmlFilePath', ess1File);
-% obj2.createLevel2Study(ess2Dir);
+%% Create a level 2 study
+obj2 = level2Study('level1XmlFilePath', ess1File);
+obj2.createLevel2Study(ess2Dir);

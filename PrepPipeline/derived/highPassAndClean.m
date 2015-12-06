@@ -5,7 +5,7 @@ function EEG = highPassAndClean(EEG, varargin)
 %     maxBadChannels   fraction of channels allowed bad (suggest 0.15)
 %     signalStd        max standard deviation of signal (suggest 3)
 try
-% Setup the parameters and reporting for the call   
+%Setup the parameters and reporting for the call   
     params = vargin2struct(varargin);   
     if ~isfield(EEG.etc, 'noiseDetection')
         error('highPassAndClean:NoEtcNoiseDetectionField', ...

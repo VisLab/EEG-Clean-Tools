@@ -1,12 +1,15 @@
 function [summary, hardFrames] = reportEvents(fid, EEG)
 % Outputs a summary of line noise removal to file fid and returns a cell array of important messages
-    summary = {};
+    hardFrames = [];
+    if ~isfield(EEG, 'event') || isempty(EEG.event)
+        summary = {'Events: dataset has no events'};
+        return;
+    else
+        summary = {};
+    end
     summary{end+1} = ['Events: ' num2str(length(EEG.event)) ...
                       ', Original events: ' num2str(length(EEG.urevent))];
     fprintf(fid, '%s\n', summary{end});  
-    if isempty(EEG.event)
-        return;
-    end
     if isfield(EEG.event, 'hedtags')
         summary{end+1} = 'Data set uses hedtags';
     end

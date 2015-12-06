@@ -36,24 +36,23 @@ summaryHeader = [summaryHeader ' <a href="' relativeReportLocation ...
 writeSummaryHeader(summaryFile,  summaryHeader);
 
 %  Write overview status
-writeSummaryItem(summaryFile, '', 'first');
-errorStatus = ['Error status: ' noiseDetection.errors.status];
-
-fprintf(consoleFID, '%s \n', errorStatus);
-writeSummaryItem(summaryFile, {errorStatus});
+errorStatus = getErrors(noiseDetection);
+writeHtmlList(summaryFile, errorStatus, 'first');
+writeTextList(consoleFID, errorStatus);
 
 % Versions
 versions = EEGReporting.etc.noiseDetection.version;
 versionString = getStructureString(EEGReporting.etc.noiseDetection.version);
-writeSummaryItem(summaryFile, {['Versions: ' versionString]});
+writeHtmlList(summaryFile, {['Versions: ' versionString]});
 fprintf(consoleFID, 'Versions:\n%s\n', versionString);
 
 % Events
-srateMsg = ['Sampling rate: ' num2str(EEGReporting.srate) 'Hz'];
-writeSummaryItem(summaryFile, {srateMsg});
-fprintf(consoleFID, '%s\n', srateMsg);
+srateMsg = {'Sampling rate: ' num2str(EEGReporting.srate) 'Hz'};
+writeHtmlList(summaryFile, srateMsg);
+writeTextList(consoleFID, srateMsg);
+
 [summary, hardFrames] = reportEvents(consoleFID, EEGReporting);
-writeSummaryItem(summaryFile, summary);
+writeHtmlList(summaryFile, summary);
 
 % Interpolated channels for referencing
 if isfield(noiseDetection, 'reference')
@@ -61,7 +60,7 @@ if isfield(noiseDetection, 'reference')
         'interpolatedChannels');
     summaryItem = ['Bad channels interpolated for reference: [' ...
                     num2str(interpolatedChannels), ']'];
-    writeSummaryItem(summaryFile, {summaryItem});
+    writeHtmlList(summaryFile, {summaryItem});
     fprintf(consoleFID, '%s\n', summaryItem);
 end
 % Setup visualization parameters
@@ -79,11 +78,11 @@ headColor = [0.95, 0.95, 0.95];
 elementColor = [0, 0, 0];
 %% Line noise removal step
 summary = reportLineNoise(consoleFID, noiseDetection, numbersPerRow, indent);
-writeSummaryItem(summaryFile, summary);
+writeHtmlList(summaryFile, summary);
 
 %% Initial detrend for reference calculation
 summary = reportDetrend(consoleFID, noiseDetection, numbersPerRow, indent);
-writeSummaryItem(summaryFile, summary);
+writeHtmlList(summaryFile, summary);
 
 %% Spectrum after line noise and detrend
 if isfield(noiseDetection, 'lineNoise')
@@ -104,7 +103,7 @@ if isfield(noiseDetection, 'lineNoise')
     if ~isempty(badChannels)
         badString = ['Channels with no spectra: ' getListString(badChannels)];
         fprintf(consoleFID, '%s\n', badString);
-        writeSummaryItem(summaryFile, {badString});
+        writeHtmlList(summaryFile, {badString});
     end
 end
 
@@ -113,7 +112,7 @@ end
 if isfield(noiseDetection, 'reference') && ~isempty(noiseDetection.reference) 
    [summary, noisyStatistics] = reportReference(consoleFID,  ...
                                   noiseDetection, numbersPerRow, indent);
-    writeSummaryItem(summaryFile, summary);
+    writeHtmlList(summaryFile, summary);
    EEGReporting.etc.noiseDetection.reference.noisyStatistics = noisyStatistics;
 end
 %% Robust channel deviation (referenced)
@@ -285,7 +284,7 @@ if isfield(noiseDetection, 'reference')
     for k = 2:length(reports)
         fprintf(consoleFID, '%s\n', reports{k});
     end
-    writeSummaryItem(summaryFile, {reports{1}, reports{2}, reports{3}});
+    writeHtmlList(summaryFile, {reports{1}, reports{2}, reports{3}});
 end    
 
 %% Median max abs correlation (referenced)
@@ -445,7 +444,7 @@ if isfield(noiseDetection, 'reference')
     for k = 2:length(reports)
         fprintf(consoleFID, '%s\n', reports{k});
     end
-    writeSummaryItem(summaryFile, {reports{1}, reports{2}});
+    writeHtmlList(summaryFile, {reports{1}, reports{2}});
 end
 
 %% Bad ransac fraction (referenced)
@@ -532,7 +531,7 @@ if isfield(noiseDetection, 'reference')
     for k = 2:length(reports)
         fprintf(consoleFID, '%s\n', reports{k});
     end
-    writeSummaryItem(summaryFile, {reports{1}, reports{2}});
+    writeHtmlList(summaryFile, {reports{1}, reports{2}});
 end    
 %% HF noise Z-score (referenced)
 if isfield(noiseDetection, 'reference')
@@ -645,7 +644,7 @@ if isfield(noiseDetection, 'reference')
     for k = 2:length(reports)
         fprintf(consoleFID, '%s\n', reports{k});
     end
-    writeSummaryItem(summaryFile, {reports{1}, reports{2}, reports{3}});
+    writeHtmlList(summaryFile, {reports{1}, reports{2}, reports{3}});
 end
 
 
@@ -662,7 +661,7 @@ if isfield(noiseDetection, 'reference') && ...
     xlabel('Robust average reference')
     ylabel('Ordinary average reference');
     title(tString, 'Interpreter', 'None');
-    writeSummaryItem(summaryFile, ...
+    writeHtmlList(summaryFile, ...
         {['Correlation between ordinary and robust average reference (unfiltered): ' ...
         num2str(corrAverage)]});
 end   
@@ -697,7 +696,7 @@ if isfield(noiseDetection, 'reference')
     xlabel('Robust average reference')
     ylabel('Ordinary average reference');
     title(tString, 'Interpreter', 'None');
-    writeSummaryItem(summaryFile, ...
+    writeHtmlList(summaryFile, ...
         {['Correlation between ordinary and robust average reference (filtered): ' ...
         num2str(corrAverage)]});
 end
