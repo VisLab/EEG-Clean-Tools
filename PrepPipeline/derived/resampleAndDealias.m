@@ -1,5 +1,6 @@
 function EEG = resampleAndDealias(EEG, varargin)
-% Perform a high-pass filter and ICA on data that has been Prepped
+% Resample and dealias using a low pass filter close to Nyquist. Also
+% remove extra fields from EEG.etc.noiseDetection
 try
     params = vargin2struct(varargin);
     [EEG, resampling] = resampleEEG(EEG, params);

@@ -24,6 +24,9 @@ function [EEG, resampleOut] = resampleEEG(EEG, resampleIn)
 %   resampleCommand     Command for resampling
 %   lowPassCommand      Command for low pass filtering
 %
+% This function resamples and also does a low pass filter close to Nyquist
+% frequency to avoid aliasing errors.
+%
 %% Check the parameters
 if nargin < 1 || ~isstruct(EEG)
     error('resampleEEG:NotEnoughArguments', 'first argument must be a structure');
