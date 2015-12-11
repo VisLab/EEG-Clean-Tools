@@ -1,5 +1,4 @@
 %% Example using ESS
-
 ess1Path = 'E:\\CTAData\\01. NCTU lane-keeping task';
 ess1File = 'E:\\CTAData\\01. NCTU lane-keeping task\\study_description.xml';
 ess2Dir = 'O:\ARL_Data\NCTU\\NCTU_Temp';
