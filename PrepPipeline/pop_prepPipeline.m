@@ -53,6 +53,12 @@ if nargin < 2
     userData = getUserData();
     [params, okay] = MasterGUI([],[],userData, EEG);
 end
+
+%% return if user pressed cancel
+if (~okay) 
+	return;
+end
+
 userData = getUserData();
 com = sprintf('pop_prepPipeline(%s, %s);', inputname(1), ...
     struct2str(params));
