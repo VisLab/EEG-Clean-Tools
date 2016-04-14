@@ -359,6 +359,7 @@ if isempty(g.winsize)
 else
     winlength = g.winsize;
 end;
+winlength = round(winlength);  % Added round off for integer windows
 if isempty(g.nfft)
     fftlength = 2^(nextpow2(winlength))*g.freqfac;
 else
@@ -385,11 +386,12 @@ for c=1:nchans % scan channels or components
     end;
     for e=epoch_subset
         if isempty(g.boundaries)
+            theData = matsel(tmpdata,frames,0,1,e);
             if usepwelch
-                [tmpspec,freqs] = pwelch(matsel(tmpdata,frames,0,1,e),...
+                [tmpspec,freqs] = pwelch(theData,...
                     winlength,g.overlap,fftlength,srate);
             else
-                [tmpspec,freqs] = spec(matsel(tmpdata,frames,0,1,e),fftlength,srate,...
+                [tmpspec,freqs] = spec(theData,fftlength,srate,...
                     winlength,g.overlap);
             end;
             %[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),fftlength,srate,...

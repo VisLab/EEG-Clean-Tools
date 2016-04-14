@@ -1,4 +1,4 @@
-function [signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseIn)
+function [signal, lineNoiseOut] = blasstLineNoise(signal, lineNoiseIn)
 % Remove sharp spectral peaks from signal using Sleppian filters
 %
 % Usage:
@@ -45,17 +45,21 @@ if any(tooLarge)
     lineNoiseOut.lineFrequencies = squeeze(lineNoiseOut.lineFrequencies);
 end
 
-%% Set up multi-taper parameters
-hbw = lineNoiseOut.taperBandWidth/2;   % half-bandwidth
-lineNoiseOut.taperTemplate = [hbw, lineNoiseOut.taperWindowSize, 1];
-Nwin = round(lineNoiseOut.Fs*lineNoiseOut.taperWindowSize); % number of samples in window
-lineNoiseOut.tapers = checkTapers(lineNoiseOut.taperTemplate, Nwin, lineNoiseOut.Fs); 
+%% Set up parameters for blassting the line noise
+fRange = lineNoiseOut.fScanBandWidth;
+frequencyRanges = repmat(fRange, length(lineNoiseOut.lineFrequencies));
+sRate = lineNoiseOut.Fs;
+lineFrequencies = lineNoiseOut.lineFrequencies;
+maxIterations = lineNoiseOut.maximumIterations;
 
 %% Perform the calculation for each channel separately
 data = double(signal.data);
 chans = sort(lineNoiseOut.lineNoiseChannels);
 parfor ch = chans
-    data(ch, :) = removeLinesMovingWindow(squeeze(data(ch, :)), lineNoiseOut);
+    data(ch, :) = blasst(squeeze(data(ch, :)), lineFrequencies, ...
+                         frequencyRanges, sRate, ...
+                         'MaximumIterations', maxIterations, ...
+                         'Verbose', 0);
 end
 signal.data = data;
 clear data;

@@ -104,7 +104,7 @@ end
 fprintf('Line noise removal\n');
 try
     tic
-    [EEGClean, lineNoise] = cleanLineNoise(EEGNew, params);
+    [EEGClean, lineNoise] = removeLineNoise(EEGNew, params);
     EEG.etc.noiseDetection.lineNoise = lineNoise;
     lineChannels = lineNoise.lineNoiseChannels;
     EEG.data(lineChannels, :) = EEG.data(lineChannels, :) ...
@@ -113,7 +113,7 @@ try
     computationTimes.lineNoise = toc;
 catch mex
     errorMessages.lineNoise = ...
-        ['prepPipeline failed cleanLineNoise: ' getReport(mex)];
+        ['prepPipeline failed removeLineNoise: ' getReport(mex)];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     return;

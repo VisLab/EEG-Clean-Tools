@@ -54,8 +54,9 @@ if nargin < 2
     [params, okay] = MasterGUI([],[],userData, EEG);
 end
 userData = getUserData();
-com = sprintf('pop_prepPipeline(%s, %s);', inputname(1), ...
+com = sprintf('%s = pop_prepPipeline(%s, %s);', inputname(1), ...
     struct2str(params));
+
 reportMode = userData.report.reportMode.value;
 consoleFID = userData.report.consoleFID.value;
 publishOn = userData.report.publishOn.value;

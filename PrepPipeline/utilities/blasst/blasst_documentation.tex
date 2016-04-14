@@ -1,0 +1,163 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{fullpage}
+\usepackage[square,numbers]{natbib}
+\usepackage{hyperref}
+
+\usepackage[percent]{overpic}
+\usepackage{graphicx}
+\usepackage{cmap}
+
+
+%%Theorems
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{problem}[theorem]{Problem}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+%%% Comments and Todos
+\newcommand{\ppar}[1]{\noindent{\em{#1}}}
+\newcommand{\comment}[1]{\par\noindent{\raggedright\texttt{#1}
+\par\marginpar{\textsc{Comment}}}}
+\newcommand{\todo}[1]{\vspace{5 mm}\par \noindent
+\marginpar{\textsc{ToDo}}
+\framebox{\begin{minipage}[c]{0.98\columnwidth}
+\tt #1 \end{minipage}}\vspace{5 mm}\par}
+
+%\usepackage{parskip}
+
+\title{BLASST: A MATLAB toolbox for filtering long-time, nonstationary signal artifacts.}
+\author{Kenneth Ball}
+\date{September, 2015}
+
+\begin{document}
+
+\maketitle
+
+\section*{Preliminaries}
+If you find this tool/algorithm useful, please cite our associated paper: \\ \ \\
+
+\noindent Ball, K.~R., Hairston, W.~D., Franaszczuk, P.~J., Robbins, K.~A., BLASST: Band Limited Atomic Sampling with Spectral Tuning with Applications to Utility Line Noise Filtering, [Under Review]. \\ \ \\
+
+\section{Overview of BLASST}
+Band Limited Atomic Sampling with Spectral Tuning (BLASST) is an algorithm developed to filter relatively long-time, non-stationary signal features, especially the 50/60 Hz utility line noise that is almost ubiquitious in sensitive experiments. Our motivating use case is ambulatory EEG experiments where gamma-range neural features may be of interest. We observe that most experimenters either notch filter about 50/60 Hz, or low-pass filter signals at some threshold below 50/60 Hz in order to remove the often dominant line noise features from their collected signals. Especially in cases where the utility line noise is highly non-stationary, due to either fluctuations in power generation atht the utility level or non-linear effects caused by interfering electronics in the laboratory, a relatively wide notch-filter may be required to completely remove the noise, which in turn causies a complete loss of otherwise useful information in the targeted spectral band.
+
+BLASST attempts to fit non-stationary line-noise more flexibly by attempting to reconstruct the dominant signal in the supplied target frequency range with a set of Gabor atoms arranged in time so that their envoloping Gaussian functions (approximately) add up to a partition of unity. BLASST iterates this fitting approach until a stopping criterion is reached. Information from spectral bands outside of the user-supplied target bands is leveraged to (1) modulate the fit at each iteration and (2) determine a stopping criterion based on the distribution of the amplitudes of complex Gabor atoms drawn from inside and outside the target frequency spectrum.
+
+\section{blasst():}
+\verb![signalOut , varargout] = blasst(signalIn , lineFrequencies , frequencyRanges , ...! \verb!samplingRate , varargin);!
+
+\subsection{Input:}
+\begin{itemize}
+\item \verb!signalIn! :: an $n\times N$ array of signal data. The signals are of length $N$, and there are $n$ total channels of data (so generally $n << N$).
+
+\item \verb!lineFrequencies! :: an array of target frequencies (not normalized).
+
+\item \verb!frequencyRanges! :: an array of target frequency ranges. Must be the same size as \verb!lineFrequencies!.
+
+\item \verb!samplingRate! :: the sampling rate of the signal.
+
+\item \verb!varargin! :: optional 'key',value pairs:
+
+\begin{itemize}
+
+\item  \verb~'key'~          
+          [default] purpose
+\item   \verb~'Scale'~        
+           [\verb~2^(log2(samplingRate)+2)~] Manually set the scale that 
+           indicates the spread of Gabor atoms.
+\item  \verb~'ContinuousEpochs'~  
+           [\verb~0~] If x is epoched, but epochs are temporally adjacent, 
+          setting to 1 will flatten x for processing. Otherwise, 
+           blasst is run on individual epochs.
+\item   \verb~'Verbose'~
+           [\verb~1~] When on, progress is printed on command line.
+\item   \verb~'Resolution'~
+           [\verb~2~] May be an integer value $>= 1$, sets 'resolution' in blasst.
+           Specificies density of Gabor atoms. May also be an array of
+           integer values of \verb~size(lineFrequencies)~.
+\item   \verb~'MaxIterations'~
+           [\verb~50~] Maximum number of external iterations of blasst run on
+           each frequency. May be either a scalar integer or array of
+           integers of \verb~size(lineFrequencies)~.
+\item   \verb~'ManualOffset'~
+           [\verb~log2(scaleBases)+1~] A scalar value that offsets the 
+           arrangement of Gabor atoms at each iteration of blasst.
+\item   \verb~'Channels'~
+           [\verb~1:size(x,1)~] An array of integers indexing channels to
+           be computed. Allows manually selection of channels for
+           processing.
+
+\end{itemize}
+
+\end{itemize}
+
+\subsection{Output}
+\begin{itemize}
+
+\item  \verb!signalOut! :: the processed, or ``cleaned'' signal, an array of \verb~size(signalIn)~.
+\item \verb!varargout{1}! :: the aggregate of the target signal feature removed, an array of \verb!size(signalIn)!.
+
+\end{itemize}
+
+\subsection{Basic Use Cases}
+
+\begin{itemize}
+\item Suppose you have collected signals sampled at 512 Hz, and you wish to identify and remove 60 Hz line noise. The line noise seems to be relatively stationary in frequency, so you only target features between 59.75 and 60.25 Hz. Then you may run:
+
+\verb~ >>signalOut = blasst(signalIn,60,0.25,512);~
+
+If you would like to return the noise removed \verb~noise~, you may run:
+
+\verb~ >>[signalOut,noise] = blasst(signalIn,60,0.25,512);~
+
+\item If you would like to remove harmonics of 60 Hz up to 256 Hz (the Nyquist frequency), you may run:
+
+\verb~ >>signalOut = blasst(signalIn,[60,120,180,240],0.25,512);~
+
+\item Suppose you observe high non-stationarity in frequency at 120 Hz, but tight bounds on spectral power at the other harmonics of 60 Hz. Increasing the target frequency range increases the time required to search for best fit Gabor atoms, and also increases the possiblity of overfitting. Thus, it is preferable to only increase the target frequency range value for target frequencies where it is requried. In this case, you may run:
+
+\verb~ >>signalOut = blasst(signalIn,[60,120,180,240],[0.25,2,0.25,0.25],512);~
+
+In this case, blasst() will fit features between $60\pm 0.25$, $120 \pm 2$, $180\pm 0.25$, and $240\pm 0.25$ Hz.
+
+\end{itemize}
+
+\subsection{Advanced Use Cases}
+
+\begin{itemize}
+
+\item The resolution of the fit at each iteration can be increased (or decreased) from the default value of $k = 2$ by using a key value pair \verb~ 'Resolution',k~ where \verb~k~ is an integer value greather than or equal to 1. In theory, higher resoltuion arrangements of Gabor atoms (more tightly packed) should allow for my fine tuned temporal flexibility. Of course, the Gabor atoms themselves should already be very spread out, so this may not do much. To increase the resolution to $k = 4$, you may run:
+
+\verb~ >>signalOut = blasst(signalIn,60,0.25,512,'Resolution',4);~
+
+\item The scales of Gabor atoms can be manually adjusted. Higher scales allow for more specificity in frequencies, but less resolution in time; lower scales allow for more specificity in time, but less resolution in frequency. Scales are input as the number of time samples; the default value corresponds to 4 seconds (regardless of sampling rate). Suppose you wanted to use Gabor atoms with scales of 3 seconds, and the sampling rate was 250 Hz. Then you could run:
+
+\verb~ >>signalOut = blasst(signalIn,60,0.25,256,'Scale',3*256);~
+
+\end{itemize}
+
+\subsection{Alterantive Use Cases}
+
+\begin{itemize}
+
+\item We believe BLASST may be useful for other types of filtering were flexibility and robustness to short-time signal features is desirable. For example suppose you were interested in the appearance of alpha spindles in a 512 Hz EEG signal between 9 and 14  Hz. Further, suppose you expect such features to appear in bursts of at least 0.5 seconds. Then you could run:
+
+\verb~ >>[signalOut,alpha] = blasst(signalIn,11.5,2.5,512,'Scale',512/2,'Resolution',4);~
+
+Then \verb~alpha~ will be returned as the alpha features. Theoretically, BLASST should return the desired alpha features while reducing artifacts in the target spectrum caused by spectral bleed of more temporally localized spikes of activity, such as muscle movements.
+
+
+\end{itemize}
+
+\end{document}

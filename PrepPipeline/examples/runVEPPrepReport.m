@@ -1,8 +1,8 @@
 %% Read in the file and set the necessary parameters
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
-dataDir = 'O:\ARL_Data\VEP\VEP_Robust_1Hz_New';
-summaryFolder  = 'O:\ARL_Data\VEP\VEP_Robust_1Hz_New_Report';
+dataDir = 'O:\ARL_Data\VEP\VEP_Robust_1Hz';
+summaryFolder  = 'O:\ARL_Data\VEP\VEP_Robust_1Hz_New_Report_B';
 
 %% Get the directory list
 inList = dir(dataDir);
@@ -14,18 +14,18 @@ inNames = inNames(~inTypes);
 basename = 'vep';
 summaryReportName = [basename '_summary.html'];
 sessionFolder = '.';
-summary = [summaryFolder filesep summaryReportName];
-if exist(summary, 'file') 
-   delete(summary);
+summaryFileName = [summaryFolder filesep summaryReportName];
+if exist(summaryFileName, 'file') 
+   delete(summaryFileName);
 end
 
 %% Run the pipeline
 publishOn = true;
-for k = 1%2%length(inNames)
+for k = 1:length(inNames)
     sessionReportName = [inNames{k}(1:(end-4)) '.pdf'];
     fname = [dataDir filesep inNames{k}];
     load(fname, '-mat');
-    session = [summaryFolder filesep sessionReportName];
+    sessionFileName = [summaryFolder filesep sessionReportName];
     consoleFID = 1;
-    publishPrepReport(EEG, summary, session, consoleFID, publishOn);
+    publishPrepReport(EEG, summaryFileName, sessionFileName, consoleFID, publishOn);
 end

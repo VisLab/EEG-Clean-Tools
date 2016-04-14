@@ -1,44 +1,39 @@
-function [windowValues, windowSeconds, threshhold] = getBadWindows(EEG, type)
+function [windowValues, windowSeconds, threshold] = ...
+                              getBadWindows(noisyStatistics, type)
 % Return the window values for a particular type of noisiness:
 %
 % Parameters:
-%    EEG    EEGLAB EEG structure with the PREP pipeline run on verbose
-%    type   String indicating type of noisiness: 
-%             'deviation', 'correlation', highfrequency, 'ransac' 
+%    noisyStatistics  Structure containing the noisy window calculations
+%    type             String indicating type of noisiness: 
+%                     'deviation', 'correlation', highfrequency, 'ransac' 
+%    windowValues     (output) Values of the statistic in each window
+%    windowSeconds    (output) Length of each window in seconds
+%    threshhold       (output) Threshold above which window is considered bad
+%
 windowValues = [];
 windowSeconds = 0;
-threshhold = 0;
-
-if ~isfield(EEG.etc, 'noiseDetection') || ...
-   ~isfield(EEG.etc.noiseDetection, 'reference') || ...
-   ~isfield(EEG.etc.noiseDetection.reference, 'noisyStatistics')
-   warning('getBadWindows:PREPNotRun', ...
-       'You must run the PREP pipeline to set the EEG metadata');
-   return;
-end
-
-noisyStats = EEG.etc.noiseDetection.reference.noisyStatistics;
+threshold = 0;
 switch lower(type)
     case 'deviation'
-        deviations = noisyStats.channelDeviations;
+        deviations = noisyStatistics.channelDeviations;
         medianDeviations = median(deviations(:));
         sdDeviations = mad(deviations(:), 1)*1.4826;
         windowValues = (deviations - medianDeviations)./sdDeviations;
-        threshhold =  noisyStats.robustDeviationThreshold;
-        windowSeconds = noisyStats.correlationWindowSeconds;
+        threshold =  noisyStatistics.robustDeviationThreshold;
+        windowSeconds = noisyStatistics.correlationWindowSeconds;
     case 'correlation'
-        windowValues = 1 - noisyStats.maximumCorrelations;
-        threshhold = 1 - noisyStats.correlationThreshold;
-        windowSeconds = noisyStats.correlationWindowSeconds;
+        windowValues = 1 - noisyStatistics.maximumCorrelations;
+        threshold = 1 - noisyStatistics.correlationThreshold;
+        windowSeconds = noisyStatistics.correlationWindowSeconds;
     case 'highfrequency'
-        noiseLevels = noisyStats.noiseLevels;
+        noiseLevels = noisyStatistics.noiseLevels;
         medianNoise = median(noiseLevels(:));
         sdNoise = mad(noiseLevels(:), 1)*1.4826;
         windowValues = (noiseLevels - medianNoise)./sdNoise;
-        threshhold = noisyStats.highFrequencyNoiseThreshold;
-        windowSeconds = noisyStats.correlationWindowSeconds;
+        threshold = noisyStatistics.highFrequencyNoiseThreshold;
+        windowSeconds = noisyStatistics.correlationWindowSeconds;
     case 'ransac'
-        windowValues = 1 - noisyStats.ransacCorrelations;
-        threshhold = 1 - noisyStats.ransacCorrelationThreshold;
-        windowSeconds = noisyStats.ransacWindowSeconds;
+        windowValues = 1 - noisyStatistics.ransacCorrelations;
+        threshold = 1 - noisyStatistics.ransacCorrelationThreshold;
+        windowSeconds = noisyStatistics.ransacWindowSeconds;
 end

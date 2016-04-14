@@ -54,26 +54,12 @@ end
 
 for iteration = 1:lineNoise.maximumIterations
     f0Mask = false(1, length(f0));
-%     datafitWinSave = zeros(Nwin, nw);   % Debugging
-%     f0SigSave = cell(nw, 1); % Debugging
-%     FvalSigSave = cell(nw, 1);  % Debugging
-%     aSigSave = cell(nw, 1);  % Debugging
-%     fSigSave = cell(nw, 1);  % Debugging
-%     sigSave = cell(nw, 1);   % Debugging
     for n = 1:nw
         indx = winstart(n):(winstart(n) + Nwin - 1);
         datawin = data(indx);
          [datafitwin, f0Sig] = ...
             fitSignificantFrequencies(datawin, f0, lineNoise);
-%         [datafitwin, f0Sig, FvalSig, aSig, fSig, sig] = ...
-%             fitSignificantFrequencies(datawin, f0, lineNoise);
         datafitwin0 = datafitwin;
-%         datafitWinSave(:, n) = datafitwin0;  % Debugging
-%         f0SigSave{n} = f0Sig; % Debugging
-%         FvalSigSave{n} = FvalSig;  % Debugging
-%         aSigSave{n} = aSig;  % Debugging
-%         fSigSave{n} = fSig;  % Debugging
-%         sigSave{n} = sig;   % Debugging
         f0Mask = f0Mask | f0Sig;
         if n > 1
             datafitwin(1:Noverlap)= smooth.*datafitwin(1:Noverlap) + ...
@@ -81,8 +67,6 @@ for iteration = 1:lineNoise.maximumIterations
         end;
         datafit(indx, :) = datafitwin;
     end
-%     save('tempDataNew.mat', 'datafitWinSave', 'f0SigSave', ...
-%          'FvalSigSave', 'aSigSave', 'fSigSave', 'sigSave', 'lineNoise', '-v7.3');  % Debugging
 
     data(1:size(datafit, 1)) = data(1:size(datafit, 1)) - datafit;
     if sum(f0Mask) > 0
@@ -90,10 +74,6 @@ for iteration = 1:lineNoise.maximumIterations
         cleanedSpectrum = calculateSegmentSpectrum(data, lineNoise);
         cleanedSpectrum = 10*log10(cleanedSpectrum); 
         dBReduction = initialSpectrum - cleanedSpectrum;
-%         for fk=1:length(fidx)
-%             fprintf('%0.4g Hz: %0.4g dB %s ',f(fidx),dBReduction(fidx));
-%             fprintf('\n');
-%         end
         tIndex = (dBReduction(fidx) < 0)';
         f0(tIndex | ~f0Mask) = [];
         fidx(tIndex | ~f0Mask) = [];

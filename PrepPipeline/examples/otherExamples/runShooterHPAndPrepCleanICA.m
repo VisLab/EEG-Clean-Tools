@@ -8,7 +8,7 @@
 basename = 'shooter';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 inDir = 'O:\ARL_Data\Shooter\Shooter_Robust_1Hz_Unfiltered'; % Input data directory used for this demo
-outDir = 'O:\ARL_Data\Shooter\Shooter_Robust_1Hz_Infomax';
+outDir = 'O:\ARL_Data\Shooter\Shooter_Robust_1Hz_PrepInfomax';
 
 %% Get the list of files
 thisList = dir(inDir);
@@ -27,8 +27,9 @@ for j = 1:length(theseNames)
     count = count + 1;
     fprintf('%d [%d]: %s\n', count, j, thisName);
     EEG = pop_loadset(thisName);
-    EEG = highPassAndICA(EEG, 'detrendCutoff', 1.0, ...
-                        'icatype', 'runica', 'extended', 0);
+    EEG = highPassAndPrepCleanICA(EEG, 'detrendCutoff', 1.0, ...
+                        'icatype', 'runica', 'extended', 0, ...
+                        'fractionBad', 0.25);
     fname = [outDir filesep theseNames{j}];
     save(fname, 'EEG', '-mat', '-v7.3');
 end

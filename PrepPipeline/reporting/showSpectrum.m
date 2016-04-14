@@ -1,5 +1,5 @@
 function [fref, sref, badChannels] = showSpectrum(EEG, channelLabels, ...
-                channels, displayChannels, tString)
+                channels, displayChannels, tString, maxChannelsPerFigure)
 % Calculate EEG spectra for channels and show display displayChannels
 %
 % Parameters:
@@ -8,6 +8,7 @@ function [fref, sref, badChannels] = showSpectrum(EEG, channelLabels, ...
 %    displayChannels  vector of channels to display (no plot if empty)
 %    channelLabels    cell array of labels corresponding to all channels
 %    tString          title of plot if there is a display
+%    maxChannelsPerFigure maximum number of channels per figure
 %
 % Output:
 %    fref             vector of spectral frequencies in Hz
@@ -39,23 +40,42 @@ function [fref, sref, badChannels] = showSpectrum(EEG, channelLabels, ...
     if ~isempty(displayChannels)
         tString1 = {tString,'Selected channels'};
         displayChannels = intersect(channels, displayChannels);
-        displayChannels = setdiff(displayChannels, badChannels);
-
-        colors = jet(length(displayChannels));
+        %displayChannels = setdiff(displayChannels, badChannels);
+        numberPlots = ceil(length(displayChannels)/maxChannelsPerFigure);
+        perPlot = ceil(length(displayChannels)/numberPlots);
+        for k = 1:numberPlots
+            startChannel = perPlot*(k - 1) + 1;
+            endChannel = min(startChannel + perPlot - 1, length(displayChannels));
+            showChannels(displayChannels(startChannel:endChannel));
+        end
+    end
+    
+    function [] = showChannels(theseChannels)
+        colors = jet(length(theseChannels));
         figure('Name', tString, 'Color', [1, 1, 1])
         hold on
-        legends = cell(1, length(displayChannels));
-        for c = 1:length(displayChannels)
-            fftchan = displayChannels(c);
-            plot(fref{fftchan}, sref{fftchan}', 'Color', colors(c, :))
-            legends{c} = [num2str(fftchan) ' (' channelLabels{fftchan} ')'];
+        legendCount = 0;
+        legends = cell(1, length(theseChannels));
+        for c = 1:length(theseChannels)
+            fftchan = theseChannels(c);
+            f = fref{fftchan}(:);
+            s = sref{fftchan}(:);
+            if isempty(f) || isempty(s) || length(f) ~= length(s)
+                continue;
+            end
+            plot(fref{fftchan}(:), sref{fftchan}(:), 'Color', colors(c, :));
+            legendCount = legendCount + 1;
+            legends{legendCount} = [num2str(fftchan) ' (' channelLabels{fftchan} ')'];
         end
         hold off
         xlabel('Frequency (Hz)')
         ylabel('Power 10*log(\muV^2/Hz)')
-        legend(legends)
+        if ~isempty(legends)
+               legend(legends, 'Location', 'EastOutside')
+        end
         title(tString1, 'Interpreter', 'none')
         box on
         drawnow
     end
 end
+        

@@ -68,9 +68,9 @@ end
     else
         prepReport;
     end
-    writeSummaryItem(summaryFile, '', 'last');
-    fclose('all');
     if publishOn 
+        writeSummaryItem(summaryFile, '', 'last');
+        fclose('all');
         fprintf('temp report location %s\n', tempReportLocation);
         fprintf('session report location %s\n', sessionReportLocation);
         movefile(tempReportLocation, sessionReportLocation);

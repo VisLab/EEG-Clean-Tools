@@ -7,19 +7,21 @@
 %% Read in the file and set the necessary parameters
 basename = 'shooter';
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
-inDir = 'C:\Users\research\data\Shooter_Robust_1Hz_Unfiltered'; % Input data directory used for this demo
-outDir = 'C:\Users\research\data\Shooter_Robust_0p5HzHP_ICA_Extended';
-
+inDir = 'E:\CTA_DATA\Shooter\Level0'; % Input data directory used for this demo
+outDir = 'O:\ARL_Data\Shooter\Shooter_Robust_1Hz_Unfiltered_New';
+dataDir = 'O:\ARL_Data\Shooter\Shooter_Robust_1Hz_Unfiltered_New_Report';
+frontChop = 6;   % Chop all but 6 seconds from front of first event
+backChop = 6;    % Chop all but 6 seconds from back of last event
+doReport = true;
+publishOn = true;
 %% Prepare if reporting
 if doReport
     summaryReportName = [basename '_summary.html'];
     sessionFolder = '.';
-    reportSummary = [dataDir filesep summaryReportName];
-    if exist(reportSummary, 'file')
-        delete(reportSummary);
+    summaryReport = [dataDir filesep summaryReportName];
+    if exist(summaryReport, 'file')
+        delete(summaryReport);
     end
-    summaryReportLocation = [dataDir filesep summaryReportName];
-    summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
 end
 %% Parameters that must be preset
 params = struct();
@@ -28,6 +30,7 @@ params.detrendType = 'high pass';
 params.detrendCutoff = 1;
 params.referenceType = 'robust';
 params.keepFiltered = false;
+params.lineNoiseMethod = 'clean';
 
 %% Parameters especially set for reduced threshold
 params.fScanBandWidth = 2;
@@ -42,7 +45,7 @@ dirNames(strcmpi(dirNames, '.')| strcmpi(dirNames, '..')) = [];
 
 %% Run the pipeline
 count = 0;
-for k = 1:length(dirNames)
+for k = 3:length(dirNames)
     thisDir = [inDir filesep dirNames{k}];
     fprintf('Directory: %s\n', thisDir);
     thisList = dir(thisDir);
@@ -50,8 +53,8 @@ for k = 1:length(dirNames)
     theseTypes = [thisList(:).isdir];
     theseNames = theseNames(~theseTypes);
     for j = 1:length(theseNames)
-        ext = theseNames{j}((end-3):end);
-        if ~strcmpi(ext, '.set')
+        [thePath, theName, theExt] = fileparts(theseNames{j});
+        if ~strcmpi(theExt, '.set')
             continue;
         end
         thisName = [thisDir filesep theseNames{j}];
@@ -75,29 +78,31 @@ for k = 1:length(dirNames)
         params.rereferencedChannels = chans;
         params.detrendChannels = chans;
         params.lineNoiseChannels = chans;
-        params.name = thisName(1:end-4);
+        pieces = strsplit(thisName, '_');
+        params.name = pieces{1};
         fprintf('Original length: %g seconds\n', EEG.pnts/EEG.srate);
-        [EEG, choppedFront, choppedBack] = chop(EEG, frontChop, backChop);
-        fprintf('Chopped %g from front and %g from back, new length:%g\n', ...
-            choppedFront, choppedBack, EEG.pnts/EEG.srate);
+        % Chop the signal if it isn't eyes open or eyes closed
+        if ~strcmpi(params.name, 'EC') && strcmpi(params.name, 'EO')
+            [EEG, choppedFront, choppedBack] = chop(EEG, frontChop, backChop);
+            fprintf('Chopped %g from front and %g from back, new length:%g\n', ...
+                choppedFront, choppedBack, EEG.pnts/EEG.srate);
+        else
+            choppedFront = 0;
+            choppedBack = 0;
+        end
         [EEG, computationTimes] = prepPipeline(EEG, params);
         EEG.etc.noiseDetection.chopped = [choppedFront, choppedBack];
+       
         fprintf('Computation times (seconds):\n   %s\n', ...
             getStructureString(computationTimes));
         fname = [outDir filesep theseNames{j}];
         save(fname, 'EEG', '-mat', '-v7.3');
         if doReport
             [fpath, name, fext] = fileparts(thisName);
-            sessionReportName = [name '.pdf'];
-            tempReportLocation = [dataDir filesep sessionFolder ...
-                filesep 'prepPipelineReport.pdf'];
-            actualReportLocation = [dataDir filesep sessionFolder ...
-                filesep sessionReportName];
-            
-            relativeReportLocation = [sessionFolder filesep sessionReportName];
+            sessionReport = [dataDir filesep name '.pdf'];
             consoleFID = 1;
-            publishPrepPipelineReport(EEG, dataDir, summaryReportName, ...
-                sessionFolder, sessionReportName, true);
+            publishPrepReport(EEG, summaryReport, ...
+                sessionReport, consoleFID, publishOn);
         end
     end
 end

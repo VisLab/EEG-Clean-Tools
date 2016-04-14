@@ -12,6 +12,11 @@ function summary = reportLineNoise(fid, noiseDetection, numbersPerRow, indent)
         return;
     end
     lineNoise = noiseDetection.lineNoise;
+    if isfield(lineNoise, 'lineNoiseMethod')
+        fprintf(fid, 'Line noise method: %s\n', lineNoise.lineNoiseMethod);
+    else
+        fprintf(fid, 'Line noise method: clean\n');
+    end
     fprintf(fid, 'Version %s\n', noiseDetection.version.LineNoise);
     fprintf(fid, 'Sampling frequency Fs: %g Hz\n', lineNoise.Fs);
     fprintf(fid, 'Line noise frequencies:\n');
@@ -28,8 +33,10 @@ function summary = reportLineNoise(fid, noiseDetection, numbersPerRow, indent)
     fprintf(fid, 'Spectral pad factor: %d\n', lineNoise.pad);
     fprintf(fid, 'Analysis frequency interval(fPassBand): [ %g, %g ] Hz\n', ...
         lineNoise.fPassBand);
-    fprintf(fid, 'Taper template: [ %g, %g, %g ]\n', ...
+    if isfield(lineNoise, 'taperTemplate')
+        fprintf(fid, 'Taper template: [ %g, %g, %g ]\n', ...
         lineNoise.taperTemplate);
+    end
     fprintf(fid, 'Line noise channels (%d channels):\n', ...
         length(lineNoise.lineNoiseChannels));
     printList(fid, lineNoise.lineNoiseChannels, numbersPerRow, indent);

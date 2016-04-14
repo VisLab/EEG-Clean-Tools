@@ -1,4 +1,4 @@
-%% Example using ESS for the BCIT to resample
+%% Example using ESS for the BCIT to perform ASR cleaning
 % ess2Dir = 'O:\ARL_Data\BCIT_ESS\Experiment X2 Traffic Complexity';
 % ess2File = [ess2Dir filesep 'studyLevel2_description.xml'];
 % 
@@ -15,8 +15,7 @@ derivedXMLFile = [levelDerivedDir filesep level2File];
 obj = levelDerivedStudy('parentStudyXmlFilePath', derivedXMLFile);
 
 %% Call the HP and ICA combination
-callbackAndParameters = {@highPassAndICA, ...
-    {'detrendCutoff', 1, 'icatype', 'runica', 'extended', 0}};    
+callbackAndParameters = {@cleanASR3, {'burstCriterion', 20}};    
 obj = obj.createLevelDerivedStudy(callbackAndParameters, ...
-      'filterDescription', 'High pass filter at 1Hz followed by infomax', ...
-     'filterLabel', 'hpICA', 'levelDerivedFolder', levelDerivedDirNew);
+      'filterDescription', 'Use ASR to clean the data', ...
+     'filterLabel', 'ASR', 'levelDerivedFolder', levelDerivedDirNew);
