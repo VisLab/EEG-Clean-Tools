@@ -10,9 +10,12 @@ pop_editoptions('option_single', false, 'option_savetwofiles', false);
 % inDir = 'E:\CTADATA\Shooter\Level0'; % Input data directory used for this demo
 % outDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_Clean_Unfiltered';
 % dataDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_Clean_Unfiltered_Report';
+% inDir = 'E:\CTADATA\Shooter\Level0'; % Input data directory used for this demo
+% outDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_Blasst_Unfiltered';
+% dataDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_Blasst_Unfiltered_Report';
 inDir = 'E:\CTADATA\Shooter\Level0'; % Input data directory used for this demo
-outDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_Blasst_Unfiltered';
-dataDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_Blasst_Unfiltered_Report';
+outDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_NoLine_Unfiltered';
+dataDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_NoLine_Unfiltered_Report';
 frontChop = 6;   % Chop all but 6 seconds from front of first event
 backChop = 6;    % Chop all but 6 seconds from back of last event
 doReport = true;
@@ -33,7 +36,7 @@ params.detrendType = 'high pass';
 params.detrendCutoff = 1;
 params.referenceType = 'robust';
 params.keepFiltered = false;
-params.lineNoiseMethod = 'blasst';
+params.lineNoiseMethod = 'none';
 params.lineFrequencies = [60, 100, 120, 180, 200, 240];
 %% Parameters especially set for reduced threshold
 params.fScanBandWidth = 2;
@@ -81,8 +84,7 @@ for k = 1:length(dirNames)
         params.rereferencedChannels = chans;
         params.detrendChannels = chans;
         params.lineNoiseChannels = chans;
-        pieces = strsplit(thisName, '_');
-        params.name = pieces{1};
+        params.name = theName;
         fprintf('Original length: %g seconds\n', EEG.pnts/EEG.srate);
         % Chop the signal if it isn't eyes open or eyes closed
         if ~strcmpi(params.name, 'EC') && strcmpi(params.name, 'EO')
