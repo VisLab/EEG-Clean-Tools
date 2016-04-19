@@ -48,11 +48,18 @@ if isempty(tmp)
     addpath(genpath(myPath));
 end;
 
-%% pop up window
+%% Pop up window
 if nargin < 2
     userData = getUserData();
     [params, okay] = MasterGUI([],[],userData, EEG);
 end
+
+%% Return if user pressed cancel
+if (~okay) 
+	return;
+end
+
+%% Being the pipeline execution
 userData = getUserData();
 com = sprintf('%s = pop_prepPipeline(%s, %s);', inputname(1), ...
     struct2str(params));
