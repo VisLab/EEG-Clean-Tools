@@ -20,7 +20,7 @@
 
     <section class="main-content">
       <h1>
-<a id="introduction-to-the-prep-pipeline" class="anchor" href="#introduction-to-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction to the PREP pipeline</h1>
+<a id="introduction-to-the-prep-pipeline" class="anchor" href="#introduction-to-the-prep-pipeline" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction to the PREP pipeline</h1>
 
 <p>The PREP pipeline is a standardized early-stage EEG processing pipeline that focuses on the identification of bad channels and the calculation of a robust average reference. PREP also has an extensive reporting facility. It is designed to be run in a completely automated way. The major sections of this document are:</p>
 
@@ -32,12 +32,12 @@
 </ul>
 
 <h3>
-<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h3>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h3>
 
 <p>The PREP pipeline relies on the MATLAB Signal Processing toolbox and EEGLAB, a freely-available MATLAB toolbox for processing EEG. EEGLAB is available from  <a href="http://scn.ucsd.edu/eeglab">http://scn.ucsd.edu/eeglab</a>. PREP assumes that the EEG data is provided as an EEGLAB EEG structure and that channel locations are provided in the EEG.chanlocs structure.</p>
 
 <h3>
-<a id="citing-the-prep-pipeline" class="anchor" href="#citing-the-prep-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Citing the PREP pipeline</h3>
+<a id="citing-the-prep-pipeline" class="anchor" href="#citing-the-prep-pipeline" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Citing the PREP pipeline</h3>
 
 <p>The PREP pipeline is freely available under the GUN General Public License. 
 Please cite the following publication if using:  </p>
@@ -49,18 +49,18 @@ Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  </p>
 </blockquote>
 
 <h3>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h3>
 
 <p>The PREP pipeline can be run in two ways --- as a standalone toolbox or as an EEGLAB plugin. To run in standalone mode, simply download the PREP code, found the the EEG-Clean-Tools</p>
 
 <h1>
-<a id="prep-as-an-eeglab-plugin" class="anchor" href="#prep-as-an-eeglab-plugin" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP as an EEGLAB plugin</h1>
+<a id="prep-as-an-eeglab-plugin" class="anchor" href="#prep-as-an-eeglab-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>PREP as an EEGLAB plugin</h1>
 
 <p>You can install PREP as an EEGLAB plugin by unzipping the PREPPipeline directory into the plugins directory of
 your EEGLAB installation. </p>
 
 <h1>
-<a id="using-parallel-processing-with-prep" class="anchor" href="#using-parallel-processing-with-prep" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using parallel processing with PREP</h1>
+<a id="using-parallel-processing-with-prep" class="anchor" href="#using-parallel-processing-with-prep" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using parallel processing with PREP</h1>
 
 <p>The PREP pipeline can execute fairly slowly on headsets with a lot of channels. However, many of the steps are embarassingly parallel --- that is the PREP can perform operations separately on individual channels or individual windows.
 If you have the MATLAB Parallel Processing Toolbox, you just need to make sure that it is enabled. The following screenshot
@@ -72,7 +72,7 @@ the pool when needed:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/ParallelProcessing.png" alt="MATLAB Parallel processing">  </p>
 
 <h2>
-<a id="running-the-prep-pipeline-from-eeglab" class="anchor" href="#running-the-prep-pipeline-from-eeglab" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the PREP pipeline from EEGLAB</h2>
+<a id="running-the-prep-pipeline-from-eeglab" class="anchor" href="#running-the-prep-pipeline-from-eeglab" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running the PREP pipeline from EEGLAB</h2>
 
 <p>Load an EEG dataset to be processed using the Load dataset submenu under the File menu of EEGLAB.  The PREP pipeline 
 can be found under the EEGLAB Tools submenu:<br>
@@ -122,12 +122,12 @@ the processed EEG data set:<br>
 <img src="https://raw.githubusercontent.com/VisLab/EEG-Clean-Tools/gh-pages/images/PrepFinalSave.png" alt="PREP final save menu">  </p>
 
 <h1>
-<a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>PREP Overview</h1>
+<a id="prep-overview" class="anchor" href="#prep-overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>PREP Overview</h1>
 
 <p>This section discusses the algorithm and the meeting of the various parameters.</p>
 
 <h3>
-<a id="processing-steps" class="anchor" href="#processing-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Processing steps</h3>
+<a id="processing-steps" class="anchor" href="#processing-steps" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Processing steps</h3>
 
 <ol>
 <li>Handle boundary events prior to processing</li>
@@ -140,14 +140,14 @@ the processed EEG data set:<br>
 </ol>
 
 <h2>
-<a id="boundary-marker-handling" class="anchor" href="#boundary-marker-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Boundary marker handling</h2>
+<a id="boundary-marker-handling" class="anchor" href="#boundary-marker-handling" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Boundary marker handling</h2>
 
 <p>PREP is meant to work on data obtained from a continuous recording session. However, sometimes researchers record multiple sessions in the same file (such as by temporarily suspending and resuming recording). EEGLAB uses boundary events to mark
 these discontinuities. Some (but not all) EEGLAB functions respect these boundary markers. By default, the PREP pipeline will not process data sets with boundary markers. Because some researchers use these boundary markers for other purposes than for marking discontinuities, PREP allows the option of temporarily removing boundary markers before processing and then reinserting afterwards. <strong>You should not disregard boundary markers unless you are absolutely sure that these markers</strong>
 <strong>to not represent discontinuities.</strong></p>
 
 <h2>
-<a id="detrend-high-pass-filtering" class="anchor" href="#detrend-high-pass-filtering" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detrend (high pass filtering)</h2>
+<a id="detrend-high-pass-filtering" class="anchor" href="#detrend-high-pass-filtering" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Detrend (high pass filtering)</h2>
 
 <p>High pass filtering of some sort is needed in order for many of the algorithms, including line noise removal and
 referencing to perform correctly. However, the exact cutoff may dramatically effect downstream algorithms. By default, 
@@ -155,7 +155,7 @@ PREP uses a 1 Hz cutoff, but only temporarily filters, so that the final signal 
 allows you to defer the final choice of high pass cutoff for downstream processing to later. </p>
 
 <h3>
-<a id="calling-sequence-for-removing-trends" class="anchor" href="#calling-sequence-for-removing-trends" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for removing trends</h3>
+<a id="calling-sequence-for-removing-trends" class="anchor" href="#calling-sequence-for-removing-trends" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Calling sequence for removing trends</h3>
 
 <p>The <code>removeTrend</code> function takes two structures in and produces two output structures. The <code>signal</code> structure
 includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The <code>.data</code> field should be channels x frames. </p>
@@ -177,7 +177,7 @@ of the actual command used. Usually, the only field that a user might need to pr
 </blockquote>
 
 <h3>
-<a id="parameters-for-removing-the-trend" class="anchor" href="#parameters-for-removing-the-trend" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for removing the trend</h3>
+<a id="parameters-for-removing-the-trend" class="anchor" href="#parameters-for-removing-the-trend" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Parameters for removing the trend</h3>
 
 <p>The following parameters appear as fields in the <code>detrendIn</code> structure:  </p>
 
@@ -202,12 +202,12 @@ The amount in seconds to slide the local detrending window when local linear reg
 By default, PREP uses 0.02 seconds. This parameter is not used unless the <code>detrendType</code> is <code>'linear'</code>.  </p>
 
 <h2>
-<a id="line-noise-removal" class="anchor" href="#line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Line noise removal</h2>
+<a id="line-noise-removal" class="anchor" href="#line-noise-removal" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Line noise removal</h2>
 
 <p>We use an iterative version of a method that estimates the amplitude and size of a deterministic sinusoid at a specified frequency embedded in locally white noise. The model is applied in sliding windows to adjust for non stationarity. The algorithm requires a rough guess of the frequencies to be removed. By default, PREP uses multiples of 60 Hz. If the data set was recorded in a place where 50 Hz alternating current is used, you will need to provide the <code>lineFrequencies</code> parameter. Sometimes unusual frequencies appear due to aliasing and other recording artifacts. For example, a frequency spike at 212 Hz might appear as an aliasing artifact in a signal recorded at 512 Hz (212 = 512 - 300). You might need to rerun with different frequencies if unusual spectral peaks are visible in the reports. </p>
 
 <h3>
-<a id="calling-sequence-for-line-noise-removal" class="anchor" href="#calling-sequence-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for line noise removal</h3>
+<a id="calling-sequence-for-line-noise-removal" class="anchor" href="#calling-sequence-for-line-noise-removal" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Calling sequence for line noise removal</h3>
 
 <p>The <code>cleanLineNoise</code> function takes two structures in and produces two output structures. The <code>signal</code> structure
 includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. </p>
@@ -230,7 +230,7 @@ of the actual command used.</p>
 </blockquote>
 
 <h3>
-<a id="parameters-for-line-noise-removal" class="anchor" href="#parameters-for-line-noise-removal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for line noise removal</h3>
+<a id="parameters-for-line-noise-removal" class="anchor" href="#parameters-for-line-noise-removal" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Parameters for line noise removal</h3>
 
 <p>The following parameters appear as fields in the <code>lineNoiseIn</code> structure:  </p>
 
@@ -279,7 +279,7 @@ is not significantly above the background, it is removed from consideration. Whe
 stops the procedure. Most of the time, only a few iterations are required.  You should not have to override this parameter.  </p>
 
 <h2>
-<a id="robust-referencing" class="anchor" href="#robust-referencing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Robust referencing</h2>
+<a id="robust-referencing" class="anchor" href="#robust-referencing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Robust referencing</h2>
 
 <p>Referencing is the process of subtracting a common reference signal from all of the channels. Data sets collected
 from Biosemi headsets require referencing of some sort. Other headsets benefit as well. When comparing results across
@@ -292,7 +292,7 @@ errors.  To address this, the robust reference iteratively detects and interpola
 average reference that is not affected by artifacts.  </p>
 
 <h3>
-<a id="calling-sequence-for-referencing" class="anchor" href="#calling-sequence-for-referencing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for referencing</h3>
+<a id="calling-sequence-for-referencing" class="anchor" href="#calling-sequence-for-referencing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Calling sequence for referencing</h3>
 
 <p>The <code>performReference</code> function takes two structures in and produces two output structures. The signal structure
 includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. On output, PREP stores metadata about the referencing in the <code>.etc.noiseDetection</code> field.</p>
@@ -314,7 +314,7 @@ reports of the output of the bad channel detection. Details in the document on P
 </blockquote>
 
 <h3>
-<a id="parameters-for-referencing" class="anchor" href="#parameters-for-referencing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for referencing</h3>
+<a id="parameters-for-referencing" class="anchor" href="#parameters-for-referencing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Parameters for referencing</h3>
 
 <p>The following parameters appear as fields in the <code>referenceIn</code> structure:  </p>
 
@@ -406,12 +406,12 @@ the data structure to contain all of the window information for later processing
 after running the reports.  </p>
 
 <h2>
-<a id="reporting" class="anchor" href="#reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reporting</h2>
+<a id="reporting" class="anchor" href="#reporting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reporting</h2>
 
 <p>PREP has an extensive report facility that can be used provided that your reporting level was <code>'verbose'</code>. The GUI version of the PREP pipeline (<code>pop_prepPipeline'</code>) has options in the report GUI for you to select whether or not to run the report. If the report mode is <code>'normal'</code> (the default), then PREP runs the processing pipeline followed by the report, followed by the post processing. If the report mode is <code>'skip'</code>, then PREP runs the processing pipeline followed by the post processing. If the report mode is <code>'reportOnly'</code>, then PREP only runs the report and skips both the processing and the post processing.  </p>
 
 <h3>
-<a id="calling-sequence-for-reporting" class="anchor" href="#calling-sequence-for-reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Calling sequence for reporting</h3>
+<a id="calling-sequence-for-reporting" class="anchor" href="#calling-sequence-for-reporting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Calling sequence for reporting</h3>
 
 <p>The <code>publishPrepReport</code> function takes an EEG structure that has been run through the PREP pipeline with
 report level of verbose. You need to furnish a summary directory name and a summary file name for an HTML file with summary information for all of the stuff.</p>
@@ -433,7 +433,7 @@ The following produces an HTML-formatted summary report in the current directory
 </blockquote>
 
 <h3>
-<a id="parameters-for-reporting" class="anchor" href="#parameters-for-reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters for reporting</h3>
+<a id="parameters-for-reporting" class="anchor" href="#parameters-for-reporting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Parameters for reporting</h3>
 
 <p><strong><code>signal</code></strong><br>
 The <code>signal</code> structure includes a <code>.data</code> field and an <code>.srate</code> field. The <code>signal</code> structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. In order to get reports, the EEG structure must have the <code>.etc.noiseDetection</code> as PREP generates the report from information stored there.  </p>
