@@ -9,7 +9,7 @@ find user documention at:
 PREP that can be unzipped into your EEGLAB plugins directory.  
 
 ### Citing the PREP pipeline
-The PREP pipeline is freely available under the GUN General Public License. 
+The PREP pipeline is freely available under the GNU General Public License. 
 Please cite the following publication if using:  
 > Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015)  
 > The PREP pipeline: standardized preprocessing for large-scale EEG analysis  
