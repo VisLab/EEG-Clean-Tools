@@ -1,0 +1,8 @@
+title: PREP Pipeline: EEG-Clean-Tools
+description: Contains tools for EEG standardized preprocessing
+google_analytics: UA-66346771-1
+show_downloads: true
+theme: jekyll-theme-cayman
+
+gems:
+  - jekyll-mentions
