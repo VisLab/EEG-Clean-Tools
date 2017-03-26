@@ -59,13 +59,15 @@ for iteration = 1:lineNoise.maximumIterations
         datawin = data(indx);
          [datafitwin, f0Sig] = ...
             fitSignificantFrequencies(datawin, f0, lineNoise);
-        datafitwin0 = datafitwin;
+
         f0Mask = f0Mask | f0Sig;
+        % datafitwin0 = datafitwin; incorrectly placed
         if n > 1
             datafitwin(1:Noverlap)= smooth.*datafitwin(1:Noverlap) + ...
                 (1 - smooth).*datafitwin0((Nwin - Noverlap + 1):Nwin);
         end;
         datafit(indx, :) = datafitwin;
+        datafitwin0 = datafitwin; % Moved from above the if statement
     end
 
     data(1:size(datafit, 1)) = data(1:size(datafit, 1)) - datafit;
