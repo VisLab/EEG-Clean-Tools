@@ -6,7 +6,7 @@
 %
 % Inputs:
 %   INEEG   - input EEG dataset
-%   params  - structure with parameters to override defaults
+%   params  - (optional) structure with parameters to override defaults
 %
 % Outputs:
 %   OUTEEG  - output dataset
