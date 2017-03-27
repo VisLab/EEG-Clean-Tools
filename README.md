@@ -24,6 +24,10 @@ well as associated visualization tools. Kay Robbins of UTSA is the lead develope
 maintainer of PREP.
 
 ### Releases   
+Version 0.54.0 Unreleased
+* Added Blasst as an unsupported line noise removal option
+* Moved legend of spectrum to right, put in checks
+* Corrected bug in smoothing in cleanline
 
 Version 0.52 Released
 * Modified code to handle EEG structures with empty EEG.error.
