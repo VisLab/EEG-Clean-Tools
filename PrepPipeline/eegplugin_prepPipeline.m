@@ -29,8 +29,16 @@
 %    'callback', 'EEG = pop_clean_rawdata(EEG); [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); eeglab redraw');
 
 % eegplugin_prepPipeline() - the PREP pipeline plugin
-function eegplugin_prepPipeline(fig, trystrs, catchstrs) 
- 
+function vers = eegplugin_prepPipeline(fig, trystrs, catchstrs) 
+vers = 'PrepPipeline0.54.0'; 
+
+%% Add path to prepPipeline subdirectories if not in the list
+tmp = which('getPipelineDefaults');
+if isempty(tmp)
+    myPath = fileparts(which('prepPipeline'));
+    addpath(genpath(myPath));
+end;
+
 % create menu
 comprep = [trystrs.no_check '[EEG LASTCOM] = pop_prepPipeline(EEG);' catchstrs.new_and_hist];
 menu = findobj(fig, 'tag', 'tools');

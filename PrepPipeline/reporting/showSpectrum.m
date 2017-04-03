@@ -1,5 +1,5 @@
 function [fref, sref, badChannels] = showSpectrum(EEG, channelLabels, ...
-                channels, displayChannels, tString, maxChannelsPerFigure)
+    channels, displayChannels, tString, maxChannelsPerFigure)
 % Calculate EEG spectra for channels and show display displayChannels
 %
 % Parameters:
@@ -20,36 +20,36 @@ function [fref, sref, badChannels] = showSpectrum(EEG, channelLabels, ...
 %
 %  Uses calculateSpectrum -- adapted from EEGLAB
 %
-    fftwinfac = 4;
-    sref = cell(length(channels), 1);
-    fref = cell(length(channels), 1);
-    badList = false(length(channels), 1);
-    tempData = EEG.data(channels, :);
-    srate = EEG.srate;
-    numFrames = size(EEG.data, 2);
-    fftFactor = fftwinfac*EEG.srate;
-    parfor k = 1:length(channels)
-      [sref{k}, fref{k}]= calculateSpectrum(tempData(k, :), ...
-           numFrames, srate, 'freqfac', 4, 'winsize', ...
-           fftFactor, 'plot', 'off');
-       if isempty(sref{k})
-           badList(k) = true;
-       end
-    end   
-    badChannels = channels(badList);
-    if ~isempty(displayChannels)
-        tString1 = {tString,'Selected channels'};
-        displayChannels = intersect(channels, displayChannels);
-        %displayChannels = setdiff(displayChannels, badChannels);
-        numberPlots = ceil(length(displayChannels)/maxChannelsPerFigure);
-        perPlot = ceil(length(displayChannels)/numberPlots);
-        for k = 1:numberPlots
-            startChannel = perPlot*(k - 1) + 1;
-            endChannel = min(startChannel + perPlot - 1, length(displayChannels));
-            showChannels(displayChannels(startChannel:endChannel));
-        end
+fftwinfac = 4;
+sref = cell(length(channels), 1);
+fref = cell(length(channels), 1);
+badList = false(length(channels), 1);
+tempData = EEG.data(channels, :);
+srate = EEG.srate;
+numFrames = size(EEG.data, 2);
+fftFactor = fftwinfac*EEG.srate;
+parfor k = 1:length(channels)
+    [sref{k}, fref{k}]= calculateSpectrum(tempData(k, :), ...
+        numFrames, srate, 'freqfac', 4, 'winsize', ...
+        fftFactor, 'plot', 'off');
+    if isempty(sref{k})
+        badList(k) = true;
     end
-    
+end
+badChannels = channels(badList);
+if ~isempty(displayChannels)
+    tString1 = {tString,'Selected channels'};
+    displayChannels = intersect(channels, displayChannels);
+    %displayChannels = setdiff(displayChannels, badChannels);
+    numberPlots = ceil(length(displayChannels)/maxChannelsPerFigure);
+    perPlot = ceil(length(displayChannels)/numberPlots);
+    for k = 1:numberPlots
+        startChannel = perPlot*(k - 1) + 1;
+        endChannel = min(startChannel + perPlot - 1, length(displayChannels));
+        showChannels(displayChannels(startChannel:endChannel));
+    end
+end
+
     function [] = showChannels(theseChannels)
         colors = jet(length(theseChannels));
         figure('Name', tString, 'Color', [1, 1, 1])
@@ -71,11 +71,11 @@ function [fref, sref, badChannels] = showSpectrum(EEG, channelLabels, ...
         xlabel('Frequency (Hz)')
         ylabel('Power 10*log(\muV^2/Hz)')
         if ~isempty(legends)
-               legend(legends, 'Location', 'EastOutside')
+            legends = legends(~cellfun('isempty',legends));
+            legend(legends, 'Location', 'EastOutside')
         end
         title(tString1, 'Interpreter', 'none')
         box on
         drawnow
     end
 end
-        

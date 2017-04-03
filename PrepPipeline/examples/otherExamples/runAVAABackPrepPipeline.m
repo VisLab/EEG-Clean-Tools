@@ -6,7 +6,6 @@
 
 %% Read in the file and set the necessary parameters
 basename = 'TsLs_NBack';
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 inDir = 'E:\CTAData\AVAA_Validation_setfiles'; % Input data directory used for this demo
 outDir = 'O:\ARL_Data\TsLs_NBack\AVAA_Robust_1Hz';
 reportDir = 'O:\ARL_Data\TsLs_NBack\AVAA_Robust_1Hz_Report';

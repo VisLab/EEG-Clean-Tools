@@ -5,7 +5,6 @@ function [EEG, postOut] = prepPostProcess(EEG, postIn)
 % 
 
 %% %% Check the parameters
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 if nargin < 1 || ~isstruct(EEG)
     error('postProcess:NotEnoughArguments', 'first argument must be a structure');

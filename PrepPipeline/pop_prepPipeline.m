@@ -41,12 +41,12 @@ elseif nargin < 2
     params = struct();
 end
 
-%% Add path to prepPipeline subdirectories if not in the list
-tmp = which('getPipelineDefaults');
-if isempty(tmp)
-    myPath = fileparts(which('prepPipeline'));
-    addpath(genpath(myPath));
-end;
+% %% Add path to prepPipeline subdirectories if not in the list
+% tmp = which('getPipelineDefaults');
+% if isempty(tmp)
+%     myPath = fileparts(which('prepPipeline'));
+%     addpath(genpath(myPath));
+% end;
 
 %% Pop up window
 if nargin < 2

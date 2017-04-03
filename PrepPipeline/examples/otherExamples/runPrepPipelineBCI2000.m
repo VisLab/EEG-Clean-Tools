@@ -6,7 +6,6 @@
 
 %% Read in the file and set the necessary parameters
 basename = 'BCI2000';
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 inDir = 'J:\CTAData\RestingDataCollection\BCI2000\Level0'; % Input data directory used for this demo
 outDir = 'J:\CTAData\RestingDataCollection\BCI2000\BCI2000_Robust_Clean_1Hz_Unfiltered';
 dataDir = 'J:\CTAData\RestingDataCollection\BCI2000\BCI2000_Robust_Clean_1Hz_Unfiltered_Report';

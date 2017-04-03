@@ -42,7 +42,9 @@ computationTimes= struct( ...
     'lineNoise', 0, 'reference', 0);
 errorMessages = struct('status', 'good', 'boundary', 0, ...
                'detrend', 0, 'lineNoise', 0, 'reference', 0);
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
+[backupOptionsFile, currentOptionsFile, warningsState] = setupForEEGLAB();
+finishup = onCleanup(@() cleanup(backupOptionsFile, currentOptionsFile, ...
+    warningsState));
 if isfield(EEG.etc, 'noiseDetection')
     warning('EEG.etc.noiseDetection already exists and will be cleared\n')
 end
@@ -169,3 +171,10 @@ end
 %% Report that there were no errors
 EEG.etc.noiseDetection.errors = errorMessages;
 
+end
+
+function cleanup(backupFile, currentFile, warningsState)
+% Restore EEGLAB options file and warning settings 
+restoreEEGOptions(backupFile, currentFile);
+warning(warningsState);
+end % cleanup

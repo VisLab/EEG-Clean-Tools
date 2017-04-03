@@ -6,7 +6,6 @@
 
 %% Read in the file and set the necessary parameters
 basename = 'shooter';
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 inDir = 'E:\CTADATA\Shooter\Level0'; % Input data directory used for this demo
 outDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_Unfiltered_NoLine';
 dataDir = 'E:\CTADATA\Shooter\Shooter_Robust_1Hz_Unfiltered_NoLine_Report';

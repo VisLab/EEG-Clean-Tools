@@ -1,7 +1,6 @@
 %% Example: Running the pipeline outside of ESS
 
 %% Read in the file and set the necessary parameters
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 inDir = 'D:\Research\BlinkDetection\BlinksColumbiaTest\original';
 outDir = 'D:\Research\BlinkDetection\BlinksColumbiaTest\prepped';
 reportDir = 'D:\Research\BlinkDetection\BlinksColumbiaTest\report';

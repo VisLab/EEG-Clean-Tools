@@ -2,7 +2,6 @@
 
 % %% Read in the file and set the necessary parameters
 % basename = 'umich_lsie';
-% pop_editoptions('option_single', false, 'option_savetwofiles', false);
 % params = struct();
 % %% Parameters that must be preset
 % params.referenceChannels = 1:256;
