@@ -1,4 +1,4 @@
-function showPipelineDefaults(EEG, FID)
+function showPrepDefaults(EEG, FID)
 % Displays information about the defaults used for PREP pipeline steps
 %
 % Parameters:
@@ -11,7 +11,7 @@ function showPipelineDefaults(EEG, FID)
 types = {'boundary', 'resample', 'globaltrend', 'detrend', ...
                 'linenoise', 'reference', 'report', 'postprocess'};
 if nargin < 1 || ~isstruct(EEG)
-    error('showPipelineDefaults:NotEnoughArguments', ...
+    error('showPrepDefaults:NotEnoughArguments', ...
          'first argument must be a structure');
 elseif nargin < 2 || ~exist('FID', 'var')  
     FID = 1;
@@ -19,7 +19,7 @@ end
 
 indent = '  ';
 for k = 1:length(types)
-    theseDefaults = getPipelineDefaults(EEG, types{k});
+    theseDefaults = getPrepDefaults(EEG, types{k});
     theseFields = fieldnames(theseDefaults);
     fprintf(FID, '\nDefaults for %s:\n', types{k});
     for j = 1:length(theseFields)

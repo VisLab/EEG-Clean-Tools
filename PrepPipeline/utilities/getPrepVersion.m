@@ -1,5 +1,6 @@
-function [prepver, changeLog] = getPrepPipelineVersion()
+function [versionString, prepver, changeLog] = getPrepVersion()
 
+versionString = 'PrepPipeline0.54.0'; 
 prepver = struct('Detrend', 'v0.54.0', 'GlobalTrend', 'v0.54.0', ...
                  'LineNoise', 'v0.54.0', 'Resampling', 'v0.54.0', ...
                  'Reference', 'v0.54.0', 'Interpolation', 'v0.54.0');

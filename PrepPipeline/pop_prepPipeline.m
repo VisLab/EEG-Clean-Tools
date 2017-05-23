@@ -41,12 +41,12 @@ elseif nargin < 2
     params = struct();
 end
 
-% %% Add path to prepPipeline subdirectories if not in the list
-% tmp = which('getPipelineDefaults');
-% if isempty(tmp)
-%     myPath = fileparts(which('prepPipeline'));
-%     addpath(genpath(myPath));
-% end;
+%% Add path to prepPipeline subdirectories if not in the list
+tmp = which('getPrepDefaults');
+if isempty(tmp)
+    myPath = fileparts(which('prepPipeline'));
+    addpath(genpath(myPath));
+end;
 
 %% Pop up window
 if nargin < 2
@@ -91,7 +91,7 @@ end
             'report', [],  'postProcess', []);
         stepNames = fieldnames(userData);
         for k = 1:length(stepNames)
-            defaults = getPipelineDefaults(EEG, stepNames{k});
+            defaults = getPrepDefaults(EEG, stepNames{k});
             [theseValues, errors] = checkStructureDefaults(params, ...
                 defaults);
             if ~isempty(errors)

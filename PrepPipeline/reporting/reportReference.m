@@ -2,6 +2,7 @@ function [summary, noisyStatistics] = reportReference(fid, noiseDetection, numbe
 %% Extracts and outputs parameters for referencing calculation
 % Outputs a summary to file fid and returns a cell array of important messages
     summary = {};
+    noisyStatistics = struct();
     if ~isempty(noiseDetection.errors.reference)
         summary{end+1} =  noiseDetection.errors.reference;
         fprintf(fid, '%s\n', summary{end});

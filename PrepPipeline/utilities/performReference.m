@@ -26,12 +26,12 @@ end
 
 %% Set the defaults and initialize as needed
 referenceOut = getReferenceStructure();
-defaults = getPipelineDefaults(signal, 'reference');
+defaults = getPrepDefaults(signal, 'reference');
 [referenceOut, errors] = checkDefaults(referenceIn, referenceOut, defaults);
 if ~isempty(errors)
     error('performReference:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end
-defaults = getPipelineDefaults(signal, 'detrend');
+defaults = getPrepDefaults(signal, 'detrend');
 [referenceOut, errors] = checkDefaults(referenceIn, referenceOut, defaults);
 if ~isempty(errors)
     error('performReference:BadParameters', ['|' sprintf('%s|', errors{:})]);

@@ -94,7 +94,7 @@ end
 
 %% Set the defaults and initialize as needed
 noisyOut = getNoisyStructure();
-defaults = getPipelineDefaults(signal, 'reference');
+defaults = getPrepDefaults(signal, 'reference');
 [noisyOut, errors] = checkDefaults(noisyIn, noisyOut, defaults);
 if ~isempty(errors)
     error('findNoisyChannels:BadParameters', ['|' sprintf('%s|', errors{:})]);

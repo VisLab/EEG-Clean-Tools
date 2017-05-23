@@ -30,10 +30,10 @@
 
 % eegplugin_prepPipeline() - the PREP pipeline plugin
 function vers = eegplugin_prepPipeline(fig, trystrs, catchstrs) 
-vers = 'PrepPipeline0.54.0'; 
+vers = getPrepVersion(); 
 
 %% Add path to prepPipeline subdirectories if not in the list
-tmp = which('getPipelineDefaults');
+tmp = which('getPrepDefaults');
 if isempty(tmp)
     myPath = fileparts(which('prepPipeline'));
     addpath(genpath(myPath));

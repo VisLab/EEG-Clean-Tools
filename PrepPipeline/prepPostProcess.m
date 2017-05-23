@@ -16,7 +16,7 @@ if ~isstruct(postIn)
 end
 postOut = struct('keepFiltered', [], 'removeInterpolatedChannels', [], ...
                   'cleanupReference', []);
-defaults = getPipelineDefaults(EEG, 'postProcess');
+defaults = getPrepDefaults(EEG, 'postProcess');
 
 [postOut, errors] = checkDefaults(postIn, postOut, defaults);
 if ~isempty(errors)

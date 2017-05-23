@@ -43,7 +43,7 @@ if ~isstruct(globalTrendIn)
     error('removeGlobalTrend:NoData', 'second argument must be a structure')
 end
 
-defaults = getPipelineDefaults(EEG, 'globaltrend');
+defaults = getPrepDefaults(EEG, 'globaltrend');
 globalTrendOut = struct('globalTrendChannels', [], 'doLocal', [], ...
     'localCutoff', [], 'localStepSize', [], 'linearFit', [], ...
      'channelCorrelations', []);

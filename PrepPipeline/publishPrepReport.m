@@ -30,7 +30,7 @@ function [] = publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
 %
 %
 %% Handle the parameters
-if (nargin < 5)
+if (nargin < 4)
     error('publishPrepReport:NotEnoughParameters', ...
         ['Usage: publishPrepReport(EEG, summaryFilePath, ' ...
         'sessionFilePath, consoleId, publishOn)']);
@@ -69,7 +69,7 @@ end
         prepReport;
     end
     if publishOn 
-        writeSummaryItem(summaryFile, '', 'last');
+        writeHtmlList(summaryFile, '', 'last');
         fclose('all');
         fprintf('temp report location %s\n', tempReportLocation);
         fprintf('session report location %s\n', sessionReportLocation);

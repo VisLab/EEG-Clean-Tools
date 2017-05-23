@@ -1,5 +1,5 @@
 function [structOut, errors] = checkDefaults(structIn, structOut, defaults)
-% Check structIn input parameters against defaults put in structOut
+% Check structIn input parameters against defaults fields of structOut
 errors = cell(0);
 fNames = fieldnames(defaults);
 for k = 1:length(fNames)
@@ -10,6 +10,6 @@ for k = 1:length(fNames)
                          defaults.(fNames{k}).attributes);
        structOut.(fNames{k}) = nextValue;
     catch mex
-        errors{end+1} = [fNames{k} ' invalid: ' mex.message]; %#ok<AGROW>
+        errors{end+1} = [fNames{k} ' parameter value invalid: ' mex.message]; %#ok<AGROW>
     end
 end

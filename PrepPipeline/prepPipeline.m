@@ -55,12 +55,26 @@ if ~isfield(params, 'name')
     params.name = ['EEG' EEG.filename];
 end
 EEG.etc.noiseDetection = ...
-       struct('name', params.name, 'version', getPrepPipelineVersion, ...
+       struct('name', params.name, 'version', getPrepVersion, ...
               'errors', []);
 EEG.data = double(EEG.data);   % Don't monkey around -- get into double
+
+%% Check for the general defaults
+try
+    defaults = getPrepDefaults(EEG, 'general');
+    [params, errors] = checkDefaults(params, params, defaults);
+    if ~isempty(errors)
+        error('prepPipeline:GeneralDefaultError', ['|' sprintf('%s|', errors{:})]);
+    end
+catch mex
+    warning('[%s] %s: Prep could not begin processing the EEG', ...
+       mex.identifier, getReport(mex, 'extended', 'hyperlinks', 'on')); 
+    return;
+end
+
 %% Check for boundary events
 try
-    defaults = getPipelineDefaults(EEG, 'boundary');
+    defaults = getPrepDefaults(EEG, 'boundary');
     [boundaryOut, errors] = checkDefaults(params, struct(), defaults);
     if ~isempty(errors)
         error('boundary:BadParameters', ['|' sprintf('%s|', errors{:})]);
@@ -70,19 +84,24 @@ try
             isfield(EEG, 'event') && ~isempty(EEG.event)
         eTypes = find(strcmpi({EEG.event.type}, 'boundary'));
         if ~isempty(eTypes)
-            error(['Dataset ' params.name  ...
+            error('boundary:UnremovedBoundary', ['Dataset ' params.name  ...
                 ' has boundary events: [' getListString(eTypes) ...
-                '] which are treated as discontinuities unless set to ignore']);
+                '] which are treated as discontinuities unless ' ...
+                'set to ignore. Prep cannot continue']);
         end
     end
 catch mex
     errorMessages.boundary = ...
-        ['prepPipeline bad boundary events: ' getReport(mex)];
+        ['prepPipeline bad boundary events: ' ...
+         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
+    if strcmpi(params.errorMsgs, 'verbose')
+        warning('[%s]\n%s', mex.identifier, ...
+           getReport(mex, 'extended', 'hyperlinks', 'on')); 
+    end
     return;
 end
-
 
 %% Part II:  HP the signal for detecting bad channels
 fprintf('Preliminary detrend to compute reference\n');
@@ -91,14 +110,19 @@ try
     [EEGNew, detrend] = removeTrend(EEG, params);
     EEG.etc.noiseDetection.detrend = detrend;
     % Make sure detrend defaults are available for referencing
-    defaults = getPipelineDefaults(EEG, 'detrend');
+    defaults = getPrepDefaults(EEG, 'detrend');
     params = checkDefaults(detrend, params, defaults); 
     computationTimes.detrend = toc;
 catch mex
     errorMessages.removeTrend = ...
-        ['prepPipeline failed removeTrend: ' getReport(mex)];
+        ['prepPipeline failed removeTrend: ' ...
+         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
+    if strcmpi(params.errorMsgs, 'verbose')
+        warning('[%s]\n%s', mex.identifier, ...
+            getReport(mex, 'extended', 'hyperlinks', 'on')); 
+    end
     return;
 end
  
@@ -115,9 +139,14 @@ try
     computationTimes.lineNoise = toc;
 catch mex
     errorMessages.lineNoise = ...
-        ['prepPipeline failed removeLineNoise: ' getReport(mex)];
+        ['prepPipeline failed removeLineNoise: ' ...
+         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
+    if strcmpi(params.errorMsgs, 'verbose')
+        warning('[%s]\n%s', mex.identifier, ...
+            getReport(mex, 'extended', 'hyperlinks', 'on')); 
+    end
     return;
 end 
 
@@ -134,13 +163,17 @@ catch mex
         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
+    if strcmpi(params.errorMsgs, 'verbose')
+        warning('[%s]\n%s', mex.identifier, ...
+            getReport(mex, 'extended', 'hyperlinks', 'on'));
+    end
     return;
 end
 
 %% Part V: Post process
 fprintf('Post-process\n')
 try
-    defaults = getPipelineDefaults(EEG, 'postprocess');
+    defaults = getPrepDefaults(EEG, 'postprocess');
     postProcessOut = checkDefaults(params, struct(), defaults);
     if postProcessOut.keepFiltered
         EEG = removeTrend(EEG, EEG.referenceOut);
@@ -165,6 +198,10 @@ catch mex
         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
+    if strcmpi(params.errorMsgs, 'verbose')
+        warning('[%s]\n%s', mex.identifier, ...
+            getReport(mex, 'extended', 'hyperlinks', 'on'));
+    end
     return;
 end
 

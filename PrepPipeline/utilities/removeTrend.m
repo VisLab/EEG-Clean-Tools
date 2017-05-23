@@ -43,7 +43,7 @@ if ~isstruct(detrendIn)
     error('removeTrend:NoData', 'second argument must be a structure')
 end
 
-defaults = getPipelineDefaults(EEG, 'detrend');
+defaults = getPrepDefaults(EEG, 'detrend');
 detrendOut = struct('detrendChannels', [], 'detrendType', [], ...
                     'detrendCutoff', [], 'detrendStepSize', [], ...
                     'detrendCommand', []);

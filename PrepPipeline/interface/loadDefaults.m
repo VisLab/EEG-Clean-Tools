@@ -8,22 +8,22 @@
 %Notes:
 %
 % *************************************************************************
-function [defaultParams,defaultValues]=loadDefaults(signal,type)
-    defaultValues=struct;
-    defaultParams=getPipelineDefaults(signal,type);
-    fNames=fieldnames(defaultParams);
-    for k=1:length(fNames)
-       if(strcmp(defaultParams.(fNames{k}).classes,'struct')==0)
-            changeStr=num2str(defaultParams.(fNames{k}).default);
-            defaultParams.(fNames{k}).default=changeStr;
-            sFind=strfind(defaultParams.(fNames{k}).default,'[');
-            defaultParams.(fNames{k}).default(sFind)=[];
-            sFind=strfind(defaultParams.(fNames{k}).default,']');
-            defaultParams.(fNames{k}).default(sFind)=[];
+function [defaultParams, defaultValues] = loadDefaults(signal, type)
+    defaultValues = struct();
+    defaultParams = getPrepDefaults(signal,type);
+    fNames = fieldnames(defaultParams);
+    for k = 1:length(fNames)
+       if strcmp(defaultParams.(fNames{k}).classes,'struct')==0
+            changeStr = num2str(defaultParams.(fNames{k}).default);
+            defaultParams.(fNames{k}).default = changeStr;
+            sFind = strfind(defaultParams.(fNames{k}).default,'[');
+            defaultParams.(fNames{k}).default(sFind) = [];
+            sFind = strfind(defaultParams.(fNames{k}).default,']');
+            defaultParams.(fNames{k}).default(sFind) = [];
        end
     end
-    for k=1:length(fNames)
-        setVal=defaultParams.(fNames{k}).default;
-        defaultValues.(fNames{k})=setVal;
+    for k = 1:length(fNames)
+        setVal = defaultParams.(fNames{k}).default;
+        defaultValues.(fNames{k}) = setVal;
     end
 end
