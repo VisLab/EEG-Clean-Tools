@@ -52,7 +52,7 @@ writeTextList(consoleFID, errors);
 
 % Versions
 writeSummaryHeader(summaryFile,  ['Prep version:' version], 'h4');
-fprintf(consoleFID, 'Prep version:\n%s\n', version);
+fprintf(consoleFID, 'Prep version: %s\n', version);
 
 % Events
 summaryMsg = ['Data summary: sampling rate ' num2str(EEGReporting.srate) 'Hz'];
@@ -64,8 +64,8 @@ writeHtmlList(summaryFile, summary, 'both');
 % Interpolated channels for referencing
 if isfield(noiseDetection, 'reference')
     writeSummaryHeader(summaryFile,  'Interpolated channels', 'h4');
-    interpolatedChannels = ...
-        getFieldIfExists(noiseDetection, 'interpolatedChannels');
+    interpolated = getFieldIfExists(noiseDetection.reference, 'interpolatedChannels');
+    interpolatedChannels = getFieldIfExists(interpolated, 'all');
     summaryItem = ['Bad channels interpolated for reference: [' ...
                     num2str(interpolatedChannels), ']'];
     writeHtmlList(summaryFile, {summaryItem}, 'both');
@@ -97,8 +97,9 @@ writeHtmlList(summaryFile, summary, 'both');
 if ~isfield(noiseDetection, 'lineNoise')
    fprintf(consoleFID, 'Skipping line noise and detrend\n');
 else
-    lineChannels = noiseDetection.lineNoise.lineNoiseChannels; 
-    numChans = min(6, length(lineChannels));
+    lineChannels = noiseDetection.lineNoise.lineNoiseChannels;
+    actualChans = setdiff(lineChannels, interpolatedChannels);
+    numChans = min(6, length(actualChans));
     indexchans = floor(linspace(1, length(lineChannels), numChans));
     displayChannels = lineChannels(indexchans);
     channelLabels = {EEGReporting.chanlocs(lineChannels).labels};
