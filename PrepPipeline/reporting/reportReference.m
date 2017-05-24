@@ -14,8 +14,6 @@ function [summary, noisyStatistics] = reportReference(fid, noiseDetection, numbe
     end
     reference = noiseDetection.reference;
     noisyStatistics = reference.noisyStatistics;
-    fprintf(fid, 'Referencing version %s\n',  ...
-        noiseDetection.version.Reference);
     fprintf(fid, 'Reference type %s\n',  reference.referenceType);
     fprintf(fid, 'Interpolation order %s\n',  reference.interpolationOrder);
     fprintf(fid, '\nReference channels (%d channels):\n', ...

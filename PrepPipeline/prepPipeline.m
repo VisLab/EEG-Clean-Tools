@@ -55,8 +55,7 @@ if ~isfield(params, 'name')
     params.name = ['EEG' EEG.filename];
 end
 EEG.etc.noiseDetection = ...
-       struct('name', params.name, 'version', getPrepVersion, ...
-              'errors', []);
+    struct('name', params.name, 'version', getPrepVersion, 'errors', []);
 EEG.data = double(EEG.data);   % Don't monkey around -- get into double
 
 %% Check for the general defaults

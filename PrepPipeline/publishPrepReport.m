@@ -53,19 +53,26 @@ end
     if summaryFile == -1;
         error('publishPrepReport:BadSummaryFile', ...
             'Failed to open summary file %s', summaryReportLocation);
+    elseif isempty(EEG) || ~isfield(EEG, 'etc') || ...
+          ~isfield(EEG.etc, 'noiseDetection')
+        error('publishPrepReport:PrepNotRun', ...
+            ['EEG.etc must contain PREP informational structures to ' ...
+             'run reports --- run PREP first']);
     end
-    assignin('base', 'EEGReporting', EEG);
-    assignin('base', 'summaryFile', summaryFile);
-    assignin('base', 'consoleFID', consoleFID);
-    assignin('base', 'relativeReportLocation', relativeReportLocation);
+ 
     script_name = 'prepReport.m';
     if publishOn
+        assignin('base', 'EEGReporting', EEG);
+        assignin('base', 'summaryFile', summaryFile);
+        assignin('base', 'consoleFID', consoleFID);
+        assignin('base', 'relativeReportLocation', relativeReportLocation);
         publish_options.outputDir = sessionFolder;
         publish_options.maxWidth = 800;
         publish_options.format = 'pdf';
         publish_options.showCode = false;
         publish(script_name, publish_options);
     else
+        EEGReporting = EEG; %#ok<NASGU>
         prepReport;
     end
     if publishOn 

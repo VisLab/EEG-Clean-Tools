@@ -17,7 +17,6 @@ function summary = reportLineNoise(fid, noiseDetection, numbersPerRow, indent)
     else
         fprintf(fid, 'Line noise method: clean\n');
     end
-    fprintf(fid, 'Version %s\n', noiseDetection.version.LineNoise);
     fprintf(fid, 'Sampling frequency Fs: %g Hz\n', lineNoise.Fs);
     fprintf(fid, 'Line noise frequencies:\n');
     printList(fid, lineNoise.lineFrequencies, numbersPerRow, indent);

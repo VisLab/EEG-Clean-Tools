@@ -75,7 +75,7 @@ if okay
         EEG = prepPipeline(EEG, params);
     end
     if (strcmpi(reportMode, 'normal') || ...
-            strcmpi(reportMode, 'reportOnly')) && publishOn
+            strcmpi(reportMode, 'reportOnly')) %&& publishOn
         publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
             consoleFID, publishOn);
     end

@@ -11,8 +11,7 @@ function summary = reportDetrend(fid, noiseDetection, numbersPerRow, indent)
         fprintf(fid, '%s\n', summary{end});
         return;
     end
-    detrendInfo = noiseDetection.detrend;
-    fprintf(fid, '\nDetrend version %s\n', noiseDetection.version.Detrend);      
+    detrendInfo = noiseDetection.detrend;     
     fprintf(fid, 'Detrend cutoff: %g Hz\n', detrendInfo.detrendCutoff);
     fprintf(fid, 'Detrend type: %s\n', detrendInfo.detrendType);
     fprintf(fid, 'Detrend step size: %s\n', detrendInfo.detrendStepSize);

@@ -24,7 +24,7 @@
 %% Write data status and report header
 noiseDetection = struct();
 reference = struct();
-version = struct();
+version = '';
 
 if isfield(EEGReporting, 'etc') && isfield(EEGReporting.etc, 'noiseDetection')
     noiseDetection = EEGReporting.etc.noiseDetection;
@@ -33,7 +33,7 @@ if isfield(noiseDetection, 'reference')
     reference = noiseDetection.reference;
 end
 if isfield(noiseDetection, 'version')
-   versions = EEGReporting.etc.noiseDetection.version;
+   version = EEGReporting.etc.noiseDetection.version;
 end
 
 summaryHeader = [noiseDetection.name '[' ...
@@ -51,10 +51,8 @@ fprintf(consoleFID, '%s\n', errorStatus);
 writeTextList(consoleFID, errors);
 
 % Versions
-writeSummaryHeader(summaryFile,  'Prep versions', 'h4');
-versionString = getStructureString(versions);
-writeHtmlList(summaryFile, {versionString}, 'both');
-fprintf(consoleFID, 'Prep versions:\n%s\n', versionString);
+writeSummaryHeader(summaryFile,  ['Prep version:' version], 'h4');
+fprintf(consoleFID, 'Prep version:\n%s\n', version);
 
 % Events
 summaryMsg = ['Data summary: sampling rate ' num2str(EEGReporting.srate) 'Hz'];
