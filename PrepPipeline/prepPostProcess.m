@@ -4,8 +4,7 @@ function [EEG, postOut] = prepPostProcess(EEG, postIn)
 %
 % 
 
-%% %% Check the parameters
-
+%% Check the parameters
 if nargin < 1 || ~isstruct(EEG)
     error('postProcess:NotEnoughArguments', 'first argument must be a structure');
 elseif nargin < 2 || ~exist('postIn', 'var') || isempty(postIn)

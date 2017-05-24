@@ -64,10 +64,10 @@ writeHtmlList(summaryFile, summary, 'both');
 % Interpolated channels for referencing
 if isfield(noiseDetection, 'reference')
     writeSummaryHeader(summaryFile,  'Interpolated channels', 'h4');
-    interpolated = getFieldIfExists(noiseDetection.reference, 'interpolatedChannels');
-    interpolatedChannels = getFieldIfExists(interpolated, 'all');
-    summaryItem = ['Bad channels interpolated for reference: [' ...
-                    num2str(interpolatedChannels), ']'];
+    badChannels = getFieldIfExists(noiseDetection.reference, 'badChannels');
+    badChannelNumbers = getFieldIfExists(badChannels, 'all');
+    summaryItem = ['Bad channels for reference: [' ...
+                    num2str(badChannelNumbers), ']'];
     writeHtmlList(summaryFile, {summaryItem}, 'both');
     fprintf(consoleFID, '%s\n', summaryItem);
 end
@@ -98,7 +98,7 @@ if ~isfield(noiseDetection, 'lineNoise')
    fprintf(consoleFID, 'Skipping line noise and detrend\n');
 else
     lineChannels = noiseDetection.lineNoise.lineNoiseChannels;
-    actualChans = setdiff(lineChannels, interpolatedChannels);
+    actualChans = setdiff(lineChannels, badChannelNumbers);
     numChans = min(6, length(actualChans));
     indexchans = floor(linspace(1, length(lineChannels), numChans));
     displayChannels = lineChannels(indexchans);
@@ -109,11 +109,11 @@ else
     else
        EEGNew = EEGReporting;
     end
-    [fref, sref, badChannels] = showSpectrum(EEGNew, channelLabels, ...
+    [fref, sref, badSpectraChannels] = showSpectrum(EEGNew, channelLabels, ...
         lineChannels, lineChannels, tString, 20);
     clear EEGNew;
-    if ~isempty(badChannels)
-        badString = ['Channels with no spectra: ' getListString(badChannels)];
+    if ~isempty(badSpectraChannels)
+        badString = ['Channels with no spectra: ' getListString(badSpectraChannels)];
         fprintf(consoleFID, '%s\n', badString);
         writeHtmlList(summaryFile, {badString}, 'both');
     end
@@ -144,7 +144,7 @@ else
     
 
     interpolatedLocations = getReportChannelInformation(channelLocations, ...
-        noisyStatistics.evaluationChannels, reference.interpolatedChannels);
+        noisyStatistics.evaluationChannels, reference.badChannels);
     % Original locations
     if ~isfield(reference, 'noisyStatisticsOriginal') || ...
             isempty(reference.noisyStatisticsOriginal)
@@ -723,9 +723,9 @@ else
     xlabel('Robust average reference')
     ylabel('Ordinary average reference');
     title(tString, 'Interpreter', 'None');
-    writeHtmlList(summaryFile, ...
-        {['Correlation between ordinary and robust average reference (unfiltered): ' ...
-        num2str(corrAverage)]});
+    corrString = ['Ordinary vs robust average reference (unfiltered) correlation: ' ...
+        num2str(corrAverage)];
+    writeSummaryHeader(summaryFile,  corrString, 'h4');
 end   
 %% Noisy and robust average reference by time
 if ~isfield(noiseDetection, 'reference') || ...
@@ -764,9 +764,9 @@ else
     xlabel('Robust average reference')
     ylabel('Ordinary average reference');
     title(tString, 'Interpreter', 'None');
-    writeHtmlList(summaryFile, ...
-        {['Correlation between ordinary and robust average reference (filtered): ' ...
-        num2str(corrAverage)]});
+    corrString = ['Ordinary vs robust average reference (filtered) correlation: ' ...
+        num2str(corrAverage)];
+    writeSummaryHeader(summaryFile,  corrString, 'h4');
 end
 %% Noisy minus robust average reference by time
 if ~isfield(noiseDetection, 'reference') || ...

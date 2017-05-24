@@ -65,12 +65,12 @@ function [summary, noisyStatistics] = reportReference(fid, noiseDetection, numbe
     
     %% Listing of noisy channels
     channelLabels = {reference.channelLocations.labels};
-    originalBad = reference.interpolatedChannels.all;
+    originalBad = reference.badChannels.all;
     badList = getLabeledList(originalBad,  ...
         channelLabels(originalBad), numbersPerRow, indent);
     summary{end+1} = ['Bad channels interpolated: ' badList];
     fprintf(fid, '\n\nBad channels interpolated:\n %s', badList);
-    printBadChannelsByType(fid, reference.interpolatedChannels, channelLabels, numbersPerRow, indent)
+    printBadChannelsByType(fid, reference.badChannels, channelLabels, numbersPerRow, indent)
     
     finalBad = noisyStatistics.noisyChannels.all;
     badList = getLabeledList(finalBad, channelLabels(finalBad), ...

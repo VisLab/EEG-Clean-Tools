@@ -179,7 +179,7 @@ try
     end
     if postProcessOut.removeInterpolatedChannels
         interpolatedChannels = ...
-            EEG.etc.noiseDetection.reference.interpolatedChannels.all;
+            EEG.etc.noiseDetection.reference.badChannels.all;
         if ~isempty(interpolatedChannels)
              EEG = pop_chanedit(EEG, 'delete', interpolatedChannels);
         end

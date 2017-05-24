@@ -23,11 +23,26 @@ Matousek and Jeremy Cockfield worked on the interfaces for the EEGLAB plugin as
 well as associated visualization tools. Kay Robbins of UTSA is the lead developer and
 maintainer of PREP.
 
-### Releases   
+### Support:    
+This research was sponsored by the Army Research Laboratory and was accomplished
+under Cooperative Agreement Number W911NF-10-2-0022. The views and conclusions
+contained in this document/software are those of the authors and should not be interpreted
+as representing the official policies, either expressed or implied, of the
+Army Research Laboratory or the U.S. Government. The U.S. Government is
+authorized to reproduce and distribute reprints for Government purposes
+notwithstanding any copyright notation herein.
+
+### Releases 
+Version 0.55.0 Unreleased
+* Changed the EEG.etc.noiseDetection.reference structure to distinguish
+  between bad channels and interpolated channels (allow option to not interpolate)
+  
 Version 0.54.0 Unreleased
 * Added Blasst as an unsupported line noise removal option
 * Moved legend of spectrum to right, put in checks
 * Corrected bug in smoothing in cleanline
+* Corrected several reporting issues
+* Default behavior now outputs errors to command line in addition to logging
 
 Version 0.52 Released
 * Modified code to handle EEG structures with empty EEG.error.
