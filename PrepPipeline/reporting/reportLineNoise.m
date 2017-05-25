@@ -13,10 +13,12 @@ function summary = reportLineNoise(fid, noiseDetection, numbersPerRow, indent)
     end
     lineNoise = noiseDetection.lineNoise;
     if isfield(lineNoise, 'lineNoiseMethod')
-        fprintf(fid, 'Line noise method: %s\n', lineNoise.lineNoiseMethod);
+        summary{end + 1} = ['Line noise method: ' ...
+                             num2str(lineNoise.lineNoiseMethod)];
     else
-        fprintf(fid, 'Line noise method: clean\n');
+        summary{end + 1} = 'Line noise method: clean';
     end
+    fprintf(fid, '%s\n', summary{end});
     fprintf(fid, 'Sampling frequency Fs: %g Hz\n', lineNoise.Fs);
     fprintf(fid, 'Line noise frequencies:\n');
     printList(fid, lineNoise.lineFrequencies, numbersPerRow, indent);

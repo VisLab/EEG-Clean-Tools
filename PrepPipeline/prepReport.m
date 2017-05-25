@@ -22,18 +22,24 @@
 % output.
 %
 %% Write data status and report header
-noiseDetection = struct();
 reference = struct();
 version = '';
+fullInformation = false;
 
 if isfield(EEGReporting, 'etc') && isfield(EEGReporting.etc, 'noiseDetection')
     noiseDetection = EEGReporting.etc.noiseDetection;
+else
+    error('prepReport:NoNoiseDetection', ...
+    'PREP reporting relies on EEGReporting.etc.noiseDetection which does not exist');
 end
 if isfield(noiseDetection, 'reference')
     reference = noiseDetection.reference;
 end
 if isfield(noiseDetection, 'version')
    version = EEGReporting.etc.noiseDetection.version;
+end
+if isfield(noiseDetection, 'fullReferenceInfo');
+    fullInformation = EEGReporting.etc.noiseDetection.fullReferenceInfo;
 end
 
 summaryHeader = [noiseDetection.name '[' ...
@@ -42,6 +48,12 @@ fprintf(consoleFID, '%s\n', summaryHeader);
 summaryHeader = [summaryHeader ' <a href="' relativeReportLocation ...
     '">Report details</a>'];
 writeSummaryHeader(summaryFile,  summaryHeader);
+originalChannelLabels = noiseDetection.originalChannelLabels;
+originalMask = true(1, length(originalChannelLabels));
+currentChannelLabels = {EEGReporting.chanlocs.labels};
+[actualLabels, iorig, icurrent] = ...
+    intersect(originalChannelLabels, currentChannelLabels);
+currentChannelsInOriginal = sort(iorig);
 
 %  Write overview status
 [errorStatus, errors] = getErrors(noiseDetection);
@@ -62,14 +74,23 @@ fprintf(consoleFID, '%s\n', summaryMsg);
 writeHtmlList(summaryFile, summary, 'both');
 
 % Interpolated channels for referencing
+removedChannels = [];
+interpolatedChannels = [];
+stillNoisyChannels = [];
 if isfield(noiseDetection, 'reference')
     writeSummaryHeader(summaryFile,  'Interpolated channels', 'h4');
-    badChannels = getFieldIfExists(noiseDetection.reference, 'badChannels');
-    badChannelNumbers = getFieldIfExists(badChannels, 'all');
-    summaryItem = ['Bad channels for reference: [' ...
-                    num2str(badChannelNumbers), ']'];
-    writeHtmlList(summaryFile, {summaryItem}, 'both');
-    fprintf(consoleFID, '%s\n', summaryItem);
+    removedChannels = getFieldIfExists(noiseDetection, 'removedChannels');
+    interpolatedChannels = getFieldIfExists(noiseDetection, 'interpolatedChannels');
+    stillNoisyChannels = [];
+    summaryItem = {'Channels interpolated during reference: [' ...
+                    num2str(interpolatedChannels), ']'; ...
+                   'Channels still noisy after reference: [' ...
+                   num2str(stillNoisyChannels), ']'; ...
+                   'Channels removed during post-process: [' ...
+                    num2str(removedChannels), ']'};
+    writeHtmlList(summaryFile, summaryItem, 'both');
+    fprintf(consoleFID, '%s\n%s\n%s\n', ...
+            summaryItem{1}, summaryItem{2}, summaryItem{3});
 end
 
 % Setup visualization parameters
@@ -98,19 +119,25 @@ if ~isfield(noiseDetection, 'lineNoise')
    fprintf(consoleFID, 'Skipping line noise and detrend\n');
 else
     lineChannels = noiseDetection.lineNoise.lineNoiseChannels;
-    actualChans = setdiff(lineChannels, badChannelNumbers);
-    numChans = min(6, length(actualChans));
-    indexchans = floor(linspace(1, length(lineChannels), numChans));
+    [chans, iorig, iline] = intersect(currentChannelsInOriginal, lineChannels);
+    actualLineChannels = sort(iorig);
+    numChans = min(6, length(actualLineChannels));
+    indexchans = floor(linspace(1, length(actualLineChannels), numChans));
     displayChannels = lineChannels(indexchans);
-    channelLabels = {EEGReporting.chanlocs(lineChannels).labels};
+    channelLabels = {EEGReporting.chanlocs(actualLineChannels).labels};
     tString = noiseDetection.name;
-    if isfield(noiseDetection, 'detrend') 
-       EEGNew = removeTrend(EEGReporting, noiseDetection.detrend);
+    if isfield(noiseDetection, 'detrend')
+       detrend = noiseDetection.detrend;
+       detrendChannels = detrend.detrendChannels;
+       [chans, iorig] = intersect(currentChannelsInOriginal, detrendChannels);
+       isort = sort(iorig);
+       detrend.detrendChannels = isort(:)';
+       EEGNew = removeTrend(EEGReporting, detrend);
     else
        EEGNew = EEGReporting;
     end
     [fref, sref, badSpectraChannels] = showSpectrum(EEGNew, channelLabels, ...
-        lineChannels, lineChannels, tString, 20);
+        actualLineChannels, actualLineChannels, tString, 20);
     clear EEGNew;
     if ~isempty(badSpectraChannels)
         badString = ['Channels with no spectra: ' getListString(badSpectraChannels)];
@@ -121,18 +148,14 @@ end
 
 %% Referencing step
 writeSummaryHeader(summaryFile,  'Reference summary', 'h4');
-[summary, noisyStatistics] = reportReference(consoleFID,  ...
-                 noiseDetection, numbersPerRow, indent);
+summary = reportReference(consoleFID, reference, numbersPerRow, indent);
 writeHtmlList(summaryFile, summary, 'both');
 
 %% Robust channel deviation (referenced)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping robust channel deviation\n');
 else
-    EEGReporting.etc.noiseDetection.reference.noisyStatistics = noisyStatistics;
-    reference = noiseDetection.reference;
     noisyStatistics = reference.noisyStatistics;
-
     showColorbar = true;   
     channelInformation = reference.channelInformation;
     nosedir = channelInformation.nosedir;
@@ -197,7 +220,7 @@ else
 end 
 
 %% Robust channel deviation (original)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping robust channel deviation (original)\n');
 else
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
@@ -205,7 +228,7 @@ else
 end
 
 %% Robust channel deviation (interpolated)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping robust channel deviation (marking interpolated)\n');
 else
     plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
@@ -213,7 +236,7 @@ else
 end  
 
 %% Robust deviation window statistics
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping robust deviation window statistics\n');
 else
     beforeDeviationLevels = noisyStatisticsOriginal.channelDeviations(evaluationChannels, :);
@@ -305,7 +328,7 @@ else
 end    
 
 %% Median max abs correlation (referenced)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping median max absoluted correlation (referenced)\n');
 else
     tString = 'Median max correlation';
@@ -317,7 +340,7 @@ else
 end 
 
 %% Median max abs correlation (original)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping median max abs correlation (original)\n');
 else
     tString = 'Median max correlation';
@@ -329,7 +352,7 @@ else
 end 
 
 %% Median max abs correlation (interpolated)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, ...
         'Skipping median max abs correlation (marking interpolated)\n');
 else
@@ -343,7 +366,7 @@ else
 end 
 
 %% Mean max abs correlation (referenced)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, ...
         'Skipping median max abs correlation (referenced)\n');
 else
@@ -356,7 +379,7 @@ else
 end
 
 %% Mean max abs correlation (original)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping mean max abs correlation (original)\n');
 else
     tString = 'Mean max correlation';
@@ -368,7 +391,7 @@ else
 end  
 
 %% Mean max abs correlation (interpolated)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, ...
         'Skipping mean max abs correlation (marking interpolated)\n');
 else
@@ -382,7 +405,7 @@ else
 end 
 
 %% Bad min max correlation fraction (referenced)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping bad min max correlation (referenced)\n');
 else
     tString = 'Min max corr fraction';
@@ -405,7 +428,7 @@ else
         showColorbar, headColor, darkElementColor, clim, nosedir, [tString '(referenced)'])
 end    
 %% Bad min max correlation fraction(original)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping median max abs correlation (original)\n');
 else
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
@@ -413,7 +436,7 @@ else
 end
 
 %% Bad min max correlation fraction (interpolated)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, ...
         'Skipping bad min max correlation fraction (marking interpolated)\n');
 else
@@ -422,7 +445,7 @@ else
 end  
 
 %% Correlation window statistics
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping correlation window statistics\n');
 else
     beforeCorrelationLevels = ...
@@ -488,7 +511,7 @@ else
 end
 
 %% Bad ransac fraction (referenced)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping bad ransac fraction (referenced)\n');
 else
     tString = 'Ransac fraction failed';
@@ -500,7 +523,7 @@ else
 end    
 
 %% Bad ransac fraction (original)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping bad ransac fraction (original)\n');
 else
     dataOriginal = noisyStatisticsOriginal.ransacBadWindowFraction;
@@ -510,7 +533,7 @@ else
 end
 
 %% Bad ransac fraction (interpolated)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping bad ransac fraction (marking interpolated)\n');
 else
     dataBeforeInterpolation = noisyStatisticsBeforeInterpolation.ransacBadWindowFraction;
@@ -520,7 +543,7 @@ else
 end  
 
 %% Channels with poor ransac correlations
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping channels with poor ransac correlations\n');
 else
     beforeRansacLevels = ...
@@ -584,7 +607,7 @@ else
     writeHtmlList(summaryFile, {reports{1}, reports{2}}, 'both');
 end    
 %% HF noise Z-score (referenced)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping HF noise Z-score (referenced)\n');
 else
     tString = 'Z-score HF SNR';
@@ -608,7 +631,7 @@ end
 
 
 %% HF noise Z-score (original)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping HF noise Z-score (original)\n');
 else
     plotScalpMap(dataOriginal, originalLocations, scalpMapInterpolation, ...
@@ -616,7 +639,7 @@ else
 end
 
 %% HF noise Z-score (interpolated)
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping HF noise Z-score (marking interpolated)\n');
 else
     plotScalpMap(dataBeforeInterpolation, interpolatedLocations, scalpMapInterpolation, ...
@@ -624,7 +647,7 @@ else
 end
 
 %% HF noise window stats
-if ~isfield(noiseDetection, 'reference') || isempty(noiseDetection.reference)
+if isempty(reference) || ~fullInformation
     fprintf(consoleFID, 'Skipping HF window stats\n');
 else
     beforeNoiseLevels = noisyStatisticsOriginal.noiseLevels(evaluationChannels, :);
@@ -709,8 +732,7 @@ end
 
 
 %% Noisy average vs robust average reference
-if ~isfield(noiseDetection, 'reference') || ...
-    isempty(noiseDetection.reference) || ...
+if isempty(reference) || ~fullInformation || ...
     ~isfield(reference, 'referenceSignal') || isempty(reference.referenceSignal)
     fprintf(consoleFID, 'Skipping noisy vs robust average reference\n');
 else
@@ -727,9 +749,9 @@ else
         num2str(corrAverage)];
     writeSummaryHeader(summaryFile,  corrString, 'h4');
 end   
+
 %% Noisy and robust average reference by time
-if ~isfield(noiseDetection, 'reference') || ...
-    isempty(noiseDetection.reference) || ...
+if isempty(reference) || ~fullInformation || ...
     ~isfield(reference, 'referenceSignal') || isempty(reference.referenceSignal)
     fprintf(consoleFID, 'Skipping noisy and robust average reference by time\n');
 else
@@ -743,8 +765,7 @@ else
 end
 
 %% Noisy vs robust average reference (filtered)
-if ~isfield(noiseDetection, 'reference') || ...
-    isempty(noiseDetection.reference) || ...
+if isempty(reference) || ~fullInformation || ...
     ~isfield(reference, 'referenceSignal') || isempty(reference.referenceSignal)
     fprintf(consoleFID, 'Skipping noisy vs robust average reference (filtered)\n');
 else
@@ -769,8 +790,7 @@ else
     writeSummaryHeader(summaryFile,  corrString, 'h4');
 end
 %% Noisy minus robust average reference by time
-if ~isfield(noiseDetection, 'reference') || ...
-    isempty(noiseDetection.reference) || ...
+if isempty(reference) || ~fullInformation || ...
     ~isfield(reference, 'referenceSignal') || isempty(reference.referenceSignal)
     fprintf(consoleFID, 'Skipping noisy minus robust average reference by time\n');
 else

@@ -1,18 +1,13 @@
-function [summary, noisyStatistics] = reportReference(fid, noiseDetection, numbersPerRow, indent)
+function summary = reportReference(fid, reference, numbersPerRow, indent)
 %% Extracts and outputs parameters for referencing calculation
 % Outputs a summary to file fid and returns a cell array of important messages
     summary = {};
-    noisyStatistics = struct();
-    if ~isempty(noiseDetection.errors.reference)
-        summary{end+1} =  noiseDetection.errors.reference;
-        fprintf(fid, '%s\n', summary{end});
-    end
-    if ~isfield(noiseDetection, 'reference')
-        summary{end+1} = 'Signal wasn''t referenced';
-        fprintf(fid, '%s\n', summary{end});
+    if isempty(reference) || ~isfield(reference, 'noisyStatistics') || ...
+            isempty(reference.noisyStatistics)
+        summary = {'Dataset does not contain reference reports'};
+        fprintf(fid, 'Referencing: %s\n', summary{1});
         return;
     end
-    reference = noiseDetection.reference;
     noisyStatistics = reference.noisyStatistics;
     fprintf(fid, 'Reference type %s\n',  reference.referenceType);
     fprintf(fid, 'Interpolation order %s\n',  reference.interpolationOrder);
@@ -28,7 +23,7 @@ function [summary, noisyStatistics] = reportReference(fid, noiseDetection, numbe
         length(reference.rereferencedChannels));
     printList(fid, reference.rereferencedChannels,  ...
         numbersPerRow, indent);
-    
+
     fprintf(fid, 'Noisy channel detection parameters:\n');
     fprintf(fid, '%sRobust deviation threshold (z score): %g\n', ...
         indent, noisyStatistics.robustDeviationThreshold);
@@ -61,8 +56,8 @@ function [summary, noisyStatistics] = reportReference(fid, noiseDetection, numbe
     fprintf(fid, '%sMaximum reference iterations: %g\n', indent, ...
         getFieldIfExists(reference, 'maxReferenceIterations'));
     fprintf(fid, '%sActual reference iterations: %g\n', indent, ...
-          getFieldIfExists(reference, 'actualReferenceIterations'));
-    
+        getFieldIfExists(reference, 'actualReferenceIterations'));
+
     %% Listing of noisy channels
     channelLabels = {reference.channelLocations.labels};
     originalBad = reference.badChannels.all;
@@ -71,7 +66,7 @@ function [summary, noisyStatistics] = reportReference(fid, noiseDetection, numbe
     summary{end+1} = ['Bad channels interpolated: ' badList];
     fprintf(fid, '\n\nBad channels interpolated:\n %s', badList);
     printBadChannelsByType(fid, reference.badChannels, channelLabels, numbersPerRow, indent)
-    
+
     finalBad = noisyStatistics.noisyChannels.all;
     badList = getLabeledList(finalBad, channelLabels(finalBad), ...
         numbersPerRow, indent);
@@ -79,9 +74,9 @@ function [summary, noisyStatistics] = reportReference(fid, noiseDetection, numbe
     summary{end+1} = ['Bad channels after interpolation+referencing:' badList];
     printBadChannelsByType(fid, noisyStatistics.noisyChannels, channelLabels, numbersPerRow, indent)
     %% Iteration report
-        report = sprintf('\n\nActual interpolation iterations: %d\n', ...
-            reference.actualReferenceIterations);
-        fprintf(fid, '%s', report);
-        summary{end+1} = report;
-    
-end
+    report = sprintf('\n\nActual interpolation iterations: %d\n', ...
+        reference.actualReferenceIterations);
+    fprintf(fid, '%s', report);
+    summary{end+1} = report;
+
+    end

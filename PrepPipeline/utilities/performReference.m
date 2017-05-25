@@ -1,5 +1,11 @@
-function [signal, referenceOut] = performReference(signal, referenceIn)
+function [signal, referenceOut] =  performReference(signal, referenceIn)
 % Perform the specified reference
+%
+% Parameters:
+%    signal       EEGLAB EEG or similar structure 
+%                 (must have .srate, .data, and .chanlocs fields)
+%    referenceIn  (optional) Input reference structure --- or empty
+%    signal       (output) Input signal after referencing and interpolation
 %
 % Default for the PREP pipeline is:
 %    referenceType = 'robust'
@@ -11,12 +17,16 @@ function [signal, referenceOut] = performReference(signal, referenceIn)
 %% Check the input parameters
 if nargin < 1
     error('performReference:NotEnoughArguments', 'requires at least 1 argument');
-elseif isstruct(signal) && ~isfield(signal, 'data')
-    error('performReference:NoDataField', 'requires a structure data field');
+elseif ~isstruct(signal) 
+    error('performReference:SignalNotStructue', 'signal must be a structure');
+elseif ~isfield(signal, 'data')
+    error('performReference:NoDataField', 'signal structure requires a data field');
+elseif ~isfield(signal, 'chanlocs') || ~isfield(signal.chanlocs, 'labels')
+    error('performReference:NoChanLocs', 'signal structure requires a chanlocs field');
 elseif size(signal.data, 3) ~= 1
-    error('performReference:DataNotContinuous', 'signal data must be a 2D array');
+    error('performReference:DataNotContinuous', 'signal.data must be a 2D array');
 elseif size(signal.data, 2) < 2
-    error('performReference:NoData', 'signal data must have multiple points');
+    error('performReference:NoData', 'signal.data must have multiple points');
 elseif ~exist('referenceIn', 'var') || isempty(referenceIn)
     referenceIn = struct();
 end

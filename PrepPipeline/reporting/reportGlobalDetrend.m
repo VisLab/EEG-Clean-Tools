@@ -6,7 +6,7 @@ function summary = reportGlobalDetrend(fid, noiseDetection, numbersPerRow, inden
         summary{end+1} =  noiseDetection.errors.globalTrend;
         fprintf(fid, '%s\n', summary{end});
     end
-    if ~isfield(noiseDetection, 'globalTrend')
+    if ~isfield(noiseDetection, 'globalTrend') || isempty(noiseDetection.globalTrend)
         summary{end+1} = 'Signal didn''t have global trend removed';
         fprintf(fid, '%s\n', summary{end});
         return;

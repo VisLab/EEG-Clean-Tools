@@ -72,7 +72,8 @@ end
         ylabel('Power 10*log(\muV^2/Hz)')
         if ~isempty(legends)
             legends = legends(~cellfun('isempty',legends));
-            legend(legends, 'Location', 'EastOutside')
+            ht = legend(legends, 'Location', 'EastOutside');
+            title(ht, 'Current ch#(label)')
         end
         title(tString1, 'Interpreter', 'none')
         box on

@@ -38,8 +38,7 @@ function [EEG, computationTimes] = prepPipeline(EEG, params)
 % source.
 
 %% Setup the output structures and set the input parameters
-computationTimes= struct( ...
-    'lineNoise', 0, 'reference', 0);
+computationTimes= struct( 'detrend', 0, 'lineNoise', 0, 'reference', 0);
 errorMessages = struct('status', 'good', 'boundary', 0, ...
                'detrend', 0, 'lineNoise', 0, 'reference', 0);
 [backupOptionsFile, currentOptionsFile, warningsState] = setupForEEGLAB();
@@ -55,8 +54,14 @@ if ~isfield(params, 'name')
     params.name = ['EEG' EEG.filename];
 end
 EEG.etc.noiseDetection = ...
-    struct('name', params.name, 'version', getPrepVersion, 'errors', []);
+    struct('name', params.name, 'version', getPrepVersion, ...
+           'originalChannelLabels', [], ...
+           'errors', [], 'boundary', [], 'detrend', [], ...
+           'lineNoise', [], 'reference', [], 'postProcess', [], ...
+           'interpolatedChannels', [], 'removedChannels', [], ...
+           'stillNoisyChannels', [], 'fullReferenceInfo', false);
 EEG.data = double(EEG.data);   % Don't monkey around -- get into double
+EEG.etc.noiseDetection.originalChannelLabels = {EEG.chanlocs.labels};
 
 %% Check for the general defaults
 try
@@ -90,8 +95,7 @@ try
         end
     end
 catch mex
-    errorMessages.boundary = ...
-        ['prepPipeline bad boundary events: ' ...
+    errorMessages.boundary = ['prepPipeline bad boundary events: ' ...
          getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
@@ -113,8 +117,7 @@ try
     params = checkDefaults(detrend, params, defaults); 
     computationTimes.detrend = toc;
 catch mex
-    errorMessages.removeTrend = ...
-        ['prepPipeline failed removeTrend: ' ...
+    errorMessages.removeTrend = ['prepPipeline failed removeTrend: ' ...
          getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
@@ -137,9 +140,8 @@ try
     clear EEGNew;
     computationTimes.lineNoise = toc;
 catch mex
-    errorMessages.lineNoise = ...
-        ['prepPipeline failed removeLineNoise: ' ...
-         getReport(mex, 'basic', 'hyperlinks', 'off')];
+    errorMessages.lineNoise = ['prepPipeline failed removeLineNoise: ' ...
+        getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
     if strcmpi(params.errorMsgs, 'verbose')
@@ -155,10 +157,14 @@ try
     tic
     [EEG, referenceOut] = performReference(EEG, params);
     EEG.etc.noiseDetection.reference = referenceOut;
+    EEG.etc.noiseDetection.fullReferenceInfo = true;
+    EEG.etc.noiseDetection.interpolatedChannels = ...
+        referenceOut.interpolatedChannels;
+    EEG.etc.noiseDetection.stillNoisyChannels = ...
+        referenceOut.noisyStatistics.noisyChannels.all;
     computationTimes.reference = toc;
 catch mex
-    errorMessages.reference = ...
-        ['prepPipeline failed performReference: ' ...
+    errorMessages.reference = ['prepPipeline failed to perform reference: ' ...
         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
@@ -178,22 +184,23 @@ try
         EEG = removeTrend(EEG, EEG.referenceOut);
     end
     if postProcessOut.removeInterpolatedChannels
-        interpolatedChannels = ...
-            EEG.etc.noiseDetection.reference.badChannels.all;
-        if ~isempty(interpolatedChannels)
-             EEG = pop_chanedit(EEG, 'delete', interpolatedChannels);
+        removedChannels = EEG.etc.noiseDetection.interpolatedChannels;
+        if ~isempty(removedChannels)
+             EEG.chanlocs(removedChannels) = [];
+             EEG.data(removedChannels, :) = [];
+             EEG.nbchan = length(EEG.chanlocs);
         end
-        postProcessOut.interpolatedChannels = interpolatedChannels;
+        EEG.etc.noiseDetection.removedChannels = removedChannels;
     end
     if postProcessOut.cleanupReference
         reference = EEG.etc.noiseDetection.reference;
         reference = cleanupReference(reference);
         EEG.etc.noiseDetection.reference = reference;
+        EEG.etc.noiseDetection.fullReferenceInfo = false;
     end
     EEG.etc.noiseDetection.postProcess = postProcessOut;
 catch mex
-    errorMessages.reference = ...
-        ['prepPipeline failed postProcess: ' ...
+    errorMessages.reference = ['prepPipeline failed postProcess: ' ...
         getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
@@ -211,6 +218,6 @@ end
 
 function cleanup(backupFile, currentFile, warningsState)
 % Restore EEGLAB options file and warning settings 
-restoreEEGOptions(backupFile, currentFile);
-warning(warningsState);
+   restoreEEGOptions(backupFile, currentFile);
+   warning(warningsState);
 end % cleanup
