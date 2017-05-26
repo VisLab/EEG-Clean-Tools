@@ -33,16 +33,17 @@ authorized to reproduce and distribute reprints for Government purposes
 notwithstanding any copyright notation herein.
 
 ### Releases 
-Version 0.55.0 Unreleased
-* Changed the EEG.etc.noiseDetection.reference structure to distinguish
-  between bad channels and interpolated channels (allow option to not interpolate)
-  
-Version 0.54.0 Unreleased
+Version 0.55.0 Released 05/26/2017
+* Changed the EEG.etc.noiseDetection structure to contain removed channels and interpolated channels for easier access 
+* Fixed reporting to work when bad channels have been removed
+* Added original channel labels to EEG.etc.noiseDetection for ease in reporting
 * Added Blasst as an unsupported line noise removal option
-* Moved legend of spectrum to right, put in checks
+* Moved legend of spectrum to right, put in checks for removed channels
 * Corrected bug in smoothing in cleanline
 * Corrected several reporting issues
 * Default behavior now outputs errors to command line in addition to logging
+* Renamed several functions to make naming scheme consistent
+* Started supporting changelog in versions
 
 Version 0.52 Released
 * Modified code to handle EEG structures with empty EEG.error.
