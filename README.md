@@ -33,7 +33,7 @@ authorized to reproduce and distribute reprints for Government purposes
 notwithstanding any copyright notation herein.
 
 ### Releases 
-Version 0.55.0 Released 05/26/2017
+Version 0.55.0 Released 05/29/2017
 * Changed the EEG.etc.noiseDetection structure to contain removed channels and interpolated channels for easier access 
 * Fixed reporting to work when bad channels have been removed
 * Added original channel labels to EEG.etc.noiseDetection for ease in reporting
@@ -44,6 +44,7 @@ Version 0.55.0 Released 05/26/2017
 * Default behavior now outputs errors to command line in addition to logging
 * Renamed several functions to make naming scheme consistent
 * Started supporting changelog in versions
+* Fixed bug in struct2str and improved com return on pop_prepPipeline
 
 Version 0.52 Released
 * Modified code to handle EEG structures with empty EEG.error.

@@ -1,47 +1,47 @@
-function [str] = struct2str(struct)
+function [str] = struct2str(theStruct)
 % Converts a struct into a string
 str = '';
-fNames = fieldnames(struct);
-if ~isempty(fNames)
-    str = 'struct(';
-    for a = 1:length(fNames)
-        if ischar(struct.(fNames{a}))
-            handleStr(a, struct, fNames);
-        elseif islogical(struct.(fNames{a}))
-            handleLogical(a, struct, fNames);
-        else
-            handleNumerical(a, struct, fNames);
-        end
-    end
-    str = [str ')'];
+fNames = fieldnames(theStruct);
+if isempty(fNames)
+  return;
 end
+str = 'struct(';
+for a = 1:length(fNames)
+    if ischar(theStruct.(fNames{a}))
+        strVal = getStr(a);
+    elseif islogical(theStruct.(fNames{a}))
+        strVal = getLogical(a);
+    else
+        strVal = getNumerical(a);
+    end
+    str = [str '''' fNames{a} ''', ' strVal]; %#ok<AGROW>
+end
+if strcmpi(str(end-1), ',')
+    str = str(1:end-2);
+end
+str = [str ')'];
 
-    function handleLogical(indx, struct, fNames)
+    function strVal = getLogical(indx)
         % Appends a logical structure field to the string
-        if struct.(fNames{1})
-            str = [str '''' fNames{indx} ''', ' ...
-                'true'];
+        if theStruct.(fNames{indx})
+            strVal = 'true, ';
         else
-            str = [str '''' fNames{indx} ''', ' ...
-                'false'];
+            strVal = 'false, ';
         end
-    end  % handleLogical
+    end  % getLogical
 
-    function handleNumerical(indx, struct, fNames)
+    function strVal = getNumerical(indx)
         % Appends a numerical structure field to the string
-        if isscalar(struct.(fNames{indx}))
-            str = [str '''' fNames{indx} ''', ' ...
-                num2str(struct.(fNames{indx})) ];
+        if isscalar(theStruct.(fNames{indx}))
+           strVal = [num2str(theStruct.(fNames{indx})) ', '];
         else
-            str = [str '''' fNames{1} ''', ' ...
-                '[' num2str(struct.(fNames{indx})) ']'];
+           strVal = ['[' num2str(theStruct.(fNames{indx})) '], '];
         end
-    end % handleNumerical
+    end % getNumerical
 
-    function handleStr(indx, struct, fNames)
+    function strVal = getStr(indx)
         % Appends a string structure field to the string
-        str = [str ','  '''' fNames{indx} ''', ' ...
-            '''' struct.(fNames{indx}) ''''];
+      strVal = ['''' theStruct.(fNames{indx}) ''', '];
     end % handleStr
 
 end % struct2str
