@@ -79,9 +79,9 @@ interpolatedChannels = [];
 stillNoisyChannels = [];
 if isfield(noiseDetection, 'reference')
     writeSummaryHeader(summaryFile,  'Interpolated channels', 'h4');
-    removedChannels = getFieldIfExists(noiseDetection, 'removedChannels');
-    interpolatedChannels = getFieldIfExists(noiseDetection, 'interpolatedChannels');
-    stillNoisyChannels = [];
+    removedChannels = getFieldIfExists(noiseDetection, 'removedChannelNumbers');
+    interpolatedChannels = getFieldIfExists(noiseDetection, 'interpolatedChannelNumbers');
+    stillNoisyChannels = getFieldIfExists(noiseDetection, 'stillNoisyChannelNumbers');
     summaryItem = {['Channels interpolated during reference: [' ...
                     num2str(interpolatedChannels) ']']; ...
                    ['Channels still noisy after reference: [' ...

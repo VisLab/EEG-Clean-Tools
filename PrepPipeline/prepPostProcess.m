@@ -41,21 +41,18 @@ catch mex
  try
     interpolatedChannels = EEG.etc.noiseDetection.reference.interpolatedChannels.all;
     if postOut.removeInterpolatedChannels && ~isempty(interpolatedChannels)
-      EEG.etc.noiseDetection.postProcess.removedChannels = ...
+      EEG.etc.noiseDetection.postProcess.removedChannelNumbers = ...
            interpolatedChannels; 
       EEG.etc.noiseDetection.postProcess.removedChannelData = ...
            EEG.data(interpolatedChannels, :);
       EEG.etc.noiseDetection.postProcess.removedChanlocs = ...
-           EEG.chanlocs(interpolatedChannels);          
+           EEG.chanlocs(interpolatedChannels); 
+      EEG.etc.noiseDetection.removedChannelNumbers = interpolatedChannels;
       channels = 1:size(EEG.data, 1);
       channels = setdiff(channels, interpolatedChannels);
       EEG.data = EEG.data(channels, :);
       EEG.nbchan = length(channels);
-      EEG.chanlocs = EEG.chanlocs(channels);
-      EEG.etc.noiseDetection.postProcess.removedChannels = ...
-                                            interpolatedChannels; 
-      EEG.etc.noiseDetection.postProcess.removedChannelData = ...
-                                            interpolatedChannels;                                   
+      EEG.chanlocs = EEG.chanlocs(channels);                              
     end
 catch mex
     errorMessages.removeInterpolated = ...
@@ -64,7 +61,8 @@ catch mex
     EEG.etc.noiseDetection.errors.postProcess = errorMessages;
     return;
  end
-
+ postOut = EEG.etc.noiseDetection.postProcess;
+ 
  %% Cleanup if requested
  try
     if postOut.cleanupReference

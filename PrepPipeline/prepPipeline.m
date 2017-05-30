@@ -58,8 +58,8 @@ EEG.etc.noiseDetection = ...
            'originalChannelLabels', [], ...
            'errors', [], 'boundary', [], 'detrend', [], ...
            'lineNoise', [], 'reference', [], 'postProcess', [], ...
-           'interpolatedChannels', [], 'removedChannels', [], ...
-           'stillNoisyChannels', [], 'fullReferenceInfo', false);
+           'interpolatedChannelNumbers', [], 'removedChannelNumbers', [], ...
+           'stillNoisyChannelNumbers', [], 'fullReferenceInfo', false);
 EEG.data = double(EEG.data);   % Don't monkey around -- get into double
 EEG.etc.noiseDetection.originalChannelLabels = {EEG.chanlocs.labels};
 
@@ -158,9 +158,9 @@ try
     [EEG, referenceOut] = performReference(EEG, params);
     EEG.etc.noiseDetection.reference = referenceOut;
     EEG.etc.noiseDetection.fullReferenceInfo = true;
-    EEG.etc.noiseDetection.interpolatedChannels = ...
-        referenceOut.interpolatedChannels;
-    EEG.etc.noiseDetection.stillNoisyChannels = ...
+    EEG.etc.noiseDetection.interpolatedChannelNumbers = ...
+        referenceOut.interpolatedChannels.all;
+    EEG.etc.noiseDetection.stillNoisyChannelNumbers = ...
         referenceOut.noisyStatistics.noisyChannels.all;
     computationTimes.reference = toc;
 catch mex
@@ -184,13 +184,13 @@ try
         EEG = removeTrend(EEG, EEG.referenceOut);
     end
     if postProcessOut.removeInterpolatedChannels
-        removedChannels = EEG.etc.noiseDetection.interpolatedChannels;
+        removedChannels = EEG.etc.noiseDetection.interpolatedChannelNumbers;
         if ~isempty(removedChannels)
              EEG.chanlocs(removedChannels) = [];
              EEG.data(removedChannels, :) = [];
              EEG.nbchan = length(EEG.chanlocs);
         end
-        EEG.etc.noiseDetection.removedChannels = removedChannels;
+        EEG.etc.noiseDetection.removedChannelNumbers = removedChannels;
     end
     if postProcessOut.cleanupReference
         reference = EEG.etc.noiseDetection.reference;

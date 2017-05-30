@@ -80,21 +80,21 @@ function [statisticsTitles, statisticsIndex,  noisyChannels, ...
     noisyChannels.badChannelLabels = channelLabels(noisyChannels.badChannelNumbers);
  
     noisyChannels.interpolatedNaN = ...
-        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromNaNs');
+        getFieldIfExists(reference.badChannels, 'badChannelsFromNaNs');
     noisyChannels.interpolatedNoData = ...
-        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromNoData');
+        getFieldIfExists(reference.badChannels, 'badChannelsFromNoData');
     noisyChannels.interpolatedLowSNR = ...
-        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromLowSNR');
+        getFieldIfExists(reference.badChannels, 'badChannelsFromLowSNR');
     noisyChannels.interpolatedHF = ...
-        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromHFNoise');
+        getFieldIfExists(reference.badChannels, 'badChannelsFromHFNoise');
     noisyChannels.interpolatedCorr = ...
-        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromCorrelation');
+        getFieldIfExists(reference.badChannels, 'badChannelsFromCorrelation');
     noisyChannels.interpolatedDev = ...
-        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromDeviation');
+        getFieldIfExists(reference.badChannels, 'badChannelsFromDeviation');
     noisyChannels.interpolatedRansac = ...
-        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromRansac');
+        getFieldIfExists(reference.badChannels, 'badChannelsFromRansac');
     noisyChannels.interpolatedDropOuts = ...
-        getFieldIfExists(reference.interpolatedChannels, 'badChannelsFromDropOuts');
+        getFieldIfExists(reference.badChannels, 'badChannelsFromDropOuts');
 
 %% Deviations
     statistics(s.medDevOrig) = original.channelDeviationMedian;
