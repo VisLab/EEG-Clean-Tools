@@ -30,7 +30,6 @@
 
 % eegplugin_prepPipeline() - the PREP pipeline plugin
 function vers = eegplugin_prepPipeline(fig, trystrs, catchstrs) 
-vers = getPrepVersion(); 
 
 %% Add path to prepPipeline subdirectories if not in the list
 tmp = which('getPrepDefaults');
@@ -38,6 +37,7 @@ if isempty(tmp)
     myPath = fileparts(which('prepPipeline'));
     addpath(genpath(myPath));
 end;
+vers = getPrepVersion(); 
 
 % create menu
 comprep = [trystrs.no_check '[EEG LASTCOM] = pop_prepPipeline(EEG);' catchstrs.new_and_hist];
