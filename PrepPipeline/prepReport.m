@@ -25,6 +25,8 @@
 reference = struct();
 version = '';
 fullInformation = false;
+numbersPerRow = 10;
+indent = '  ';
 
 if isfield(EEGReporting, 'etc') && isfield(EEGReporting.etc, 'noiseDetection')
     noiseDetection = EEGReporting.etc.noiseDetection;
@@ -42,9 +44,12 @@ if isfield(noiseDetection, 'fullReferenceInfo');
     fullInformation = EEGReporting.etc.noiseDetection.fullReferenceInfo;
 end
 
+[channels, frames] = size(EEGReporting.data);
+
+fprintf(consoleFID, '%s\nChannels: %d\nFrames: %d\n', ...
+    noiseDetection.name, channels, frames);
 summaryHeader = [noiseDetection.name '[' ...
-    num2str(size(EEGReporting.data, 1)) ' channels, ' num2str(size(EEGReporting.data, 2)) ' frames]'];
-fprintf(consoleFID, '%s\n', summaryHeader);
+    num2str(channels) ' channels, ' num2str(frames) ' frames]'];
 summaryHeader = [summaryHeader ' <a href="' relativeReportLocation ...
     '">Report details</a>'];
 writeSummaryHeader(summaryFile,  summaryHeader);
@@ -89,13 +94,16 @@ if isfield(noiseDetection, 'reference')
                    ['Channels removed during post-process: [' ...
                     num2str(removedChannels) ']' ]};
     writeHtmlList(summaryFile, summaryItem, 'both');
-    fprintf(consoleFID, '%s\n%s\n%s\n', ...
-            summaryItem{1}, summaryItem{2}, summaryItem{3});
+    fprintf(consoleFID, 'Channels interpolated during reference:\n');
+    printList(consoleFID, interpolatedChannels, numbersPerRow, indent);
+    fprintf(consoleFID, 'Channels still noisy after reference:\n');
+    printList(consoleFID, stillNoisyChannels, numbersPerRow, indent);
+    fprintf(consoleFID, 'Channels removed during post-process:\n');
+    printList(consoleFID, removedChannels, numbersPerRow, indent);
 end
 
 % Setup visualization parameters
-numbersPerRow = 10;
-indent = '  ';
+
 colors = [0, 0, 0; 0, 1, 0; 1, 0, 0];
 legendStrings = {'Original', 'Before interp' 'Final'};
 symbols = {'+', 'x', 'o'};

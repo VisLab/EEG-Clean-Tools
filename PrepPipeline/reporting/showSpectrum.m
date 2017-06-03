@@ -73,7 +73,9 @@ end
         if ~isempty(legends)
             legends = legends(~cellfun('isempty',legends));
             ht = legend(legends, 'Location', 'EastOutside');
-            title(ht, 'Current ch#(label)')
+            if ~verLessThan('matlab', '9.0.0') 
+               title(ht, 'Current ch#(label)')
+            end
         end
         title(tString1, 'Interpreter', 'none')
         box on

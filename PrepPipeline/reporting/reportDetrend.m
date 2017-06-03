@@ -19,5 +19,5 @@ function summary = reportDetrend(fid, noiseDetection, numbersPerRow, indent)
     fprintf('Detrend command:\n%s\n', detrendInfo.detrendCommand);
     fprintf(fid, 'Detrended channels (%d channels):\n', ...
             length(detrendInfo.detrendChannels));
-    printList(fid, detrendInfo.detrendChannels, numbersPerRow, indent);
+    printListCompressed(fid, detrendInfo.detrendChannels, numbersPerRow, indent);
 end

@@ -33,6 +33,11 @@ authorized to reproduce and distribute reprints for Government purposes
 notwithstanding any copyright notation herein.
 
 ### Releases 
+Version 0.55.1 Released 06/03/2017
+* Wrote printListCompressed to display channels more compactly
+* Put in a MATLAB version check because legend titles not supported in 2014b
+* Fixed spacing on output of interpolated channel numbers
+
 Version 0.55.0 Released 05/29/2017
 * Changed the EEG.etc.noiseDetection structure to contain removed channels and interpolated channels for easier access 
 * Fixed reporting to work when bad channels have been removed

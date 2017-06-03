@@ -6,9 +6,17 @@ function [currentVersion, changeLog, markdown] = getPrepVersion()
 end
 
 function changeLog = getChangeLog()
-   changeLog(1) = ...
+   changeLog(2) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
+    changeLog(2).version = '0.55.1';
+    changeLog(2).status = 'Released';
+    changeLog(2).date = '06/03/2017';
+    changeLog(2).changes = { ...
+       'Wrote printListCompressed to display channels more compactly'; ...
+       'Put in a MATLAB version check because legend titles not supported in 2014b'; ...
+       'Fixed spacing on output of interpolated channel numbers'};
+   
     changeLog(1).version = '0.55.0';
     changeLog(1).status = 'Released';
     changeLog(1).date = '05/29/2017';
@@ -38,6 +46,6 @@ function markdown = getMarkdown(changeLog)
            cString = sprintf('* %s\n', changes{j});
            tString = [tString cString]; %#ok<*AGROW>
        end
-       markdown = [markdown tString];
+       markdown = [markdown tString sprintf('  \n')];
    end
 end

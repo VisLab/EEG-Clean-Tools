@@ -40,6 +40,6 @@ function summary = reportLineNoise(fid, noiseDetection, numbersPerRow, indent)
     end
     fprintf(fid, 'Line noise channels (%d channels):\n', ...
         length(lineNoise.lineNoiseChannels));
-    printList(fid, lineNoise.lineNoiseChannels, numbersPerRow, indent);
+    printListCompressed(fid, lineNoise.lineNoiseChannels, numbersPerRow, indent);
 end
 
