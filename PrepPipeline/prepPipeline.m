@@ -181,7 +181,7 @@ try
     defaults = getPrepDefaults(EEG, 'postprocess');
     postProcessOut = checkDefaults(params, struct(), defaults);
     if postProcessOut.keepFiltered
-        EEG = removeTrend(EEG, EEG.referenceOut);
+        EEG = removeTrend(EEG, postProcessOut);
     end
     if postProcessOut.removeInterpolatedChannels
         removedChannels = EEG.etc.noiseDetection.interpolatedChannelNumbers;

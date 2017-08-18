@@ -6,8 +6,14 @@ function [currentVersion, changeLog, markdown] = getPrepVersion()
 end
 
 function changeLog = getChangeLog()
-   changeLog(2) = ...
+   changeLog(3) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+
+    changeLog(3).version = '0.55.2';
+    changeLog(3).status = 'Released';
+    changeLog(3).date = '08/18/2017';
+    changeLog(3).changes = { ...
+       'Fixed undefined reference to referenceOut in prepPipeline post process'};
 
     changeLog(2).version = '0.55.1';
     changeLog(2).status = 'Released';
