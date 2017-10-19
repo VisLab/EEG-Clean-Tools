@@ -99,7 +99,7 @@ end
             bad = signal.data(noisy, :);
             sourceChannels = setdiff(referenceOut.evaluationChannels, noisy);
             signal = interpolateChannels(signal, noisy, sourceChannels);
-            referenceOut.interpolatedChannelNumbers = referenceOut.interpoledChannels.all;
+            referenceOut.interpolatedChannelNumbers = referenceOut.interpolatedChannels.all;
             referenceOut.referenceSignal = ...
                 nanmean(signal.data(referenceOut.referenceChannels, :), 1);
             referenceOut.badSignalsUninterpolated = ...

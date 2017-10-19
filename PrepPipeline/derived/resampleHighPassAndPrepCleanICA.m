@@ -1,6 +1,6 @@
 function EEG = resampleHighPassAndPrepCleanICA(EEG, varargin)
 % Perform a high-pass filter and ICA on data that has been Prepped and excised
-%
+% 
 % Parameters:
 %    EEG   EEGLAB EEG structure
 %    varargin    name value pairs

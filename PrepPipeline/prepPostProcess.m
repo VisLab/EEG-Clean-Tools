@@ -15,11 +15,16 @@ if ~isstruct(postIn)
 end
 postOut = struct('keepFiltered', [], 'removeInterpolatedChannels', [], ...
                   'cleanupReference', []);
-defaults = getPrepDefaults(EEG, 'postProcess');
+defaults = getPrepDefaults(EEG, 'postprocess');
 
 [postOut, errors] = checkDefaults(postIn, postOut, defaults);
 if ~isempty(errors)
     error('postProcess:BadParameters', ['|' sprintf('%s|', errors{:})]);
+end
+defaults = getPrepDefaults(EEG, 'general');
+[postOut, errors] = checkDefaults(postOut, postOut, defaults);
+if ~isempty(errors)
+    error('postProcess:BadGeneralParameters', ['|' sprintf('%s|', errors{:})]);
 end
 EEG.etc.noiseDetection.postProcess = postOut;
 %% Perform filtering if requested
@@ -31,9 +36,14 @@ EEG.etc.noiseDetection.postProcess = postOut;
     end
 catch mex
     errorMessages.detrend = ...
-        ['postProcessing failed removeTrend: ' getReport(mex)];
-    errorMessages.status = 'unprocessed';
+        ['postProcessing failed removeTrend: ' ...
+        getReport(mex, 'basic', 'hyperlinks', 'off')];
+    EEG.etc.noiseDetection.errors.status = 'post-processing error';
     EEG.etc.noiseDetection.errors.postProcess = errorMessages;
+    if strcmpi(postOut.errorMsgs, 'verbose')
+        warning('[%s]\n%s', mex.identifier, ...
+            getReport(mex, 'extended', 'hyperlinks', 'on'));
+    end
     return;
  end
 
@@ -46,19 +56,24 @@ catch mex
       EEG.etc.noiseDetection.postProcess.removedChannelData = ...
            EEG.data(interpolatedChannels, :);
       EEG.etc.noiseDetection.postProcess.removedChanlocs = ...
-           EEG.chanlocs(interpolatedChannels); 
-      EEG.etc.noiseDetection.removedChannelNumbers = interpolatedChannels;
-      channels = 1:size(EEG.data, 1);
-      channels = setdiff(channels, interpolatedChannels);
-      EEG.data = EEG.data(channels, :);
-      EEG.nbchan = length(channels);
-      EEG.chanlocs = EEG.chanlocs(channels);                              
-    end
+           EEG.chanlocs(interpolatedChannels);
+      EEG.chanlocs(interpolatedChannels) = [];
+      EEG.data(interpolatedChannels, :) = [];
+      EEG.nbchan = length(EEG.chanlocs);                              
+    else
+       EEG.etc.noiseDetection.postProcess.removedChannelNumbers = [];
+       EEG.etc.noiseDetection.postProcess.removedChannelLocs = [];
+    end   
 catch mex
     errorMessages.removeInterpolated = ...
-        ['postProcessing failed to remove interpolated channels: ' getReport(mex)];
-    errorMessages.status = 'unprocessed';
+        ['postProcessing failed to remove interpolated channels: ' ...
+          getReport(mex, 'basic', 'hyperlinks', 'off')];
+    EEG.etc.noiseDetection.errors.status = 'post-processing error';
     EEG.etc.noiseDetection.errors.postProcess = errorMessages;
+    if strcmpi(postOut.errorMsgs, 'verbose')
+        warning('[%s]\n%s', mex.identifier, ...
+            getReport(mex, 'extended', 'hyperlinks', 'on'));
+    end
     return;
  end
  postOut = EEG.etc.noiseDetection.postProcess;
@@ -70,8 +85,13 @@ catch mex
     end
 catch mex
     errorMessages.cleanupReference = ...
-        ['postProcessing failed to cleanup reference information: ' getReport(mex)];
-    errorMessages.status = 'unprocessed';
+        ['postProcessing failed to cleanup reference information: ' ...
+        getReport(mex, 'basic', 'hyperlinks', 'off')];
+    EEG.etc.noiseDetection.errors.status = 'post-processing error';
     EEG.etc.noiseDetection.errors.postProcess = errorMessages;
+    if strcmpi(postOut.errorMsgs, 'verbose')
+        warning('[%s]\n%s', mex.identifier, ...
+            getReport(mex, 'extended', 'hyperlinks', 'on'));
+    end
     return;
 end

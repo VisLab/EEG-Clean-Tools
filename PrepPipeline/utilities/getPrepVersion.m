@@ -6,9 +6,17 @@ function [currentVersion, changeLog, markdown] = getPrepVersion()
 end
 
 function changeLog = getChangeLog()
-   changeLog(3) = ...
+   changeLog(4) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
+    changeLog(4).version = '0.55.3';
+    changeLog(4).status = 'Released';
+    changeLog(4).date = '10/19/2017';
+    changeLog(4).changes = { ...
+       'Fixed issue with interpolated channels when interpolation order is pre-process'; ...
+       'Fixed issue with correct removal of interpolated channels during post-processing'; ...
+       'Reordered preprocessing and report buttons on master GUI'};
+ 
     changeLog(3).version = '0.55.2';
     changeLog(3).status = 'Released';
     changeLog(3).date = '08/18/2017';

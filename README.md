@@ -33,6 +33,14 @@ authorized to reproduce and distribute reprints for Government purposes
 notwithstanding any copyright notation herein.
 
 ### Releases 
+Version 0.55.3 Released 10/19/2017
+* Fixed issue with interpolated channels when interpolation order is pre-process
+* Fixed issue with correct removal of interpolated channels during post-processing
+* Reordered preprocessing and report buttons on master GUI
+  
+Version 0.55.2 Released 08/18/2017
+* Fixed undefined reference to referenceOut in prepPipeline post process
+
 Version 0.55.1 Released 06/03/2017
 * Wrote printListCompressed to display channels more compactly
 * Put in a MATLAB version check because legend titles not supported in 2014b
