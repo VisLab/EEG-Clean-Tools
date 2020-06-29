@@ -9,14 +9,16 @@ The PREP pipeline is a standardized early-stage EEG processing pipeline that foc
 The PREP pipeline relies on the MATLAB Signal Processing toolbox and EEGLAB, a freely-available MATLAB toolbox for processing EEG. EEGLAB is available from  [http://scn.ucsd.edu/eeglab](http://scn.ucsd.edu/eeglab). PREP assumes that the EEG data is provided as an EEGLAB EEG structure and that channel locations are provided in the EEG.chanlocs structure.
 
 ### Citing the PREP pipeline
-The PREP pipeline is freely available under the GUN General Public License. 
+The PREP pipeline is freely available under the GNU General Public License. 
 Please cite the following publication if using:  
 > Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015)  
 > The PREP pipeline: standardized preprocessing for large-scale EEG analysis  
 > Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  
 
 ### Installation
-The PREP pipeline can be run in two ways --- as a standalone toolbox or as an EEGLAB plugin. To run in standalone mode, simply download the PREP code, found the the EEG-Clean-Tools
+The PREP pipeline can be run in two ways --- as a standalone toolbox or as an EEGLAB plugin. To run in standalone mode, simply download the EEG-Clean-Tools
+repository from https://github.com/VisLab/EEG-Clean-Tools. Unzip if necessary and then add the PrepPipeline directory and all of its subdirectories to your
+MATLAB path.  
 
 # PREP as an EEGLAB plugin
 You can install PREP as an EEGLAB plugin by unzipping the PREPPipeline directory into the plugins directory of
