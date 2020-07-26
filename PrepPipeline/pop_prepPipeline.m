@@ -46,7 +46,7 @@ tmp = which('getPrepDefaults');
 if isempty(tmp)
     myPath = fileparts(which('prepPipeline'));
     addpath(genpath(myPath));
-end;
+end
 
 %% Pop up window
 if nargin < 2

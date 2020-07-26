@@ -33,6 +33,12 @@ authorized to reproduce and distribute reprints for Government purposes
 notwithstanding any copyright notation herein.
 
 ### Releases 
+Version 0.55.4 Released 7/26/2020  
+* Correctly restored EEGLAB options after execution
+* Added functions to output errors from etc.noiseDetection
+* Corrected findpeaks naming conflict in Chronux
+* Post process does not execute if Prep had errors  
+
 Version 0.55.3 Released 10/19/2017
 * Fixed issue with interpolated channels when interpolation order is pre-process
 * Fixed issue with correct removal of interpolated channels during post-processing

@@ -9,29 +9,48 @@ function [EEG, postOut] = prepPostProcess(EEG, postIn)
         warningsState));
 
 %% Check the parameters
-    if nargin < 1 || ~isstruct(EEG)
-        error('postProcess:NotEnoughArguments', 'first argument must be a structure');
-    elseif nargin < 2 || ~exist('postIn', 'var') || isempty(postIn)
-        postIn = struct();
-    end
-    if ~isstruct(postIn)
-        error('postProcess:NoData', 'second argument must be a structure')
-    end
-    postOut = struct('keepFiltered', [], 'removeInterpolatedChannels', [], ...
-                      'cleanupReference', []);
-    defaults = getPrepDefaults(EEG, 'postprocess');
+postOut = struct();
 
-    [postOut, errors] = checkPrepDefaults(postIn, postOut, defaults);
-    if ~isempty(errors)
-        error('postProcess:BadParameters', ['|' sprintf('%s|', errors{:})]);
+%% Initial setup
+    try
+        %% Check the input
+        if nargin < 1 || ~isstruct(EEG)
+            error('postProcess:NotEnoughArguments', 'first argument must be a structure');
+        elseif nargin < 2 || ~exist('postIn', 'var') || isempty(postIn)
+            postIn = struct();
+        end
+        if ~isstruct(postIn)
+            error('postProcess:NoData', 'second argument must be a structure')
+        end
+        if ~isfield(EEG, 'etc') || ~isfield(EEG.etc, 'noiseDetection') || ...
+                hasPrepErrors(EEG.etc.noiseDetection)
+            error('postProcess:NoPrep', 'Prep has not executed or has errors');
+        end
+
+        %% Set up the output structure
+        postOut = struct('keepFiltered', [], 'removeInterpolatedChannels', [], ...
+            'cleanupReference', []);
+        defaults = getPrepDefaults(EEG, 'postprocess');
+
+        [postOut, errors] = checkPrepDefaults(postIn, postOut, defaults);
+        if ~isempty(errors)
+            error('postProcess:BadParameters', ['|' sprintf('%s|', errors{:})]);
+        end
+        defaults = getPrepDefaults(EEG, 'general');
+        [postOut, errors] = checkPrepDefaults(postOut, postOut, defaults);
+        if ~isempty(errors)
+            error('postProcess:BadGeneralParameters', ['|' sprintf('%s|', errors{:})]);
+        end
+        EEG.etc.noiseDetection.postProcess = postOut;
+
+    catch mex
+        errorMessages.setup = ...
+            ['postProcessing failed due to previous issues: ' ...
+            getReport(mex, 'basic', 'hyperlinks', 'off')];
+        EEG.etc.noiseDetection.errors.postProcess = errorMessages;
+        return;
     end
-    defaults = getPrepDefaults(EEG, 'general');
-    [postOut, errors] = checkPrepDefaults(postOut, postOut, defaults);
-    if ~isempty(errors)
-        error('postProcess:BadGeneralParameters', ['|' sprintf('%s|', errors{:})]);
-    end
-    EEG.etc.noiseDetection.postProcess = postOut;
-    
+     
 %% Perform filtering if requested
      try
         if postOut.keepFiltered
@@ -100,6 +119,9 @@ function [EEG, postOut] = prepPostProcess(EEG, postIn)
         end
         return;
      end
+     
+     %% If we got this far everything was good
+     EEG.etc.noiseDetection.errors.postProcess = 0;
 end
 
 %% Cleanup callback

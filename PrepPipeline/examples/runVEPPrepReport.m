@@ -24,7 +24,11 @@ end
 %% Run the pipeline
 
 for k = 1:length(inNames)
-    sessionReportName = [inNames{k}(1:(end-4)) '.pdf'];
+    [~, theName, theExt] = fileparts(inNames{k});
+    if ~strcmpi(theExt, '.set') && ~strcmpi(theExt, '.mat')
+        continue;
+    end
+    sessionReportName = [theName '.pdf'];
     fname = [dataDir filesep inNames{k}];
     load(fname, '-mat');
     sessionFileName = [summaryFolder filesep sessionReportName];
