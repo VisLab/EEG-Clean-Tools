@@ -114,6 +114,7 @@ end
 
     function [] = doRobustPost()
         % Robust reference with interpolation afterwards
+        fprintf('Robust referencing\n');
         referenceOut = robustReference(signal, referenceOut);
         noisy = referenceOut.badChannels.all;
         if isempty(noisy)   %No noisy channels -- ordinary ref
@@ -189,8 +190,8 @@ end
         elseif ~strcmpi(referenceOut.referenceType, 'average') && ...
             ~strcmpi(referenceOut.referenceType, 'specific') && ...
             ~strcmpi(referenceOut.referenceType, 'none')
-        warning('specificReference:BadReferenceType', 'Unrecognized reference type');
-        end;
+            warning('specificReference:BadReferenceType', 'Unrecognized reference type');
+        end
         referenceOut.noisyStatisticsOriginal  = ...
            findNoisyChannels(removeTrend(signal, referenceOut), referenceOut);
         referenceOut.noisyStatisticsBeforeInterpolation = ...

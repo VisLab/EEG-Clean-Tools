@@ -68,7 +68,7 @@ while true  % Do at least 1 iteration
         && isempty(setdiff(noisyChannelsOld, noisyChannels))))) || ...
         iterations > referenceOut.maxReferenceIterations 
         break;
-    end    
+    end 
     noisyChannelsOld = noisyChannels; 
     sourceChannels = setdiff(referenceOut.referenceChannels, noisyChannels);
     if length(sourceChannels)  < 2
