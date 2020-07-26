@@ -17,12 +17,12 @@ postOut = struct('keepFiltered', [], 'removeInterpolatedChannels', [], ...
                   'cleanupReference', []);
 defaults = getPrepDefaults(EEG, 'postprocess');
 
-[postOut, errors] = checkDefaults(postIn, postOut, defaults);
+[postOut, errors] = checkPrepDefaults(postIn, postOut, defaults);
 if ~isempty(errors)
     error('postProcess:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end
 defaults = getPrepDefaults(EEG, 'general');
-[postOut, errors] = checkDefaults(postOut, postOut, defaults);
+[postOut, errors] = checkPrepDefaults(postOut, postOut, defaults);
 if ~isempty(errors)
     error('postProcess:BadGeneralParameters', ['|' sprintf('%s|', errors{:})]);
 end

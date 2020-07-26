@@ -5,7 +5,7 @@
 %       function. It displays the errors in a pop-up GUI.
 %Parameters:
 %       I   errors      Cell array of strings; errors found by the
-%                       checkDefaults function
+%                       checkPrepDefaults function
 %       O   loop        Integer that either continues the while loop found
 %                       above or exits the loop
 %Notes:

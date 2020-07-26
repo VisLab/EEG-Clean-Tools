@@ -67,7 +67,7 @@ EEG.etc.noiseDetection.originalChannelLabels = {EEG.chanlocs.labels};
 %% Check for the general defaults
 try
     defaults = getPrepDefaults(EEG, 'general');
-    [params, errors] = checkDefaults(params, params, defaults);
+    [params, errors] = checkPrepDefaults(params, params, defaults);
     if ~isempty(errors)
         error('prepPipeline:GeneralDefaultError', ['|' sprintf('%s|', errors{:})]);
     end
@@ -80,7 +80,7 @@ end
 %% Check for boundary events
 try
     defaults = getPrepDefaults(EEG, 'boundary');
-    [boundaryOut, errors] = checkDefaults(params, struct(), defaults);
+    [boundaryOut, errors] = checkPrepDefaults(params, struct(), defaults);
     if ~isempty(errors)
         error('boundary:BadParameters', ['|' sprintf('%s|', errors{:})]);
     end
@@ -115,10 +115,10 @@ try
     EEG.etc.noiseDetection.detrend = detrend;
     % Make sure detrend defaults are available for referencing
     defaults = getPrepDefaults(EEG, 'detrend');
-    params = checkDefaults(detrend, params, defaults); 
+    params = checkPrepDefaults(detrend, params, defaults); 
     computationTimes.detrend = toc;
 catch mex
-    errorMessages.removeTrend = ['prepPipeline failed removeTrend: ' ...
+    errorMessages.detrend = ['prepPipeline failed removeTrend: ' ...
          getReport(mex, 'basic', 'hyperlinks', 'off')];
     errorMessages.status = 'unprocessed';
     EEG.etc.noiseDetection.errors = errorMessages;
@@ -185,7 +185,7 @@ EEG.etc.noiseDetection.errors = errorMessages;
 % EEG.etc.noiseDetection.postProcess = postOut;
 % try
 %     defaults = getPrepDefaults(EEG, 'postprocess');
-%     postProcessOut = checkDefaults(params, struct(), defaults);
+%     postProcessOut = checkPrepDefaults(params, struct(), defaults);
 %     if postProcessOut.keepFiltered
 %         EEG = removeTrend(EEG, postProcessOut);
 %     end

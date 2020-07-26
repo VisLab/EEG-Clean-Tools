@@ -1,10 +1,10 @@
-function defaults = getPrepDefaults(signal, type)
-% Returns the defaults for a given step in the standard level 2 pipeline
+function defaults = getPrepDefaults(signal, defaultType)
+% Return the defaults for a given step in the standard pipeline
 %
 % Parameters:
 %     signal       a structure compatible with EEGLAB EEG structure
 %                   (must have .data and .srate fields
-%     type         a string indicating type of defaults to return:
+%     defaultType  a string indicating type of defaults to return:
 %                  boundary, resample, detrend, globaltrend, linenoise
 %                  reference
 %
@@ -19,7 +19,7 @@ function defaults = getPrepDefaults(signal, type)
 nyquist = round(signal.srate/2);
 topMultiple = floor(nyquist/60);
 lineFrequencies = (1:topMultiple)*60;
-switch lower(type)
+switch lower(defaultType)
    case 'general'
        defaults = struct( ...
             'errorMsgs', ...

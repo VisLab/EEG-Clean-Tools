@@ -1,21 +1,21 @@
 %% Example: Running the pipeline outside of ESS
 
-%% Read in the file and set the necessary parameters
+%% Set up the input and the output directories
 basename = 'vep';
-indir = 'E:\CTADATA\VEP\BiosemiOriginalSetCorrected';
+indir = 'F:\DataPool\CTADATA\VEP\BiosemiOriginalSetCorrected';
 outdir = 'D:\TempCTA';
-params = struct();
 
-%% Make directory if needed
+%% Make the output directory if needed
 if ~exist(outdir, 'dir')
     mkdir(outdir)
 end
 
-%% Parameters that must be preset
+%% Set up the params structure
+params = struct();
 params.lineFrequencies = [60, 120, 180, 212, 240];
 params.referenceChannels = 1:64;
 params.evaluationChannels = 1:64;
-params.rereferencedChannels = 1:70;
+params.rereferencedChannels = 1:83;
 params.detrendChannels = 1:70;
 params.lineNoiseChannels = 1:70;
 
@@ -27,6 +27,7 @@ params.interpolationOrder = 'post-reference';
 params.removeInterpolatedChannels = true;
 params.keepFiltered = false;
 basenameOut = [basename 'robust_1Hz_post_median_unfiltered'];
+
 
 %% Get the filelist
 fileList = getFileList('FILES', indir);
@@ -42,4 +43,9 @@ for k = 1%:length(fileList)
     EEG = prepPostProcess(EEG, params);
     fname = [outdir filesep thisName '.set'];
     save(fname, 'EEG', '-mat', '-v7.3'); 
+    if strcmpi(params.errorMsgs, 'verbose')
+        outputPrepParams(params, 'Prep parameters (non-defaults)');
+        outputPrepErrors(EEG.etc.noiseDetection, 'Prep error status');
+    end
+        
 end

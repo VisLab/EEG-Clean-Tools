@@ -1,5 +1,12 @@
-function [structOut, errors] = checkDefaults(structIn, structOut, defaults)
+function [structOut, errors] = checkPrepDefaults(structIn, structOut, defaults)
 % Check structIn input parameters against defaults fields of structOut
+%
+% Parameters:
+%    structIn     Parameter structure to be checked
+%    structOut    Base output structure for parameters.
+%    defaults     Default information
+%
+% Note:  structOut contains fields that will always be there.
 errors = cell(0);
 fNames = fieldnames(defaults);
 for k = 1:length(fNames)

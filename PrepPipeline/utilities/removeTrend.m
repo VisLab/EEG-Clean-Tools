@@ -47,7 +47,7 @@ defaults = getPrepDefaults(EEG, 'detrend');
 detrendOut = struct('detrendChannels', [], 'detrendType', [], ...
                     'detrendCutoff', [], 'detrendStepSize', [], ...
                     'detrendCommand', []);
-[detrendOut, errors] = checkDefaults(detrendIn, detrendOut, defaults);
+[detrendOut, errors] = checkPrepDefaults(detrendIn, detrendOut, defaults);
 if ~isempty(errors)
     error('removeTrend:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end

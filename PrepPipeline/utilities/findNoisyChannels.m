@@ -95,7 +95,7 @@ end
 %% Set the defaults and initialize as needed
 noisyOut = getNoisyStructure();
 defaults = getPrepDefaults(signal, 'reference');
-[noisyOut, errors] = checkDefaults(noisyIn, noisyOut, defaults);
+[noisyOut, errors] = checkPrepDefaults(noisyIn, noisyOut, defaults);
 if ~isempty(errors)
     error('findNoisyChannels:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end

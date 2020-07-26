@@ -47,7 +47,7 @@ defaults = getPrepDefaults(EEG, 'globaltrend');
 globalTrendOut = struct('globalTrendChannels', [], 'doLocal', [], ...
     'localCutoff', [], 'localStepSize', [], 'linearFit', [], ...
      'channelCorrelations', []);
-[globalTrendOut, errors] = checkDefaults(globalTrendIn, globalTrendOut, defaults);
+[globalTrendOut, errors] = checkPrepDefaults(globalTrendIn, globalTrendOut, defaults);
 if ~isempty(errors)
     error('removeGlobalTrend:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end

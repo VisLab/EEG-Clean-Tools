@@ -58,7 +58,7 @@ lineNoiseOut = struct('lineNoiseMethod', [], ...
     'taperWindowStep', [], 'tau', [], 'pad', [], ...
     'fPassBand', [], 'maximumIterations', []);
 
-[lineNoiseOut, errors] = checkDefaults(lineNoiseIn, lineNoiseOut, defaults);
+[lineNoiseOut, errors] = checkPrepDefaults(lineNoiseIn, lineNoiseOut, defaults);
 if ~isempty(errors)
     error('removeLineNoise:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end

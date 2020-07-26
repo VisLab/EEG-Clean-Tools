@@ -37,12 +37,12 @@ end
 %% Set the defaults and initialize as needed
 referenceOut = getReferenceStructure();
 defaults = getPrepDefaults(signal, 'reference');
-[referenceOut, errors] = checkDefaults(referenceIn, referenceOut, defaults);
+[referenceOut, errors] = checkPrepDefaults(referenceIn, referenceOut, defaults);
 if ~isempty(errors)
     error('performReference:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end
 defaults = getPrepDefaults(signal, 'detrend');
-[referenceOut, errors] = checkDefaults(referenceIn, referenceOut, defaults);
+[referenceOut, errors] = checkPrepDefaults(referenceIn, referenceOut, defaults);
 if ~isempty(errors)
     error('performReference:BadParameters', ['|' sprintf('%s|', errors{:})]);
 end

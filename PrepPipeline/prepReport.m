@@ -40,7 +40,7 @@ end
 if isfield(noiseDetection, 'version')
    version = EEGReporting.etc.noiseDetection.version;
 end
-if isfield(noiseDetection, 'fullReferenceInfo');
+if isfield(noiseDetection, 'fullReferenceInfo')
     fullInformation = EEGReporting.etc.noiseDetection.fullReferenceInfo;
 end
 
