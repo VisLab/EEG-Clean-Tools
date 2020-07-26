@@ -46,7 +46,6 @@ end
 if resampleOut.resampleOff
     return;
 end
-% pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% Resample the EEG data if the resampling frequency is lower than original
 if resampleOut.originalFrequency <= resampleOut.resampleFrequency  

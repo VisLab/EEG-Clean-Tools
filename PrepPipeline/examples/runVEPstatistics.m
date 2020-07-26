@@ -1,24 +1,8 @@
 %% Run the statistics for a version of the VEP 
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 saveFile = 'dataStatistics.mat';
 
 %% Setup the directories and titles
 setupDir(1) = struct('inDir', [], 'outDir', [], 'title', [], 'fieldPath', []);
-% setupDir(1).inDir = 'N:\ARLAnalysis\VEP\VEPAverage_1Hz';
-% setupDir(1).outDir = 'N:\ARLAnalysis\VEP\VEPAverage_1Hz_Report';
-% setupDir(1).title = 'VEP average 1Hz';
-% setupDir(1).fieldPath = {'etc', 'averageReference', 'noisyOut'};
-
-% setupDir(1).inDir = 'N:\ARLAnalysis\VEP\VEP_1Hz';
-% setupDir(1).outDir = 'N:\ARLAnalysis\VEP\VEP_1Hz_Report';
-% setupDir(1).title = 'VEP HP 1Hz';
-% setupDir(1).fieldPath = {'etc', 'originalReference', 'noisyOut'};
-
-% setupDir(1).inDir = 'N:\ARLAnalysis\VEP\VEPMastoid_1Hz';
-% setupDir(1).outDir = 'N:\ARLAnalysis\VEP\VEPMastoid_1Hz_Report';
-% setupDir(1).title = 'VEP mastoid 1Hz';
-% setupDir(1).fieldPath = {'etc', 'mastoidReference', 'noisyOut'};
-
 setupDir(1).inDir = 'N:\ARLAnalysis\VEP\VEPRobust_1Hz_Post_Median_Unfiltered';
 setupDir(1).outDir = 'N:\ARLAnalysis\VEP\VEPRobust_1Hz_Post_Median_Unfiltered_Report';
 setupDir(1).title = 'VEP robust 1Hz';

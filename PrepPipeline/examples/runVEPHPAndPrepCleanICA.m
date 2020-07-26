@@ -2,7 +2,6 @@
 
 %% Read in the file and set the necessary parameters
 basename = 'vep';
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 indir = 'O:\ARL_Data\VEP\VEP_Robust_1Hz'; % Input data directory used for this demo
 outdir = 'O:\ARL_Data\VEP\VEP_PrepClean_Infomax';
 

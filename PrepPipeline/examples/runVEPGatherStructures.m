@@ -2,7 +2,6 @@
 % comparison. The results is collated in a noisyStatistics structure.
 
 %% Read in the file and set the necessary parameters
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 basename = 'vep';
 averageDir = 'N:\\ARLAnalysis\\VEP\\VEPAverage_1Hz';
 mastoidDir = 'N:\\ARLAnalysis\\VEP\\VEPMastoid_1Hz';

@@ -1,5 +1,4 @@
 %% Read in the file and set the necessary parameters
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 % dataDir = 'O:\ARL_Data\VEP\VEP_Robust_1Hz';
 % summaryFolder  = 'O:\ARL_Data\VEP\VEP_Robust_1Hz_New_Report_B';

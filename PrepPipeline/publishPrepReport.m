@@ -30,13 +30,18 @@ function [] = publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
 %
 %
 %% Handle the parameters
-if (nargin < 4)
-    error('publishPrepReport:NotEnoughParameters', ...
-        ['Usage: publishPrepReport(EEG, summaryFilePath, ' ...
-        'sessionFilePath, consoleId, publishOn)']);
-elseif nargin < 5 || isempty(publishOn)
-    publishOn = true;
-end
+    if (nargin < 4)
+        error('publishPrepReport:NotEnoughParameters', ...
+            ['Usage: publishPrepReport(EEG, summaryFilePath, ' ...
+            'sessionFilePath, consoleId, publishOn)']);
+    elseif nargin < 5 || isempty(publishOn)
+        publishOn = true;
+    end
+
+%% Make sure that EEGLAB is working in double precision
+    [backupOptionsFile, currentOptionsFile, warningsState] = setupForEEGLAB();
+    finishup = onCleanup(@() cleanup(backupOptionsFile, currentOptionsFile, ...
+        warningsState));
 
 %% Setup up files and assign variables needed for publish in base workspace
 % Session folder is relative to the summary report location
@@ -50,7 +55,7 @@ end
     fprintf('Summary: %s   session: %s\n', summaryFolder, sessionFolder);
     fprintf('Relative report location %s \n', relativeReportLocation);
     summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
-    if summaryFile == -1;
+    if summaryFile == -1
         error('publishPrepReport:BadSummaryFile', ...
             'Failed to open summary file %s', summaryReportLocation);
     elseif isempty(EEG) || ~isfield(EEG, 'etc') || ...
@@ -106,3 +111,10 @@ function canonicalPath = getCanonicalPath(canonicalPath)
           canonicalPath = [canonicalPath, filesep];
        end
 end
+
+%% Cleanup callback
+function cleanup(backupFile, currentFile, warningsState)
+% Restore EEGLAB options file and warning settings 
+   restoreEEGOptions(backupFile, currentFile);
+   warning(warningsState);
+end % cleanup

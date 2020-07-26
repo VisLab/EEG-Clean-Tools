@@ -1,5 +1,4 @@
 %% Run a PREP report on an individual dataset -- good for producing figures.
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% Specific examples
 % dataFile = 'N:\ARLAnalysis\VEP\VEPRobust_1Hz_Post_Median_Unfiltered\vep_03.set';

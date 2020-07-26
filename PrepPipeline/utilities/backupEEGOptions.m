@@ -34,11 +34,7 @@ function [backupOptionsFile, currentOptionsFile] = backupEEGOptions()
 backupOptionsFile = '';
 currentOptionsFile = getEEGOptionsFile();
 if ~isempty(currentOptionsFile)
-    if ~exist(tempdir, 'dir')
-        backupOptionsFile = fullfile(pwd, 'eeg_options_backup.m');
-    else
-        backupOptionsFile = fullfile(tempdir, 'eeg_options_backup.m');
-    end
+    backupOptionsFile = [tempname '.m'];
     [status, message] = copyfile(currentOptionsFile, backupOptionsFile);
     if ~status
         ME = MException('backupEEGOptions:cannotBackup', ...

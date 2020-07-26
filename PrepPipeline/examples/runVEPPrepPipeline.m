@@ -1,4 +1,4 @@
-%% Example: Running the pipeline outside of ESS
+%% Example: Running the pipeline on a directory of EEG files
 
 %% Set up the input and the output directories
 basename = 'vep';

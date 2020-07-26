@@ -1,7 +1,7 @@
 function EEG = fixNoisyFields(EEG, referenceType)
 %% Update structure fields to agree with latest structure
 % Make sure everything is in double precision
-% pop_editoptions('option_single', false, 'option_savetwofiles', false);
+
 if isfield(EEG.etc, 'noisyParameters')
     yNoisy = EEG.etc.noisyParameters;
 else

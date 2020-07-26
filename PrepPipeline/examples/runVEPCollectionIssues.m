@@ -1,7 +1,6 @@
 %% Generates an issue report for EEG structures that have been robustly referenced.
 %
 %  Assumes EEG is in a single directory.
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 issueFile = 'issues.txt';
 
 %% Setup the directories and titles

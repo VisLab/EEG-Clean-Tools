@@ -1,5 +1,4 @@
 %% Run through the high pass and look at the spectrum afterwards
-pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% Specify collection files, legends and colors for the comparison
 statFiles = {
