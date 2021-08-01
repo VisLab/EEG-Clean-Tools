@@ -6,6 +6,17 @@ function [currentVersion, changeLog, markdown] = getPrepVersion()
 end
 
 function changeLog = getChangeLog()
+    changeLog(6) = ...
+     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+
+    changeLog(6).version = '0.56.0';
+    changeLog(6).status = 'Released';
+    changeLog(6).date = '8/01/2021';
+    changeLog(6).changes = { ...
+       'Corrected parfor failure when channel number not consecutive';
+       'Fixed missing badChannelsFromDropout in updateBadChannels issue#28'...
+        };
+
    changeLog(5) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 

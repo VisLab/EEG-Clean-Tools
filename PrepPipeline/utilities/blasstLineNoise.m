@@ -53,14 +53,15 @@ lineFrequencies = lineNoiseOut.lineFrequencies;
 maxIterations = lineNoiseOut.maximumIterations;
 
 %% Perform the calculation for each channel separately
-data = double(signal.data);
-chans = sort(lineNoiseOut.lineNoiseChannels);
-parfor ch = chans
+signal.data = double(signal.data);
+chans = lineNoiseOut.lineNoiseChannels;
+data = signal.data(chans, :);
+parfor ch = 1:size(data, 1)
     data(ch, :) = blasst(squeeze(data(ch, :)), lineFrequencies, ...
                          frequencyRanges, sRate, ...
                          'MaximumIterations', maxIterations, ...
                          'Verbose', 0);
 end
-signal.data = data;
+signal.data(chans, :) = data;
 clear data;
 

@@ -204,7 +204,7 @@ parfor k = 1:WCorrelation
     channelCorrelations(k, :)  = quantile(abs_corr, 0.98);
     noiseLevels(k, :) = mad(dataPortion - eegPortion, 1)./mad(eegPortion, 1);
     channelDeviations(k, :) =  0.7413 *iqr(dataPortion);
-end;
+end
 dropOuts = isnan(channelCorrelations) | isnan(noiseLevels);
 channelCorrelations(dropOuts) = 0.0;
 noiseLevels(dropOuts) = 0.0;

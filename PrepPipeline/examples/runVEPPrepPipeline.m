@@ -3,7 +3,7 @@
 %% Set up the input and the output directories
 basename = 'vep';
 indir = 'F:\DataPool\CTADATA\VEP\BiosemiOriginalSetCorrected';
-outdir = 'D:\TempCTA';
+outdir = 'F:\TempData';
 
 %% Make the output directory if needed
 if ~exist(outdir, 'dir')
@@ -27,7 +27,6 @@ params.interpolationOrder = 'post-reference';
 params.removeInterpolatedChannels = true;
 params.keepFiltered = false;
 basenameOut = [basename 'robust_1Hz_post_median_unfiltered'];
-
 
 %% Get the filelist
 fileList = getFileList('FILES', indir);

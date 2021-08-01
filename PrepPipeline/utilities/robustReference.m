@@ -87,4 +87,4 @@ while true  % Do at least 1 iteration
 end
 referenceOut.actualReferenceIterations = iterations;
 referenceOut.noisyStatistics = noisyStatistics;
-fprintf('Robust reference done');
+fprintf('Robust reference done\n');
