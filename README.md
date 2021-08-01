@@ -32,7 +32,11 @@ Army Research Laboratory or the U.S. Government. The U.S. Government is
 authorized to reproduce and distribute reprints for Government purposes
 notwithstanding any copyright notation herein.
 
-### Releases 
+### Releases
+Version 0.56.0 Released 8/01/2021  
+* Corrected parfor failure when channel number not consecutive
+* Fixed missing badChannelsFromDropout in updateBadChannels issue#28
+ 
 Version 0.55.4 Released 7/26/2020  
 * Correctly restored EEGLAB options after execution
 * Added functions to output errors from etc.noiseDetection

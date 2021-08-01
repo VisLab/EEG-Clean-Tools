@@ -1,18 +1,18 @@
+%% This script takes a directory of files that have been processed by PREP
+% and produces reports.
+
 %% Read in the file and set the necessary parameters
-
-% dataDir = 'O:\ARL_Data\VEP\VEP_Robust_1Hz';
-% summaryFolder  = 'O:\ARL_Data\VEP\VEP_Robust_1Hz_New_Report_B';
-
-dataDir = 'D:\TempCTA';
-summaryFolder = 'D:\TempCTA';
+dataDir = 'F:\TempData';
+summaryFolder = 'F:\TempDataReports';
 publishOn = true;
+
 %% Get the directory list
 inList = dir(dataDir);
 inNames = {inList(:).name};
 inTypes = [inList(:).isdir];
 inNames = inNames(~inTypes);
 
-%%
+%% Setup up the names
 basename = 'vep';
 summaryReportName = [basename '_summary.html'];
 sessionFolder = '.';
@@ -21,8 +21,7 @@ if exist(summaryFileName, 'file')
    delete(summaryFileName);
 end
 
-%% Run the pipeline
-
+%% Publish the reports
 for k = 1:length(inNames)
     [~, theName, theExt] = fileparts(inNames{k});
     if ~strcmpi(theExt, '.set') && ~strcmpi(theExt, '.mat')
