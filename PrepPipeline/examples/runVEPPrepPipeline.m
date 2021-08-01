@@ -3,7 +3,7 @@
 %% Set up the input and the output directories
 basename = 'vep';
 indir = 'F:\DataPool\CTADATA\VEP\BiosemiOriginalSetCorrected';
-outdir = 'D:\TempCTA';
+outdir = 'F:\TempData';
 
 %% Make the output directory if needed
 if ~exist(outdir, 'dir')
@@ -32,7 +32,7 @@ basenameOut = [basename 'robust_1Hz_post_median_unfiltered'];
 %% Get the filelist
 fileList = getFileList('FILES', indir);
 %% Run the pipeline
-for k = 1:length(fileList)
+for k = 1%:length(fileList)
     [~, thisName, ~] = fileparts(fileList{k});
     EEG = pop_loadset(fileList{k});
     params.name = thisName;
@@ -40,12 +40,12 @@ for k = 1:length(fileList)
     fprintf('Computation times (seconds):\n   %s\n', ...
         getStructureString(computationTimes));
     fprintf('Post-process\n')
-    EEG = prepPostProcess(EEG, params);
-    fname = [outdir filesep thisName '.set'];
-    save(fname, 'EEG', '-mat', '-v7.3'); 
-    if strcmpi(params.errorMsgs, 'verbose')
-        outputPrepParams(params, 'Prep parameters (non-defaults)');
-        outputPrepErrors(EEG.etc.noiseDetection, 'Prep error status');
-    end
+%     EEG = prepPostProcess(EEG, params);
+%     fname = [outdir filesep thisName '.set'];
+%     save(fname, 'EEG', '-mat', '-v7.3'); 
+%     if strcmpi(params.errorMsgs, 'verbose')
+%         outputPrepParams(params, 'Prep parameters (non-defaults)');
+%         outputPrepErrors(EEG.etc.noiseDetection, 'Prep error status');
+%     end
         
 end
