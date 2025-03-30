@@ -23,10 +23,6 @@
 
 %function eegplugin_clean_rawdata(fig,try_strings,catch_strings)
 
-% create menu
-% toolsmenu = findobj(fig, 'tag', 'tools');
-% uimenu( toolsmenu, 'label', 'Clean continuous data using ASR', 'separator','on',...
-%    'callback', 'EEG = pop_clean_rawdata(EEG); [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); eeglab redraw');
 
 % eegplugin_prepPipeline() - the PREP pipeline plugin
 function vers = eegplugin_prepPipeline(fig, trystrs, catchstrs) 
@@ -42,6 +38,6 @@ vers = getPrepVersion();
 % create menu
 comprep = [trystrs.no_check '[EEG LASTCOM] = pop_prepPipeline(EEG);' catchstrs.new_and_hist];
 menu = findobj(fig, 'tag', 'tools');
-uimenu( menu, 'Label', 'Run PREP pipeline', 'callback', comprep, ...
+uimenu( menu, 'label', 'Run PREP pipeline', 'callback', comprep, ...
     'separator', 'on');
 

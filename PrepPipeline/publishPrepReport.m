@@ -33,7 +33,7 @@ function [] = publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
     if (nargin < 4)
         error('publishPrepReport:NotEnoughParameters', ...
             ['Usage: publishPrepReport(EEG, summaryFilePath, ' ...
-            'sessionFilePath, consoleId, publishOn)']);
+            'sessionFilePath, consoleFID, publishOn)']);
     elseif nargin < 5 || isempty(publishOn)
         publishOn = true;
     end
@@ -44,77 +44,91 @@ function [] = publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
         warningsState));
 
 %% Setup up files and assign variables needed for publish in base workspace
-% Session folder is relative to the summary report location
+    wrapperScriptName = 'prepReportWrapper';
     [summaryFolder, summaryName, summaryExt] = fileparts(summaryFilePath);
     [sessionFolder, sessionName, sessionExt] = fileparts(sessionFilePath);
-    summaryReportLocation = [summaryFolder filesep summaryName summaryExt];
-    sessionReportLocation = [sessionFolder filesep sessionName sessionExt];
-    tempReportLocation = [sessionFolder filesep 'prepReport.pdf'];
-    relativeReportLocation = getRelativePath(summaryFolder, sessionFolder, ...
-        sessionName, sessionExt);
+    summaryReportLocation = fullfile(summaryFolder, [summaryName summaryExt]);
+    sessionReportLocation = fullfile(sessionFolder, [sessionName sessionExt]);
+    tempReportLocation = fullfile(sessionFolder, [wrapperScriptName '.pdf']);
+    relativeReportLocation = getRelativePath(summaryFolder, sessionFolder, sessionName, sessionExt);
+
     fprintf('Summary: %s   session: %s\n', summaryFolder, sessionFolder);
     fprintf('Relative report location %s \n', relativeReportLocation);
-    summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
-    if summaryFile == -1
-        error('publishPrepReport:BadSummaryFile', ...
-            'Failed to open summary file %s', summaryReportLocation);
-    elseif isempty(EEG) || ~isfield(EEG, 'etc') || ...
-          ~isfield(EEG.etc, 'noiseDetection')
+    
+    if isempty(EEG) || ~isfield(EEG, 'etc') || ~isfield(EEG.etc, 'noiseDetection')
         error('publishPrepReport:PrepNotRun', ...
-            ['EEG.etc must contain PREP informational structures to ' ...
-             'run reports --- run PREP first']);
+        ['EEG.etc must contain PREP informational structures to ' ...
+         'run reports --- run PREP first']);
     end
- 
-    script_name = 'prepReport.m';
+
     if publishOn
-        assignin('base', 'EEGReporting', EEG);
-        assignin('base', 'summaryFile', summaryFile);
-        assignin('base', 'consoleFID', consoleFID);
-        assignin('base', 'relativeReportLocation', relativeReportLocation);
+        % Save variables to temp file
+        dataPath = fullfile(tempdir, 'prepReportData.mat');
+        save(dataPath, 'EEG', 'consoleFID', 'relativeReportLocation', 'summaryReportLocation');
+    
+        % Write wrapper script
+        
+        wrapperPath = fullfile(tempdir, [wrapperScriptName '.m']);
+        fid = fopen(wrapperPath, 'w');
+        fprintf(fid, 'load(''%s'');\n', dataPath);
+        fprintf(fid, 'summaryFile = fopen(summaryReportLocation, ''a+'', ''n'', ''UTF-8'');\n');
+        fprintf(fid, 'prepReport(EEG, summaryFile, consoleFID, relativeReportLocation);\n');
+        fprintf(fid, 'fclose(summaryFile);\n');
+        fprintf(fid, 'clear consoleFID relativeReportLocation summaryReportLocation summaryFile tmpEEG;\n');
+        fclose(fid);
+
+        % Add tempdir to MATLAB path so publish can find the script
+        addpath(tempdir);
+    
+        % Set publish options
         publish_options.outputDir = sessionFolder;
         publish_options.maxWidth = 800;
         publish_options.format = 'pdf';
         publish_options.showCode = false;
-        publish(script_name, publish_options);
-    else
-        EEGReporting = EEG; %#ok<NASGU>
-        prepReport;
-    end
-    if publishOn 
-        writeHtmlList(summaryFile, '', 'last');
-        fclose('all');
-        fprintf('temp report location %s\n', tempReportLocation);
-        fprintf('session report location %s\n', sessionReportLocation);
-        movefile(tempReportLocation, sessionReportLocation);
-        close all
-    end
-end
+    
+        % Publish report
+        publish(wrapperScriptName, publish_options);
 
-function relativePath = getRelativePath(summaryFolder, sessionFolder, ...
-                        sessionName, sessionExt)
-      relativePath = relativize(getCanonicalPath(summaryFolder), ...
-                               getCanonicalPath(sessionFolder));
-      relativePath = getCanonicalPath(relativePath);
-      while(true)
-         relativePathNew = strrep(relativePath, '\\', '\');
-         if length(relativePathNew) == length(relativePath)
-             break;
-         end
-         relativePath = relativePathNew;
-      end
-      relativePath = strrep(relativePath, '\', '/');
-      relativePath = [relativePath sessionName sessionExt];
+        rmpath(tempdir);
+        movefile(tempReportLocation, sessionReportLocation);
+        close all;
+        delete(wrapperPath);
+        delete(dataPath);
+    else
+        summaryFile = fopen(summaryReportLocation, 'a+', 'n', 'UTF-8');
+        if summaryFile == -1
+           error('publishPrepReport:BadSummaryFile', ...
+                'Failed to open summary file %s', summaryReportLocation);
+        end
+        prepReport(EEG, summaryFile, consoleFID, relativeReportLocation);
+        fclose(summaryFile);
+        clear consoleFID relativeReportLocation summaryReportLocation summaryFile tmpEEG;
+    end
+
+end
+ 
+function relativePath = getRelativePath(summaryFolder, sessionFolder, sessionName, sessionExt)
+    relativePath = relativize(getCanonicalPath(summaryFolder), ...
+                              getCanonicalPath(sessionFolder));
+    relativePath = getCanonicalPath(relativePath);
+    while true
+        relativePathNew = strrep(relativePath, '\\', '\');
+        if length(relativePathNew) == length(relativePath)
+            break;
+        end
+        relativePath = relativePathNew;
+    end
+    relativePath = strrep(relativePath, '\', '/');
+    relativePath = [relativePath sessionName sessionExt];
 end
 
 function canonicalPath = getCanonicalPath(canonicalPath)
-       if canonicalPath(end) ~= filesep
-          canonicalPath = [canonicalPath, filesep];
-       end
+    if canonicalPath(end) ~= filesep
+        canonicalPath = [canonicalPath, filesep];
+    end
 end
 
-%% Cleanup callback
 function cleanup(backupFile, currentFile, warningsState)
-% Restore EEGLAB options file and warning settings 
-   restoreEEGOptions(backupFile, currentFile);
-   warning(warningsState);
-end % cleanup
+    restoreEEGOptions(backupFile, currentFile);
+    warning(warningsState);
+end

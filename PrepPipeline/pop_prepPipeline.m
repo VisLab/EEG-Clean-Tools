@@ -33,7 +33,6 @@
 
 function [EEG, com] = pop_prepPipeline(EEG, params)
 com = ''; % Return something if user presses the cancel button
-okay = true;
 if nargin < 1  %% display help if not enough arguments
     help pop_prepPipeline;
     return;
@@ -49,39 +48,31 @@ if isempty(tmp)
 end
 
 %% Pop up window
-if nargin < 2
-    userData = getUserData();
-    [params, okay] = MasterGUI([],[],userData, EEG);
-end
-
-%% Return if user pressed cancel
-if (~okay) 
-	return;
-end
-
-%% Being the pipeline execution
 userData = getUserData();
+if nargin < 2
+    params = MasterGUI([],[],userData, EEG);
+end
+
+%% Begin the pipeline execution
+paramsUpdated = updateParams(params);
 com = sprintf('%s = pop_prepPipeline(%s, %s);', inputname(1), ...
-    struct2str(params));
+    struct2str(paramsUpdated));
 
-reportMode = userData.report.reportMode.value;
-consoleFID = userData.report.consoleFID.value;
-publishOn = userData.report.publishOn.value;
-summaryFilePath = userData.report.summaryFilePath.value;
-sessionFilePath = userData.report.sessionFilePath.value;
+options = getReportOptions(userData, paramsUpdated);
 
-if okay
-    if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'skipReport')
-        EEG = prepPipeline(EEG, params);
-    end
-    if (strcmpi(reportMode, 'normal') || ...
-            strcmpi(reportMode, 'reportOnly')) %&& publishOn
-        publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
-            consoleFID, publishOn);
-    end
-    if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'skipReport')
-        EEG = prepPostProcess(EEG, params);
-    end
+if strcmpi(options.reportMode, 'normal') || strcmpi(options.reportMode, 'skipReport')
+    EEG = prepPipeline(EEG, paramsUpdated);
+end
+
+%% Handle reporting
+if (strcmpi(options.reportMode, 'normal') || strcmpi(options.reportMode, 'reportOnly'))
+    publishPrepReport(EEG, options.summaryFilePath, options.sessionFilePath, ...
+        options.consoleFID, options.publishOn);
+end
+
+%% Perform post-processing
+if strcmpi(options.reportMode, 'normal') || strcmpi(options.reportMode, 'skipReport')
+    EEG = prepPostProcess(EEG, paramsUpdated);
 end
 
     function userData = getUserData()
@@ -101,5 +92,62 @@ end
             userData.(stepNames{k}) = theseValues;
         end
     end  % getUserData
+
+    function paramsOut = updateParams(userDataUpdate)
+        paramsOut = struct();
+        if ~isempty(userDataUpdate)
+            fNames = fieldnames(userDataUpdate);
+            for k = 1:length(fNames)
+                nextStruct = userDataUpdate.(fNames{k});
+                nextNames = fieldnames(nextStruct);
+                for j = 1:length(nextNames)
+                    paramsOut.(nextNames{j}) = nextStruct.(nextNames{j});
+                end
+            end
+        end
+    end
+
+    function options = getReportOptions(userData, paramsUpdated)
+        options = struct('reportMode', '', 'consoleFID', '', 'publishOn', '', ...
+                         'summaryFilePath', '', 'sessionFilePath', '' );
+        options.reportMode = userData.report.reportMode.value;
+        if isfield(paramsUpdated, 'reportMode')
+            options.reportMode = paramsUpdated.reportMode;
+        end
+        options.consoleFID = userData.report.consoleFID.value;
+        if isfield(paramsUpdated, 'consoleFID')
+            options.consoleFID = paramsUpdated.consoleFID;
+        end
+        
+        options.publishOn = userData.report.publishOn.value;
+        if isfield(paramsUpdated, 'publishOn')
+            options.publishOn = paramsUpdated.publishOn;
+        end
+        
+        options.summaryFilePath = userData.report.summaryFilePath.value;
+        if isfield(paramsUpdated, 'summaryFilePath')
+            options.summaryFilePath = paramsUpdated.summaryFilePath;
+        end
+        options.summaryFilePath = resolvePath(options.summaryFilePath);
+        
+        options.sessionFilePath = userData.report.sessionFilePath.value;
+        if isfield(paramsUpdated, 'sessionFilePath')
+            options.sessionFilePath = paramsUpdated.sessionFilePath;
+        end
+        options.sessionFilePath = resolvePath(options.sessionFilePath);
+        
+        fprintf('summaryFilePath: %s\n', options.summaryFilePath)
+        fprintf('sessionFilePath: %s\n', options.sessionFilePath)
+    end
+
+    function absPath = resolvePath(pathIn)
+         if isfolder(pathIn) || isfile(pathIn)
+        % Already exists, maybe absolute
+        absPath = fullfile(pathIn);
+    else
+        % Assume relative to current folder
+        absPath = fullfile(pwd, pathIn);
+    end
+end
 
 end % pop_prepPipeline

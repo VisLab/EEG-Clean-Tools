@@ -1,4 +1,4 @@
-function [paramsOut, okay] = MasterGUI(hObject, callbackdata, userData, EEG) %#ok<INUSL>
+function paramsOut = MasterGUI(hObject, callbackdata, userData, EEG) %#ok<INUSL>
 geometry = {1, [1, 1], [1, 1], [1, 1]};
 geomvert = [1,1,1,1];
 title = 'PREP pipeline control panel';
@@ -17,30 +17,8 @@ uilist= {{'style', 'text', 'string', 'Override default parameters for processing
     'Callback', {@lineNoiseGUI, inputData}}...
     {'style', 'pushbutton', 'string', 'Post process', ...
     'Callback', {@postProcessGUI, inputData}}};
-[~, userData, buttonPressed, ~] = inputgui('geometry', geometry, 'geomvert', geomvert, ...
+[~, paramsOut] = inputgui('geometry', geometry, 'geomvert', geomvert, ...
     'uilist', uilist, 'title', title, ...
     'helpcom', 'pophelp(''pop_prepPipeline'')');
-
-okay = okayPressed(buttonPressed);
-paramsOut = struct();
-if ~isempty(userData)
-    fNames = fieldnames(userData);
-    for k = 1:length(fNames)
-        nextStruct = userData.(fNames{k});
-        nextNames = fieldnames(nextStruct);
-        for j = 1:length(nextNames)
-            paramsOut.(nextNames{j}) = nextStruct.(nextNames{j});
-        end
-    end
-end
-
-
-    function okay = okayPressed(buttonPressed)
-        % Returns true if the okay button is pressed, false if otherwise
-        okay = false;
-        if ~isempty(buttonPressed)
-            okay = true;
-        end % okayPressed
-    end
 
 end % MasterGUI

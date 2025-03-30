@@ -33,6 +33,10 @@ authorized to reproduce and distribute reprints for Government purposes
 notwithstanding any copyright notation herein.
 
 ### Releases
+Version 0.57.0 Released 3/30/2025  
+* Modified to work with modified EEGLAB GUI Builder
+* Modified reporting to not clutter workspace
+
 Version 0.56.0 Released 8/01/2021  
 * Corrected parfor failure when channel number not consecutive
 * Fixed missing badChannelsFromDropout in updateBadChannels issue#28
