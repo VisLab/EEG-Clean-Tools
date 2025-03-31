@@ -6,6 +6,13 @@ function [currentVersion, changeLog, markdown] = getPrepVersion()
 end
 
 function changeLog = getChangeLog()
+    changeLog(7) = ...
+    struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+    changeLog(7).version = '0.57.0';
+    changeLog(7).status = 'Released';
+    changeLog(7).date = '3/31/2025';
+    changeLog(7).changes = {'Updated the interface for new EEGLAB'};
+
     changeLog(6) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
