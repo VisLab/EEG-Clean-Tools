@@ -2,8 +2,9 @@
 
 %% Set up the input and the output directories
 basename = 'vep';
-indir = 'F:\DataPool\CTADATA\VEP\BiosemiOriginalSetCorrected';
-outdir = 'F:\TempData';
+% Set these to your own folders before running.
+indir = 'PATH_TO_INPUT_EEG_FILES';    % folder of EEGLAB .set files to process
+outdir = 'PATH_TO_PREP_OUTPUT';       % folder for the PREP-processed files
 
 %% Make the output directory if needed
 if ~exist(outdir, 'dir')

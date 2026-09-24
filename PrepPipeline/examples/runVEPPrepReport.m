@@ -2,8 +2,9 @@
 % and produces reports.
 
 %% Read in the file and set the necessary parameters
-dataDir = 'F:\TempData';
-summaryFolder = 'F:\TempDataReports';
+% Set these to your own folders before running.
+dataDir = 'PATH_TO_PREP_OUTPUT';      % folder of PREP-processed .set files
+summaryFolder = 'PATH_TO_REPORTS';    % folder for the summary and session reports
 publishOn = true;
 
 %% Get the directory list
