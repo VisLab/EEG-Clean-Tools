@@ -1,0 +1,34 @@
+# This repository is MATLAB code. pyproject.toml exists only to declare the
+# Python toolchain that builds the documentation in docs/. It is not a Python
+# package and is never published; the PREP version lives in
+# PrepPipeline/utilities/getPrepVersion.m, and docs/conf.py reads it from there.
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eeg-clean-tools-docs"
+version = "0.0.0"
+description = "Documentation toolchain for the PREP pipeline (MATLAB)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "GPL-2.0-or-later"}
+
+[project.urls]
+Homepage = "https://github.com/VisLab/EEG-Clean-Tools"
+Documentation = "https://vislab.github.io/EEG-Clean-Tools/"
+"Bug Tracker" = "https://github.com/VisLab/EEG-Clean-Tools/issues"
+
+[project.optional-dependencies]
+docs = [
+    "sphinx>=7.1.0,<10.0",
+    "furo>=2024.1.29",
+    "sphinx-copybutton>=0.5.2",
+    "myst-parser>=3.0.0",
+    "sphinxcontrib-matlabdomain==0.22.1",
+    "linkify-it-py>=2.0.3",
+]
+
+[tool.setuptools]
+packages = []

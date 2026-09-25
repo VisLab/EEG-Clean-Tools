@@ -4,6 +4,8 @@
     "allow": [
       "Bash(python --version)",
       "Bash(unzip -l *)",
+      "Bash(python -m sphinx *)",
+      "Bash(python docs/patch_matlabdomain.py)",
       "Bash(git status)",
       "Bash(git status *)",
       "Bash(git log)",

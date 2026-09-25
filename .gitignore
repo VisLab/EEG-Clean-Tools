@@ -14,3 +14,9 @@ CLAUDE.local.md
 # The consequence is that it lives on one machine only and is absent from
 # fresh clones and from `claude --worktree` worktrees.
 .status/
+
+# Documentation build and its Python toolchain
+docs/_build/
+.venv/
+__pycache__/
+*.egg-info/

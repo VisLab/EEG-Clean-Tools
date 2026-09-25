@@ -12,6 +12,8 @@ Test framework: none. There is no test suite; `PrepPipeline/utilities/blasst/bla
 - Run standalone: add `PrepPipeline` and its subfolders to the MATLAB path, then `[EEG, params, computationTimes] = prepPipeline(EEG, params)` on an EEGLAB `EEG` structure with channel locations. Needs EEGLAB and the Signal Processing Toolbox on the path.
 - Run as a plugin: unzip `EEGLABPlugin/PrepPipeline<version>.zip` into EEGLAB's `plugins/` folder; the menu entry is Tools -> Run PREP pipeline.
 - Check the plugin zip: `unzip -l EEGLABPlugin/PrepPipeline<version>.zip`
+- Install the docs toolchain: `uv venv --clear .venv`, activate it, then `uv pip install -e ".[docs]"` and `python docs/patch_matlabdomain.py` (required after every install of `sphinxcontrib-matlabdomain`; it fixes a Sphinx 7+ incompatibility in that package). Run the Python tools from the activated `.venv`, not through `uvx`.
+- Build docs: `python -m sphinx -b html docs docs/_build/html` - `.github/workflows/deploy-docs.yaml` runs the same build and publishes it to GitHub Pages on pushes to `master`
 
 ## Layout
 
@@ -21,6 +23,7 @@ Test framework: none. There is no test suite; `PrepPipeline/utilities/blasst/bla
 - `PrepPipeline/interface/` - the EEGLAB parameter GUIs
 - `PrepPipeline/derived/`, `PrepPipeline/examples/`, `PrepPipeline/extracted/` - scripts built on the pipeline
 - `EEGLABPlugin/` - the released plugin as a zip
+- `docs/` - Sphinx source for the documentation site (MyST markdown and `.rst`); images in `docs/_static/images/`. `pyproject.toml` exists only to declare the docs toolchain.
 - `CHANGELOG.md` - release history
 - `.status/` - working notes. Gitignored; local to each machine.
 
@@ -36,6 +39,7 @@ Test framework: none. There is no test suite; `PrepPipeline/utilities/blasst/bla
 - The version exists in three places that must agree: `PrepPipeline/utilities/getPrepVersion.m` (the change log that `getPrepVersion` returns), the zip name under `EEGLABPlugin/`, and `CHANGELOG.md`. Change all three together.
 - Do not reformat, lint, or ASCII-clean vendored code under `PrepPipeline/utilities/chronux_2_modified/` or `PrepPipeline/utilities/blasst/`.
 - `PrepPipeline/reporting/showPipelineDefaults.m` declares `function showPrepDefaults`; MATLAB calls a file by its file name, so the callable name is `showPipelineDefaults`, not the `showPrepDefaults` that the `prepPipeline` help text names. `outputPrepDefaults(EEG)` prints the same defaults.
+- `docs/api.rst` pulls each function's help text from its `.m` file, and Sphinx parses that text as reStructuredText. Help text that indents a continuation line without a blank line before it produces docutils warnings in the build. Functions at the root of `PrepPipeline/` need `.. mat:currentmodule:: .` before their `mat:autofunction` directives.
 - Do not change the signature of an entry-point function without discussion; EEGLAB and user scripts call them directly, and `pop_prepPipeline` writes the call into EEGLAB history.
 
 ## Related repositories
