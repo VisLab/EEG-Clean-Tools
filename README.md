@@ -8,6 +8,41 @@ find the user documentation at
 **Note:** For convenience, EEGLABPlugin directory contains the latest released version of the
 PREP that can be unzipped into your EEGLAB plugins directory.  
 
+### Building the documentation
+The documentation source is in `docs/` (Sphinx, with MyST markdown). To build and
+view it locally, set up the toolchain once from the repository root:
+
+```shell
+uv venv --clear .venv
+# activate: .venv\Scripts\activate (Windows) or source .venv/bin/activate (Linux/macOS)
+uv pip install -e ".[docs]"
+python docs/patch_matlabdomain.py
+```
+
+`docs/patch_matlabdomain.py` must be rerun after every reinstall of
+`sphinxcontrib-matlabdomain`. Then, with the environment activated, build and serve:
+
+```shell
+python -m sphinx -b html docs docs/_build/html
+python -m http.server -d docs/_build/html 8000
+```
+
+Open http://localhost:8000 in a browser. Opening `docs/_build/html/index.html`
+directly also works, but search does not.
+
+### Publishing the documentation
+The site at https://vislab.github.io/EEG-Clean-Tools/ is served by GitHub Pages.
+Pushing any branch other than `master` publishes nothing. The workflow
+`.github/workflows/deploy-docs.yaml` builds the docs on pull requests to `master`
+without deploying, and builds and deploys them on pushes to `master`.
+
+That deploy only reaches the site when the repository's Pages source (Settings ->
+Pages -> Source) is "GitHub Actions". While the source is "Deploy from a branch:
+gh-pages", the live site is the one on the `gh-pages` branch, and the workflow
+cannot replace it. Do not switch the source, or delete `gh-pages`, until the
+contents of `docs/` are ready to go live: the first Actions deployment overwrites
+the site at the same address.
+
 ### Citing the PREP pipeline
 The PREP pipeline is freely available under the GNU General Public License. 
 Please cite the following publication if using:  
