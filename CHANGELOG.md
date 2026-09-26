@@ -2,7 +2,7 @@
 
 Release history of the PREP pipeline, newest first. The current version is also reported by `getPrepVersion` (`PrepPipeline/utilities/getPrepVersion.m`).
 
-## Version 0.57.0 - Released 3/30/2025
+## Version 0.57.0 - Released 3/31/2025
 
 * Modified to work with modified EEGLAB GUI Builder
 * Modified reporting to not clutter workspace

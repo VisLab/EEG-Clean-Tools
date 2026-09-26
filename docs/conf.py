@@ -103,10 +103,17 @@ html_js_files = ["gh_icon_fix.js"]
 # block - the same text, laid out exactly as `help` prints it.
 
 
+_ROLE = re.compile(r":[a-z]+:`([^`]+)`")
+_LITERAL = re.compile(r"``([^`]+)``")
+
+
 def _help_text_as_literal(app, what, name, obj, options, lines):
     if not any(line.strip() for line in lines):
         return
-    body = [("    " + line) if line.strip() else "" for line in lines]
+    # matlabdomain rewrites "See also" names into :func:`x` / ``x`` markup,
+    # which a literal block would show verbatim; restore the plain names.
+    plain = [_LITERAL.sub(r"\1", _ROLE.sub(r"\1", line)) for line in lines]
+    body = [("    " + line) if line.strip() else "" for line in plain]
     lines[:] = ["::", "", *body, ""]
 
 

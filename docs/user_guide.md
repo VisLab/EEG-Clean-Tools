@@ -23,8 +23,9 @@ repository from https://github.com/VisLab/EEG-Clean-Tools. Unzip if necessary an
 MATLAB path.
 
 ## PREP as an EEGLAB plugin
-You can install PREP as an EEGLAB plugin by unzipping the PREPPipeline directory into the plugins directory of
-your EEGLAB installation.
+You can install PREP as an EEGLAB plugin by unzipping `EEGLABPlugin/PrepPipeline<version>.zip` from this
+repository into the `plugins` directory of your EEGLAB installation. The zip holds a single
+`PrepPipeline<version>` folder; restart EEGLAB and PREP appears under the Tools menu.
 
 ## Using parallel processing with PREP
 The PREP pipeline can execute fairly slowly on headsets with a lot of channels. However, many of the steps are embarassingly parallel --- that is the PREP can perform operations separately on individual channels or individual windows.
@@ -232,7 +233,7 @@ The output structure contains all of the input structure fields plus many additi
 reports of the output of the bad channel detection. Details in the document on PREP reporting.
 
 **Example:**
-> `referenceIn = struct('referenceeChannels', [1:32, 40:60]);`
+> `referenceIn = struct('referenceChannels', [1:32, 40:60]);`
 
 #### Parameters for referencing
 The following parameters appear as fields in the `referenceIn` structure:
@@ -244,7 +245,7 @@ The following parameters appear as fields in the `referenceIn` structure:
  A row vector specifying the channel numbers of the channels to use for evaluating noisy channels.  By default, PREP uses all of the channels (`1:size(signal.data, 1)`). If your signal has extraneous or unused channels, you should specify which channels to use. These channels should only be EEG channels. These channels are used to compute thresholds and to perform
 estimates in the RANSAC algorithm. Often the reference channels and the evaluation channels are the same. However, if an EEG channel has NaNs or other unusable data, it will still be used as a reference channel, but will be excluded from the evaluation channels.
 
-**`rereference`**\
+**`rereferencedChannels`**\
  A row vector specifying the channel numbers of the channels from which to subtract the computed reference.  By default, PREP uses all of the channels (`1:size(signal.data, 1)`). If your signal has extraneous or unused channels, you should specify which channels to use. Channels such as mastoids and EOG channels are usually re-referenced but are not used to
 compute the robust reference.
 
@@ -325,7 +326,7 @@ the data structure to contain all of the window information for later processing
 after running the reports.
 
 ### Reporting
-PREP has an extensive report facility that can be used provided that your reporting level was `'verbose'`. The GUI version of the PREP pipeline (`pop_prepPipeline'`) has options in the report GUI for you to select whether or not to run the report. If the report mode is `'normal'` (the default), then PREP runs the processing pipeline followed by the report, followed by the post processing. If the report mode is `'skip'`, then PREP runs the processing pipeline followed by the post processing. If the report mode is `'reportOnly'`, then PREP only runs the report and skips both the processing and the post processing.
+PREP has an extensive report facility that can be used provided that your reporting level was `'verbose'`. The GUI version of the PREP pipeline (`pop_prepPipeline`) has options in the report GUI for you to select whether or not to run the report. If the report mode is `'normal'` (the default), then PREP runs the processing pipeline followed by the report, followed by the post processing. If the report mode is `'skip'`, then PREP runs the processing pipeline followed by the post processing. If the report mode is `'reportOnly'`, then PREP only runs the report and skips both the processing and the post processing.
 
 #### Calling sequence for reporting
 The `publishPrepReport` function takes an EEG structure that has been run through the PREP pipeline with
@@ -347,7 +348,7 @@ The following produces an HTML-formatted summary report in the current directory
 The `signal` structure includes a `.data` field and an `.srate` field. The `signal` structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames. In order to get reports, the EEG structure must have the `.etc.noiseDetection` as PREP generates the report from information stored there.
 
 **`summaryFilePath`**\
-The file name for the HTML summary file that PREP produces for the report. The name should include path information when needed. If `publishOn` is `false`, PREP writes the summary information to the file indicated by `consoleFID`.
+The file name for the HTML summary file that PREP produces for the report. The name should include path information when needed. PREP appends the summary for this dataset to this file whether or not `publishOn` is `true`, so calling it for each dataset in a collection builds one collection summary. `consoleFID` receives the console output, not the summary.
 
 **`sessionFilePath`**\
 The file name for the detailed PDF report that PREP produces. The name should include path information when needed. If `publishOn` is `false`, PREP doesn't produce a report.
