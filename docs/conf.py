@@ -93,3 +93,22 @@ html_sidebars = {
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 html_js_files = ["gh_icon_fix.js"]
+
+
+# -- MATLAB help text ---------------------------------------------------------
+
+# PREP's help text is written for MATLAB's `help` command: aligned columns and
+# indented continuation lines, not reStructuredText. Parsed as reST it renders
+# badly and produces docutils warnings, so show each docstring as a literal
+# block - the same text, laid out exactly as `help` prints it.
+
+
+def _help_text_as_literal(app, what, name, obj, options, lines):
+    if not any(line.strip() for line in lines):
+        return
+    body = [("    " + line) if line.strip() else "" for line in lines]
+    lines[:] = ["::", "", *body, ""]
+
+
+def setup(app):
+    app.connect("autodoc-process-docstring", _help_text_as_literal)
