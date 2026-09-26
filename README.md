@@ -46,10 +46,12 @@ same on every platform:
 
 ```shell
 python -m sphinx -b html docs docs/_build/html
-python -m http.server -d docs/_build/html 8000
+python -m http.server 8000 --bind 127.0.0.1 -d docs/_build/html
 ```
 
-Open http://localhost:8000 in a browser, and stop the server with Ctrl+C. Opening
+The server prints `Serving HTTP on 127.0.0.1 port 8000 (http://127.0.0.1:8000/)`.
+Open that address in a browser, and stop the server with Ctrl+C. The
+`--bind 127.0.0.1` keeps the server reachable only from your own machine. Opening
 `docs/_build/html/index.html` directly also works, but search does not.
 
 ### Publishing the documentation
