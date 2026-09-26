@@ -13,9 +13,9 @@ The documentation source is in `docs/` (Sphinx, with MyST markdown). To build an
 view it locally, set up the toolchain once from the repository root:
 
 ```shell
-uv venv --clear .venv
+python -m venv --clear .venv
 # activate: .venv\Scripts\activate (Windows) or source .venv/bin/activate (Linux/macOS)
-uv pip install -e ".[docs]"
+python -m pip install -e ".[docs]"
 python docs/patch_matlabdomain.py
 ```
 

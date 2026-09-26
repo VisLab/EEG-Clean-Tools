@@ -12,7 +12,7 @@ Test framework: none. There is no test suite; `PrepPipeline/utilities/blasst/bla
 - Run standalone: add `PrepPipeline` and its subfolders to the MATLAB path, then `[EEG, params, computationTimes] = prepPipeline(EEG, params)` on an EEGLAB `EEG` structure with channel locations. Needs EEGLAB and the Signal Processing Toolbox on the path.
 - Run as a plugin: unzip `EEGLABPlugin/PrepPipeline<version>.zip` into EEGLAB's `plugins/` folder; the menu entry is Tools -> Run PREP pipeline.
 - Check the plugin zip: `unzip -l EEGLABPlugin/PrepPipeline<version>.zip`
-- Install the docs toolchain: `uv venv --clear .venv`, activate it, then `uv pip install -e ".[docs]"` and `python docs/patch_matlabdomain.py` (required after every install of `sphinxcontrib-matlabdomain`; it fixes a Sphinx 7+ incompatibility in that package). Run the Python tools from the activated `.venv`, not through `uvx`.
+- Install the docs toolchain: `python -m venv --clear .venv`, activate it, then `python -m pip install -e ".[docs]"` and `python docs/patch_matlabdomain.py` (required after every install of `sphinxcontrib-matlabdomain`; it fixes a Sphinx 7+ incompatibility in that package). Locally, use pip and the activated `.venv`, never `uv` or `uvx`: uv misbehaves on Windows. The GitHub Actions workflows use uv, and that stays.
 - Build docs: `python -m sphinx -b html docs docs/_build/html` - `.github/workflows/deploy-docs.yaml` runs the same build and publishes it to GitHub Pages on pushes to `master`
 
 ## Layout
