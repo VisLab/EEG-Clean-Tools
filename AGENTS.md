@@ -38,7 +38,6 @@ Test framework: none. There is no test suite; `PrepPipeline/utilities/blasst/bla
 
 - The version exists in three places that must agree: `PrepPipeline/utilities/getPrepVersion.m` (the change log that `getPrepVersion` returns), the zip name under `EEGLABPlugin/`, and `CHANGELOG.md`. Change all three together.
 - Do not reformat, lint, or ASCII-clean vendored code under `PrepPipeline/utilities/chronux_2_modified/` or `PrepPipeline/utilities/blasst/`.
-- `PrepPipeline/reporting/showPipelineDefaults.m` declares `function showPrepDefaults`; MATLAB calls a file by its file name, so the callable name is `showPipelineDefaults`, not the `showPrepDefaults` that the `prepPipeline` help text names. `outputPrepDefaults(EEG)` prints the same defaults.
 - `docs/api.rst` pulls each function's help text from the comment block right after its `function` line. `docs/conf.py` shows that text preformatted, exactly as MATLAB `help` prints it, so write help for `help`, not as reStructuredText. Help placed above the `function` line (as in `pop_prepPipeline.m`) does not appear. Functions at the root of `PrepPipeline/` need `.. mat:currentmodule:: .` before their `mat:autofunction` directives.
 - Do not change the signature of an entry-point function without discussion; EEGLAB and user scripts call them directly, and `pop_prepPipeline` writes the call into EEGLAB history.
 
