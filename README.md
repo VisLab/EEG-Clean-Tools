@@ -10,25 +10,47 @@ PREP that can be unzipped into your EEGLAB plugins directory.
 
 ### Building the documentation
 The documentation source is in `docs/` (Sphinx, with MyST markdown). To build and
-view it locally, set up the toolchain once from the repository root:
+view it locally, set up a Python virtual environment once, from the repository root.
+Python 3.10 or later is required.
 
-```shell
+**Windows (PowerShell):**
+
+```powershell
 python -m venv --clear .venv
-# activate: .venv\Scripts\activate (Windows) or source .venv/bin/activate (Linux/macOS)
+.venv\Scripts\Activate.ps1
 python -m pip install -e ".[docs]"
 python docs/patch_matlabdomain.py
 ```
 
+If PowerShell refuses to run `Activate.ps1`, allow local scripts for your account
+once with `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. In `cmd.exe`, activate
+with `.venv\Scripts\activate.bat` instead.
+
+**Linux and macOS:**
+
+```bash
+python3 -m venv --clear .venv
+source .venv/bin/activate
+python -m pip install -e ".[docs]"
+python docs/patch_matlabdomain.py
+```
+
+On Debian and Ubuntu, `python3 -m venv` needs the `python3-venv` package
+(`sudo apt install python3-venv`).
+
 `docs/patch_matlabdomain.py` must be rerun after every reinstall of
-`sphinxcontrib-matlabdomain`. Then, with the environment activated, build and serve:
+`sphinxcontrib-matlabdomain`. In later sessions, only the activation line is needed.
+
+With the environment activated, build and serve the site. These commands are the
+same on every platform:
 
 ```shell
 python -m sphinx -b html docs docs/_build/html
 python -m http.server -d docs/_build/html 8000
 ```
 
-Open http://localhost:8000 in a browser. Opening `docs/_build/html/index.html`
-directly also works, but search does not.
+Open http://localhost:8000 in a browser, and stop the server with Ctrl+C. Opening
+`docs/_build/html/index.html` directly also works, but search does not.
 
 ### Publishing the documentation
 The site at https://vislab.github.io/EEG-Clean-Tools/ is served by GitHub Pages.
