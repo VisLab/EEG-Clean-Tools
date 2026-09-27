@@ -20,3 +20,6 @@ docs/_build/
 .venv/
 __pycache__/
 *.egg-info/
+
+# Output of the example scripts
+PrepPipeline/examples/output/

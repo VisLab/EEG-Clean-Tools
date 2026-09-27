@@ -29,6 +29,8 @@
 *.ico binary
 *.pdf binary
 *.zip binary
+*.set binary
+*.fdt binary
 *.gz binary
 *.tar binary
 *.mp3 binary

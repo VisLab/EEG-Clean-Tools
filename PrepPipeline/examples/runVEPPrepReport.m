@@ -2,9 +2,14 @@
 % and produces reports.
 
 %% Read in the file and set the necessary parameters
-% Set these to your own folders before running.
-dataDir = 'PATH_TO_PREP_OUTPUT';      % folder of PREP-processed .set files
-summaryFolder = 'PATH_TO_REPORTS';    % folder for the summary and session reports
+% By default this reports on the output of runVEPPrepPipeline in
+% examples/output. Change these to use your own folders.
+exampleDir = fileparts(mfilename('fullpath'));
+dataDir = fullfile(exampleDir, 'output');              % PREP-processed .set files
+summaryFolder = fullfile(exampleDir, 'output', 'reports');  % summary and session reports
+if ~exist(summaryFolder, 'dir')
+    mkdir(summaryFolder);
+end
 publishOn = true;
 
 %% Get the directory list
@@ -29,8 +34,8 @@ for k = 1:length(inNames)
         continue;
     end
     sessionReportName = [theName '.pdf'];
-    fname = [dataDir filesep inNames{k}];
-    load(fname, '-mat');
+    EEG = pop_loadset('filename', inNames{k}, 'filepath', dataDir);
+    EEG.data = double(EEG.data);   % PREP reporting needs double precision
     sessionFileName = [summaryFolder filesep sessionReportName];
     consoleFID = 1;
     publishPrepReport(EEG, summaryFileName, sessionFileName, consoleFID, publishOn);

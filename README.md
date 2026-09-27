@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22983431.svg)](https://doi.org/10.5281/zenodo.22983431)
+
 EEG-Clean-Tools
 ===============
 
@@ -6,7 +8,7 @@ find the user documentation at
 [https://vislab.github.io/EEG-Clean-Tools/](https://vislab.github.io/EEG-Clean-Tools/).
 
 **Note:** For convenience, EEGLABPlugin directory contains the latest released version of the
-PREP that can be unzipped into your EEGLAB plugins directory.  
+PREP that can be unzipped into your EEGLAB plugins directory.
 
 ### Building the documentation
 The documentation source is in `docs/` (Sphinx, with MyST markdown). To build and
@@ -69,10 +71,11 @@ the site at the same address.
 
 ### Citing the PREP pipeline
 The PREP pipeline is freely available under the GNU General Public License (see License below).
-Please cite the following publication if using:  
-> Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015)  
-> The PREP pipeline: standardized preprocessing for large-scale EEG analysis  
-> Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  
+Please cite the following publication if using:
+
+> Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015)\
+> The PREP pipeline: standardized preprocessing for large-scale EEG analysis\
+> Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016
 
 ### License
 The PREP pipeline is licensed under the GNU General Public License, version 2 or
@@ -104,7 +107,7 @@ Matousek and Jeremy Cockfield worked on the interfaces for the EEGLAB plugin as
 well as associated visualization tools. Kay Robbins of UTSA is the lead developer and
 maintainer of PREP.
 
-### Support:    
+### Support:
 This research was sponsored by the Army Research Laboratory and was accomplished
 under Cooperative Agreement Number W911NF-10-2-0022. The views and conclusions
 contained in this document/software are those of the authors and should not be interpreted
