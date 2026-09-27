@@ -37,6 +37,8 @@ Defaults and version
 
 .. mat:autofunction:: utilities.outputPrepDefaults
 
+.. mat:autofunction:: reporting.showPrepDefaults
+
 .. mat:autofunction:: utilities.getPrepVersion
 
 Reporting

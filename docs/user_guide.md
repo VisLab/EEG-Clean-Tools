@@ -28,7 +28,7 @@ repository into the `plugins` directory of your EEGLAB installation. The zip hol
 `PrepPipeline<version>` folder; restart EEGLAB and PREP appears under the Tools menu.
 
 ## Using parallel processing with PREP
-The PREP pipeline can execute fairly slowly on headsets with a lot of channels. However, many of the steps are embarassingly parallel --- that is the PREP can perform operations separately on individual channels or individual windows.
+The PREP pipeline can execute fairly slowly on headsets with a lot of channels. However, many of the steps are embarrassingly parallel --- that is the PREP can perform operations separately on individual channels or individual windows.
 If you have the MATLAB Parallel Processing Toolbox, you just need to make sure that it is enabled. The following screenshot
 of the MATLAB IDE shows the Parallel Processing Toolbox icon on the lower left of the status bar at the very bottom of the window.
 ![MATLAB IDE](_static/images/MATLABWorkspace.png)
@@ -250,7 +250,7 @@ estimates in the RANSAC algorithm. Often the reference channels and the evaluati
 compute the robust reference.
 
 **`referenceType`**\
-The type of reference to be performed. By default, PREP uses ``robust'`, which computes an average reference with
+The type of reference to be performed. By default, PREP uses `'robust'`, which computes an average reference with
 iterative detection and interpolation of bad channels.  Other options include `'average'`, `'specific'`, and `'none'`.
 The `'average'` type removes the average of the reference channels with no interpolation, while `'specific'` removes
 the average of the specified channels with no interpolation. If you mean to run the standardized PREP pipeline,
@@ -326,7 +326,7 @@ the data structure to contain all of the window information for later processing
 after running the reports.
 
 ### Reporting
-PREP has an extensive report facility that can be used provided that your reporting level was `'verbose'`. The GUI version of the PREP pipeline (`pop_prepPipeline`) has options in the report GUI for you to select whether or not to run the report. If the report mode is `'normal'` (the default), then PREP runs the processing pipeline followed by the report, followed by the post processing. If the report mode is `'skip'`, then PREP runs the processing pipeline followed by the post processing. If the report mode is `'reportOnly'`, then PREP only runs the report and skips both the processing and the post processing.
+PREP has an extensive report facility that can be used provided that your reporting level was `'verbose'`. The GUI version of the PREP pipeline (`pop_prepPipeline`) has options in the report GUI for you to select whether or not to run the report. If the report mode is `'normal'` (the default), then PREP runs the processing pipeline followed by the report, followed by the post processing. If the report mode is `'skipReport'`, then PREP runs the processing pipeline followed by the post processing. If the report mode is `'reportOnly'`, then PREP only runs the report and skips both the processing and the post processing.
 
 #### Calling sequence for reporting
 The `publishPrepReport` function takes an EEG structure that has been run through the PREP pipeline with
@@ -356,5 +356,5 @@ The file name for the detailed PDF report that PREP produces. The name should in
 **`consoleFID`**\
 An open file descriptor for writing reporting information. Usually, this is 1, indicating that output should be directed to the command window. Give an open file descriptor to another file to record the report in a log.
 
-**`PublishOn`**\
+**`publishOn`**\
 If `true` (the default) PREP produces a published PDF Report and an HTML summary. If `false`, the PREP runs reporting, but keeps the figures displayed and outputs the reporting information to the command window. This mode is useful for closer examination of the figures.
