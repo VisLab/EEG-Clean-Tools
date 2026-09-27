@@ -65,8 +65,6 @@ end
 
 if strcmpi(lineNoiseOut.lineNoiseMethod, 'clean')
     [signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseOut);
-elseif strcmpi(lineNoiseOut.lineNoiseMethod, 'blasst')
-    [signal, lineNoiseOut] = blasstLineNoise(signal, lineNoiseOut);
 elseif ~strcmpi(lineNoiseOut.lineNoiseMethod, 'none')
     error('removeLineNoise:BadLineNoiseMethod', ...
           'Unrecognized line noise removal method');

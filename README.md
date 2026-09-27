@@ -68,11 +68,33 @@ contents of `docs/` are ready to go live: the first Actions deployment overwrite
 the site at the same address.
 
 ### Citing the PREP pipeline
-The PREP pipeline is freely available under the GNU General Public License. 
+The PREP pipeline is freely available under the GNU General Public License (see License below).
 Please cite the following publication if using:  
 > Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015)  
 > The PREP pipeline: standardized preprocessing for large-scale EEG analysis  
 > Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  
+
+### License
+The PREP pipeline is licensed under the GNU General Public License, version 2 or
+(at your option) any later version. The full text is in [LICENSE](LICENSE), and a
+copy is kept with the plugin as `PrepPipeline/preplicense.txt`. Parts of the
+repository come from other projects and keep their own licenses:
+
+| Component | Location | License | Copyright |
+| --- | --- | --- | --- |
+| PREP pipeline | everything not listed below | GPL-2.0-or-later ([LICENSE](LICENSE)) | Kay Robbins, with contributions from Nima Bigdely-Shamlo, Christian Kothe, Tim Mullen, Jeremy Cockfield, and Cassidy Matousek |
+| Chronux 2, modified | `PrepPipeline/utilities/chronux_2_modified/` | GPL-2.0 (`License.txt` in that folder) | The Chronux developers ([chronux.org](http://www.chronux.org/)) |
+| Line-noise removal and local detrending, adapted from cleanline and Chronux | `PrepPipeline/utilities/cleanLineNoise.m` and the functions it calls (`removeLinesMovingWindow.m`, `fitSignificantFrequencies.m`, `calculateSegmentSpectrum.m`, `private/checkTapers.m`); `PrepPipeline/utilities/localDetrend.m` | GPL, as the code they adapt | cleanline by Tim Mullen, which builds on Chronux; adaptations by Kay Robbins |
+| Spherical interpolation | `PrepPipeline/utilities/private/spherical_interpolate.m` | Permissive: use, copy, and modify, keeping the copyright notice and noting changes (file header) | Jason D.R. Farquhar; modified by Kay Robbins |
+| Helpers from EEGLAB | `PrepPipeline/reporting/calculateSpectrum.m`, `reporting/helpers/finputcheck.m`, `reporting/helpers/matsel.m` | GPL-2.0-or-later (file headers) | Scott Makeig, Arnaud Delorme, and Marissa Westerfield, SCCN, UCSD |
+| Filter helpers | `PrepPipeline/utilities/private/design_fir.m`, `filter_fast.m`, `filtfilt_fast.m`, `hlp_microcache.m` | GPL-2.0-or-later (file headers) | Christian Kothe, SCCN, UCSD; `filter_fast.m` includes `fftfilt.m` from Octave by John W. Eaton |
+| Documentation styling and build helper | `docs/_static/custom.css`, `docs/_static/gh_icon_fix.js`, `docs/patch_matlabdomain.py`, and parts of `docs/conf.py` | MIT ([docs/license_hed_matlab.txt](docs/license_hed_matlab.txt)) | HED Standard Working Group (from hed-matlab) |
+| Example EEG data | `PrepPipeline/examples/data/` | Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)) | U.S. Army Research Laboratory and the authors of the dataset; cite Robbins, Su, and Hairston, "An 18-subject EEG data collection using a visual-oddball task, designed for benchmarking algorithms and headset performance comparisons", *Data in Brief* ([article](https://www.sciencedirect.com/science/article/pii/S2352340917306285), [full data on NITRC](https://www.nitrc.org/projects/vep_eeg_raw/)) |
+| Released plugin | `EEGLABPlugin/PrepPipeline<version>.zip` | As its contents, above | Each zip is a snapshot of `PrepPipeline/` at its release |
+
+The PREP pipeline is designed and distributed for research purposes only and
+should not be used for medical purposes. The authors accept no responsibility
+for its use in this manner.
 
 ### People
 The PREP pipeline incorporates many algorithms that were developed at

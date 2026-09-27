@@ -6,7 +6,7 @@ Not in scope: EEGLAB itself, which PREP runs inside and depends on, and the down
 
 ## Commands
 
-Test framework: none. There is no test suite; `PrepPipeline/utilities/blasst/blasst_test.m` is a vendored demo script, not a test. Do not add a suite as a side effect of other work.
+Test framework: none. There is no test suite. Do not add a suite as a side effect of other work.
 
 - Smoke check (no EEGLAB needed): `matlab -batch "addpath(genpath('PrepPipeline')); disp(getPrepVersion())"` - prints the version string, for example `PrepPipeline0.57.0`
 - Run standalone: add `PrepPipeline` and its subfolders to the MATLAB path, then `[EEG, params, computationTimes] = prepPipeline(EEG, params)` on an EEGLAB `EEG` structure with channel locations. Needs EEGLAB and the Signal Processing Toolbox on the path.
@@ -18,7 +18,7 @@ Test framework: none. There is no test suite; `PrepPipeline/utilities/blasst/bla
 ## Layout
 
 - `PrepPipeline/` - entry points: `prepPipeline.m`, `pop_prepPipeline.m` (EEGLAB GUI wrapper), `prepPostProcess.m`, `prepReport.m`, `publishPrepReport.m`, `eegplugin_prepPipeline.m` (EEGLAB menu registration)
-- `PrepPipeline/utilities/` - the algorithms (`removeTrend`, `cleanLineNoise`, `performReference`, `findNoisyChannels`, defaults, version); `chronux_2_modified/` and `blasst/` are vendored third-party code
+- `PrepPipeline/utilities/` - the algorithms (`removeTrend`, `cleanLineNoise`, `performReference`, `findNoisyChannels`, defaults, version); `chronux_2_modified/` is vendored third-party code (GPL v2; see the licensing table in `README.md`)
 - `PrepPipeline/reporting/` - report and collection-statistics functions
 - `PrepPipeline/interface/` - the EEGLAB parameter GUIs
 - `PrepPipeline/derived/`, `PrepPipeline/examples/`, `PrepPipeline/extracted/` - scripts built on the pipeline
@@ -37,7 +37,7 @@ Test framework: none. There is no test suite; `PrepPipeline/utilities/blasst/bla
 ## Rules that are easy to get wrong
 
 - The version exists in three places that must agree: `PrepPipeline/utilities/getPrepVersion.m` (the change log that `getPrepVersion` returns), the zip name under `EEGLABPlugin/`, and `CHANGELOG.md`. Change all three together.
-- Do not reformat, lint, or ASCII-clean vendored code under `PrepPipeline/utilities/chronux_2_modified/` or `PrepPipeline/utilities/blasst/`.
+- Do not reformat, lint, or ASCII-clean vendored code under `PrepPipeline/utilities/chronux_2_modified/`.
 - `docs/api.rst` pulls each function's help text from the comment block right after its `function` line. `docs/conf.py` shows that text preformatted, exactly as MATLAB `help` prints it, so write help for `help`, not as reStructuredText. Help placed above the `function` line does not appear there, though MATLAB `help` still finds it. Functions at the root of `PrepPipeline/` need `.. mat:currentmodule:: .` before their `mat:autofunction` directives.
 - Do not change the signature of an entry-point function without discussion; EEGLAB and user scripts call them directly, and `pop_prepPipeline` writes the call into EEGLAB history.
 

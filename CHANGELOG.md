@@ -2,6 +2,11 @@
 
 Release history of the PREP pipeline, newest first. The current version is also reported by `getPrepVersion` (`PrepPipeline/utilities/getPrepVersion.m`).
 
+## Unreleased
+
+* Removed the unsupported BLASST line-noise option (`lineNoiseMethod` 'blasst')
+* Added a root LICENSE (GPL-2.0-or-later) and a licensing table in README.md
+
 ## Version 0.57.0 - Released 3/31/2025
 
 * Modified to work with modified EEGLAB GUI Builder
