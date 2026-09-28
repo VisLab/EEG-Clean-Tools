@@ -4,8 +4,7 @@ Release history of the PREP pipeline, newest first. The current version is also 
 
 ## Unreleased
 
-* Removed the unsupported BLASST line-noise option (`lineNoiseMethod` 'blasst')
-* Added a root LICENSE (GPL-2.0-or-later) and a licensing table in README.md
+* Fixed an off-by-one in robust referencing: it now performs at most `maxReferenceIterations` passes; it used to perform one more, so results change for recordings that never converge
 
 ## Version 0.57.0 - Released 3/31/2025
 
