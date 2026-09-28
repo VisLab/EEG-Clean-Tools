@@ -1,19 +1,103 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22983431.svg)](https://doi.org/10.5281/zenodo.22983431)
+
 EEG-Clean-Tools
 ===============
 
 Contains tools for the PREP pipeline for standardized preprocessing of EEG. You can
-find user documention at: 
-   http://vislab.github.io/EEG-Clean-Tools/   
-   
+find the user documentation at
+[https://vislab.github.io/EEG-Clean-Tools/](https://vislab.github.io/EEG-Clean-Tools/).
+
 **Note:** For convenience, EEGLABPlugin directory contains the latest released version of the
-PREP that can be unzipped into your EEGLAB plugins directory.  
+PREP that can be unzipped into your EEGLAB plugins directory.
+
+### Building the documentation
+The documentation source is in `docs/` (Sphinx, with MyST markdown). To build and
+view it locally, set up a Python virtual environment once, from the repository root.
+Python 3.10 or later is required.
+
+**Windows (PowerShell):**
+
+```powershell
+python -m venv --clear .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -e ".[docs]"
+python docs/patch_matlabdomain.py
+```
+
+If PowerShell refuses to run `Activate.ps1`, allow local scripts for your account
+once with `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. In `cmd.exe`, activate
+with `.venv\Scripts\activate.bat` instead.
+
+**Linux and macOS:**
+
+```bash
+python3 -m venv --clear .venv
+source .venv/bin/activate
+python -m pip install -e ".[docs]"
+python docs/patch_matlabdomain.py
+```
+
+On Debian and Ubuntu, `python3 -m venv` needs the `python3-venv` package
+(`sudo apt install python3-venv`).
+
+`docs/patch_matlabdomain.py` must be rerun after every reinstall of
+`sphinxcontrib-matlabdomain`. In later sessions, only the activation line is needed.
+
+With the environment activated, build and serve the site. These commands are the
+same on every platform:
+
+```shell
+python -m sphinx -b html docs docs/_build/html
+python -m http.server 8000 --bind 127.0.0.1 -d docs/_build/html
+```
+
+The server prints `Serving HTTP on 127.0.0.1 port 8000 (http://127.0.0.1:8000/)`.
+Open that address in a browser, and stop the server with Ctrl+C. The
+`--bind 127.0.0.1` keeps the server reachable only from your own machine. Opening
+`docs/_build/html/index.html` directly also works, but search does not.
+
+### Publishing the documentation
+The site at https://vislab.github.io/EEG-Clean-Tools/ is served by GitHub Pages.
+Pushing any branch other than `master` publishes nothing. The workflow
+`.github/workflows/deploy-docs.yaml` builds the docs on pull requests to `master`
+without deploying, and builds and deploys them on pushes to `master`.
+
+That deploy only reaches the site when the repository's Pages source (Settings ->
+Pages -> Source) is "GitHub Actions". While the source is "Deploy from a branch:
+gh-pages", the live site is the one on the `gh-pages` branch, and the workflow
+cannot replace it. Do not switch the source, or delete `gh-pages`, until the
+contents of `docs/` are ready to go live: the first Actions deployment overwrites
+the site at the same address.
 
 ### Citing the PREP pipeline
-The PREP pipeline is freely available under the GNU General Public License. 
-Please cite the following publication if using:  
-> Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015)  
-> The PREP pipeline: standardized preprocessing for large-scale EEG analysis  
-> Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016  
+The PREP pipeline is freely available under the GNU General Public License (see License below).
+Please cite the following publication if using:
+
+> Bigdely-Shamlo N, Mullen T, Kothe C, Su K-M and Robbins KA (2015)\
+> The PREP pipeline: standardized preprocessing for large-scale EEG analysis\
+> Front. Neuroinform. 9:16. doi: 10.3389/fninf.2015.00016
+
+### License
+The PREP pipeline is licensed under the GNU General Public License, version 2 or
+(at your option) any later version. The full text is in [LICENSE](LICENSE), and a
+copy is kept with the plugin as `PrepPipeline/preplicense.txt`. Parts of the
+repository come from other projects and keep their own licenses:
+
+| Component | Location | License | Copyright |
+| --- | --- | --- | --- |
+| PREP pipeline | everything not listed below | GPL-2.0-or-later ([LICENSE](LICENSE)) | Kay Robbins, with contributions from Nima Bigdely-Shamlo, Christian Kothe, Tim Mullen, Jeremy Cockfield, and Cassidy Matousek |
+| Chronux 2, modified | `PrepPipeline/utilities/chronux_2_modified/` | GPL-2.0 (`License.txt` in that folder) | The Chronux developers ([chronux.org](http://www.chronux.org/)) |
+| Line-noise removal and local detrending, adapted from cleanline and Chronux | `PrepPipeline/utilities/cleanLineNoise.m` and the functions it calls (`removeLinesMovingWindow.m`, `fitSignificantFrequencies.m`, `calculateSegmentSpectrum.m`, `private/checkTapers.m`); `PrepPipeline/utilities/localDetrend.m` | GPL, as the code they adapt | cleanline by Tim Mullen, which builds on Chronux; adaptations by Kay Robbins |
+| Spherical interpolation | `PrepPipeline/utilities/private/spherical_interpolate.m` | Permissive: use, copy, and modify, keeping the copyright notice and noting changes (file header) | Jason D.R. Farquhar; modified by Kay Robbins |
+| Helpers from EEGLAB | `PrepPipeline/reporting/calculateSpectrum.m`, `reporting/helpers/finputcheck.m`, `reporting/helpers/matsel.m` | GPL-2.0-or-later (file headers) | Scott Makeig, Arnaud Delorme, and Marissa Westerfield, SCCN, UCSD |
+| Filter helpers | `PrepPipeline/utilities/private/design_fir.m`, `filter_fast.m`, `filtfilt_fast.m`, `hlp_microcache.m` | GPL-2.0-or-later (file headers) | Christian Kothe, SCCN, UCSD; `filter_fast.m` includes `fftfilt.m` from Octave by John W. Eaton |
+| Documentation styling and build helper | `docs/_static/custom.css`, `docs/_static/gh_icon_fix.js`, `docs/patch_matlabdomain.py`, and parts of `docs/conf.py` | MIT ([docs/license_hed_matlab.txt](docs/license_hed_matlab.txt)) | HED Standard Working Group (from hed-matlab) |
+| Example EEG data | `PrepPipeline/examples/data/` | Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)) | U.S. Army Research Laboratory and the authors of the dataset; cite Robbins, Su, and Hairston, "An 18-subject EEG data collection using a visual-oddball task, designed for benchmarking algorithms and headset performance comparisons", *Data in Brief* ([article](https://www.sciencedirect.com/science/article/pii/S2352340917306285), [full data on NITRC](https://www.nitrc.org/projects/vep_eeg_raw/)) |
+| Released plugin | `EEGLABPlugin/PrepPipeline<version>.zip` | As its contents, above | Each zip is a snapshot of `PrepPipeline/` at its release |
+
+The PREP pipeline is designed and distributed for research purposes only and
+should not be used for medical purposes. The authors accept no responsibility
+for its use in this manner.
 
 ### People
 The PREP pipeline incorporates many algorithms that were developed at
@@ -23,7 +107,7 @@ Matousek and Jeremy Cockfield worked on the interfaces for the EEGLAB plugin as
 well as associated visualization tools. Kay Robbins of UTSA is the lead developer and
 maintainer of PREP.
 
-### Support:    
+### Support:
 This research was sponsored by the Army Research Laboratory and was accomplished
 under Cooperative Agreement Number W911NF-10-2-0022. The views and conclusions
 contained in this document/software are those of the authors and should not be interpreted
@@ -33,199 +117,4 @@ authorized to reproduce and distribute reprints for Government purposes
 notwithstanding any copyright notation herein.
 
 ### Releases
-Version 0.57.0 Released 3/30/2025  
-* Modified to work with modified EEGLAB GUI Builder
-* Modified reporting to not clutter workspace
-
-Version 0.56.0 Released 8/01/2021  
-* Corrected parfor failure when channel number not consecutive
-* Fixed missing badChannelsFromDropout in updateBadChannels issue#28
- 
-Version 0.55.4 Released 7/26/2020  
-* Correctly restored EEGLAB options after execution
-* Added functions to output errors from etc.noiseDetection
-* Corrected findpeaks naming conflict in Chronux
-* Post process does not execute if Prep had errors  
-
-Version 0.55.3 Released 10/19/2017
-* Fixed issue with interpolated channels when interpolation order is pre-process
-* Fixed issue with correct removal of interpolated channels during post-processing
-* Reordered preprocessing and report buttons on master GUI
-  
-Version 0.55.2 Released 08/18/2017
-* Fixed undefined reference to referenceOut in prepPipeline post process
-
-Version 0.55.1 Released 06/03/2017
-* Wrote printListCompressed to display channels more compactly
-* Put in a MATLAB version check because legend titles not supported in 2014b
-* Fixed spacing on output of interpolated channel numbers
-
-Version 0.55.0 Released 05/29/2017
-* Changed the EEG.etc.noiseDetection structure to contain removed channels and interpolated channels for easier access 
-* Fixed reporting to work when bad channels have been removed
-* Added original channel labels to EEG.etc.noiseDetection for ease in reporting
-* Added Blasst as an unsupported line noise removal option
-* Moved legend of spectrum to right, put in checks for removed channels
-* Corrected bug in smoothing in cleanline
-* Corrected several reporting issues
-* Default behavior now outputs errors to command line in addition to logging
-* Renamed several functions to make naming scheme consistent
-* Started supporting changelog in versions
-* Fixed bug in struct2str and improved com return on pop_prepPipeline
-
-Version 0.52 Released
-* Modified code to handle EEG structures with empty EEG.error.
-* Performed additional minor cleanup.
-
-Version 0.51 Not released
-* Developing bad window visualization plugin for EEGLAB
-
-Version 0.50 Released
-* Made several cleanup modifications to ready for release.
-
-Version 0.48 (Not released -- version 0.47 with EEGLAB integration)
-* Integrated EEGLAB plugin
-* Changed the default structure value field name from defaults.default to
-  default.value and propagated the change
-* Changed default names of line noise and global trend to linenoise and 
-  globaltrend
-* Modified the resampling step to allow an option low pass filter to remove
-  downsampling artifacts just below Nyquist frequency.
-
-  Version 0.47 (Not released -- version 0.46 with additional changes)
-* Minor refactoring of performReference to avoid 1 extra filtering operation ---
-  should not reflect results.
-* Also added average and specific referencing methods -- not tested as yet.
-
-Version 0.46 (Not released - version 0.45 with additional changes)
-* Fixed remapping of bad evaluation channels into original channel numbers
-  (relevant when there are none EEG channels interspersed in the channel
-  locations.
-* Passed detrend information in reference structure to allow detrending 
-  with other than the defaults
-* Corrected several channel mapping issues in the reporting.
-
-Version 0.45 (Not released - version 0.44 with additional changes)
-* Refactored report to allow statistics to be gathered from noisy structures
-
-Version 0.44 (Not released - version 0.43 with additional changes)
-* Corrected a minor issue with reporting -- difference between robust
-  and ordinary reference had axes reversed.
-* Updated to run with plotting compatible with MATLAB 2014b
-* Added box on to cummulative plots.
-
-Version 0.43 (Not released - version 0.42 with additional changes)
-* Corrected a minor issue with reporting -- mean scalp correlation map for
-  beforeInterpolation was plotting the Original data rather than the
-  beforeInterpolation data.
-
-Version 0.42 (Not released - version 0.41 with additional changes)
-* Added default line frequencies as multiples of 60 up to half nyquist.
-
-Version 0.41 (Not released - version 0.40 with additional changes)
-* Replaced default method with channel forgetting and median initialization
-* Converted EEG to double at the beginning of the pipeline
-* Added a noisyStatisticsForInterpolation field to the reference reporting
-  structure.
-
-Version 0.40 (Not yet released - major change in strategy)
-* Changed the name from StandardLevel2 to PrepPipeline
-* Implemented the HP filter-free strategy
-* Added a keepFiltered version -- if false (the default) the data in the
-  repository is not high pass filtered
-* Added an option for removing global trend
-* Incorporated the different reference schemes into a single performReference
-
-Version 0.28 (Not yet released)
-* Changed the name of the noisyParameter structure in EEG.etc to 
-  noiseDetection.   This is a major change with corresponding change
-  in ESS.
-* Added a specificReferenceChannels field to reference structure
-* Changed the averageReference field name to referenceSignal in reference
-  structure
-* Included a referenceType field in the reference structure (this
-  can be 'robust', 'average', or 'specific')
-* Eliminated the don't interpolateHFChannels flag.
-* Added routines to do specificReference (mastoid or average)
-* Modified showSpectrum to return the spectra of all of the channels.
-* Detrending at 0.2 Hz has replaced FIR filtering as default trend removal.
-
-Version 0.27 Released 1/7/2015
-* Correct version of bug fix in cleanLineNoise -- watch that single
-  precision conversion!
-
-Version 0.26 Released 1/7/2015
-* Release to fix bug in cleanLineNoise --- channels that are not 
-  lineNoiseChannels were set to zero rather than being carried forward.
-
-  Version 0.25 Released 1/5/2015 (major)
-* Removed saving of temporary file after line noise removal
-* Fixed report of relative reference
-* Modified findNoisyChannels to exclude NaN and constant channels 
-  from noisyChannel thresholding, but to designate them as bad channels
-* Moved resampling step before high pass filter
-* Assigned return values in a separate step
-* Put error check in ShowSpectrum when invalid data is invalid
-* Correct minor issues with PlotScalpMap
-* Added extractReferenceStatistics -- which extracts summary statistics
-  for an entire archive.
-* Added iterations on the remove robust reference
-* Added a summary reporting scheme for spotting problematic datasets.
-
-Version 0.24 Released 12/7/2104 (major)
-* Fixed channel selection bug in showSpectrum
-* Added error handling for failures in standardLevel2Pipeline
-* Added error reporting for failures
-* Corrected time scale on visualization of difference between 
-  robust and mean reference 
-* Added channel labels as well as numbers to spectrum visualization
-* Fixed major bug in robustReference so that original signal is rereferenced
-* Revised and expanded the reporting
-
-Version 0.23 Released 11/13/2014
-
-* Removed the channel locations and channel information from noisyOut
-  because it is already in the reference structure at top level.
-* Added reporting of average fraction of channels bad in windows.
-* Added first version of hdf5support -- rewrites the noisyParameters
-  to an HDF5 file.
-
-Version 0.22 Released 11/9/2014
-
-* Revised the method of computing the windowed channel deviations
-* Added summary reporting functions
-* Added a check to only perform ransac when sufficiently good channels
-  are available
-* Added check to only perform ransac when channel locations are available
-* Fixed the input parameter structure on findNoisyChannels
-* Added the infrastructure for the summary of all datasets
-
-Version 0.21 Released 10/30/2104
-
-* Removed any reference to chanlocs in highPassFilter
-* Full integration with ESS Study Level 2 code
-* Preliminary version of Standard Level 2 Report finalized (gives pdf)
-
-Version 0.20 Released 10/18/2014
-
-* Converted standardLevel2Pipeline to a function
-* Moved the computationTimes structure to standardLevel2Pipeline so that
-it is returned.
-
-Version 0.19 Released 10/16/2014
-
-* Refactored name is also included in the params structure.
-* Renamed rereferencedChannels as channelsToBeReferenced to agree with ESS.
-
-Version 0.18 Released 10/15/2014
-
-* Refactored so that all input to the pipeline is in a single params structure.
-* Fixed the HF noise reporting windows and several minor bugs
-* Added visualizations to show number of bad channels in each window
-
-
-
-
-
-
-
+Release history: [CHANGELOG.md](CHANGELOG.md).
