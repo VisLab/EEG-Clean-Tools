@@ -4,7 +4,7 @@
 # PrepPipeline/utilities/getPrepVersion.m, and docs/conf.py reads it from there.
 
 [build-system]
-requires = ["setuptools>=45", "wheel"]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]

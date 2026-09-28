@@ -74,9 +74,10 @@ such as EOG channels and mastoids.
 
 **[REPORT MENU]** You can choose to generate a report using the PREP report generation facility:
 ![PREP report menu](_static/images/PrepReportParameters.png)\
-By default, the PREP does not produce a report. If you generate choose to generate a report, you can choose to
-publish it in PDF format. Otherwise, PREP displays the report on the command line. You can also choose to
-return at a later step and generate the report only.
+By default, PREP generates a report after processing (report mode `'normal'`) and publishes it in PDF format
+(`publishOn` is true). If you turn publishing off, PREP displays the report on the command line instead.
+Choose `'skipReport'` to run the pipeline without a report, or `'reportOnly'` to return at a later step and
+generate the report only.
 
 **[POSTPROCESS MENU]** After running the PREP pipeline, you can perform additional processing steps:
 ![PREP post process menu](_static/images/PrepPostProcess.png)
@@ -149,12 +150,14 @@ By default, PREP uses 0.02 seconds. This parameter is not used unless the `detre
 We use an iterative version of a method that estimates the amplitude and size of a deterministic sinusoid at a specified frequency embedded in locally white noise. The model is applied in sliding windows to adjust for non stationarity. The algorithm requires a rough guess of the frequencies to be removed. By default, PREP uses multiples of 60 Hz. If the data set was recorded in a place where 50 Hz alternating current is used, you will need to provide the `lineFrequencies` parameter. Sometimes unusual frequencies appear due to aliasing and other recording artifacts. For example, a frequency spike at 212 Hz might appear as an aliasing artifact in a signal recorded at 512 Hz (212 = 512 - 300). You might need to rerun with different frequencies if unusual spectral peaks are visible in the reports.
 
 #### Calling sequence for line noise removal
-The `cleanLineNoise` function takes two structures in and produces two output structures. The `signal` structure
+The `removeLineNoise` function takes two structures in and produces two output structures. It fills in the
+defaults for any parameters you leave out, checks them, and then calls `cleanLineNoise`, which does the work
+and requires the full parameter structure. The `signal` structure
 includes a `.data` field and an `.srate` field. The `signal` structure is compatible with an EEGLAB EEG structure, but does not rely on any of the other EEGLAB fields. The data field should be channels x frames.
 
 As with all functions in the pipeline, the algorithm parameters are passed in a structure.
-> `[signal, lineNoiseOut] = cleanLineNoise(signal)`\
-> `[signal, lineNoiseOut] = cleanLineNoise(signal, lineNoiseIn)`
+> `[signal, lineNoiseOut] = removeLineNoise(signal)`\
+> `[signal, lineNoiseOut] = removeLineNoise(signal, lineNoiseIn)`
 
 The output structure contains all of the input structure fields plus additional fields containing information on the
 tapers used to compute the spectral components and additional fields including a string representation
@@ -272,7 +275,7 @@ or `'none'`. If you mean to run the standardized PREP pipeline, you don't need t
 A structure containing the channel locations in EEGLAB `chanlocs` format. By default, PREP uses the `signal.chanlocs`
 structure unless this field is used to over ride. PREP must have channel locations in order to work.
 
-**`channelInfo`**\
+**`channelInformation`**\
 A structure containing channel information in EEGLAB `chaninfo` format. By default, PREP uses the `signal.chaninfo`
 structure unless this field is used to over ride. PREP uses the nose direction for display purposes in the reports.
 
@@ -335,8 +338,9 @@ report level of verbose. You need to furnish a summary directory name and a summ
 As with all functions in the pipeline, the algorithm parameters are passed in a structure.
 > `publishPrepReport(signal, summaryFilePath, sessionFilePath, consoleFID, publishOn);`
 
-The output structure contains all of the input structure fields plus additional fields including a string representation
-of the actual command used.
+`publishPrepReport` returns nothing; its results are files. It appends a summary of this dataset to the HTML file
+at `summaryFilePath`, whether or not `publishOn` is true, and when `publishOn` is true it publishes the detailed
+report as a PDF at `sessionFilePath`.
 
 **Example:**\
 The following produces an HTML-formatted summary report in the current directory and publishes a detailed report in the s1 sub directory.

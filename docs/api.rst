@@ -20,6 +20,8 @@ Pipeline steps
 
 .. mat:autofunction:: utilities.removeTrend
 
+.. mat:autofunction:: utilities.removeLineNoise
+
 .. mat:autofunction:: utilities.cleanLineNoise
 
 .. mat:autofunction:: utilities.performReference
