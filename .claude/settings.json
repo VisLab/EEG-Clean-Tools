@@ -6,17 +6,15 @@
       "Bash(unzip -l *)",
       "Bash(python -m sphinx *)",
       "Bash(python docs/patch_matlabdomain.py)",
-      "Bash(git status)",
       "Bash(git status *)",
-      "Bash(git log)",
       "Bash(git log *)",
-      "Bash(git diff)",
       "Bash(git diff *)",
       "Bash(git branch)",
-      "Bash(git ls-files *)",
-      "Bash(ls)",
-      "Bash(ls *)",
-      "Bash(wc *)"
+      "Bash(git branch --show-current)",
+      "Bash(git branch -a)",
+      "Bash(git branch -r)",
+      "Bash(git branch -vv)",
+      "Bash(git ls-files *)"
     ],
     "ask": [
       "Bash(matlab -batch *)",
@@ -29,7 +27,6 @@
     "deny": [
       "Read(.env)",
       "Read(.envrc)",
-      "Read(.status/archive/**)",
       "Bash(rm -rf *)",
       "Bash(rm -r *)",
       "Bash(git push)",
