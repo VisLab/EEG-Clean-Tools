@@ -27,6 +27,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: No CRLF line endings in tracked files
+        run: |
+          if git ls-files --eol | grep -E '^i/(crlf|mixed)' | grep -v 'attr/-text'; then
+            echo "CRLF found in the files above; .gitattributes requires LF."
+            exit 1
+          fi
+
       - name: Install uv
         uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
         with:

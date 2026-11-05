@@ -1,0 +1,17 @@
+# Editor defaults for every file in this repository, including gitignored
+# working files that git never sees. LF only on every OS: .gitattributes
+# enforces it at commit time, this file at edit time.
+#
+# Trailing whitespace is trimmed in Markdown too: write a hard line break as
+# a trailing backslash, not two trailing spaces (mdformat converts the
+# two-space form to the backslash form anyway).
+#
+# This is the floor. Add sections for particular file types (indent rules,
+# for example), but do not override the [*] keys.
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
