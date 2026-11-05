@@ -1,3 +1,4 @@
+function [EEG, com] = pop_prepPipeline(EEG, params)
 % pop_prepPipeline() - runs the early stage pipeline to reference and to
 % detect bad channels
 %
@@ -31,7 +32,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [EEG, com] = pop_prepPipeline(EEG, params)
 com = ''; % Return something if user presses the cancel button
 if nargin < 1  %% display help if not enough arguments
     help pop_prepPipeline;

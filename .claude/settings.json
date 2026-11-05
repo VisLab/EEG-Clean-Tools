@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(python --version)",
+      "Bash(unzip -l *)",
+      "Bash(python -m sphinx *)",
+      "Bash(python docs/patch_matlabdomain.py)",
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git branch)",
+      "Bash(git branch --show-current)",
+      "Bash(git branch -a)",
+      "Bash(git branch -r)",
+      "Bash(git branch -vv)",
+      "Bash(git ls-files *)"
+    ],
+    "ask": [
+      "Bash(matlab -batch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git checkout -- *)",
+      "Bash(git restore *)",
+      "Bash(git stash *)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.envrc)",
+      "Bash(rm -rf *)",
+      "Bash(rm -r *)",
+      "Bash(git push)",
+      "Bash(git push *)",
+      "Bash(git reset --hard *)",
+      "Bash(pip install *)",
+      "Bash(python -m pip install *)",
+      "Bash(curl *)",
+      "Bash(wget *)"
+    ]
+  }
+}

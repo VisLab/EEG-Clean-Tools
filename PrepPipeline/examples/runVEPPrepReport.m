@@ -2,8 +2,14 @@
 % and produces reports.
 
 %% Read in the file and set the necessary parameters
-dataDir = 'F:\TempData';
-summaryFolder = 'F:\TempDataReports';
+% By default this reports on the output of runVEPPrepPipeline in
+% examples/output. Change these to use your own folders.
+exampleDir = fileparts(mfilename('fullpath'));
+dataDir = fullfile(exampleDir, 'output');              % PREP-processed .set files
+summaryFolder = fullfile(exampleDir, 'output', 'reports');  % summary and session reports
+if ~exist(summaryFolder, 'dir')
+    mkdir(summaryFolder);
+end
 publishOn = true;
 
 %% Get the directory list
@@ -28,8 +34,8 @@ for k = 1:length(inNames)
         continue;
     end
     sessionReportName = [theName '.pdf'];
-    fname = [dataDir filesep inNames{k}];
-    load(fname, '-mat');
+    EEG = pop_loadset('filename', inNames{k}, 'filepath', dataDir);
+    EEG.data = double(EEG.data);   % PREP reporting needs double precision
     sessionFileName = [summaryFolder filesep sessionReportName];
     consoleFID = 1;
     publishPrepReport(EEG, summaryFileName, sessionFileName, consoleFID, publishOn);

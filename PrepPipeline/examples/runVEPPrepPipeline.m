@@ -2,8 +2,11 @@
 
 %% Set up the input and the output directories
 basename = 'vep';
-indir = 'F:\DataPool\CTADATA\VEP\BiosemiOriginalSetCorrected';
-outdir = 'F:\TempData';
+% By default this runs on the three example recordings in examples/data and
+% writes to examples/output (not tracked by git). Change these to use your own.
+exampleDir = fileparts(mfilename('fullpath'));
+indir = fullfile(exampleDir, 'data');      % folder of EEGLAB .set files to process
+outdir = fullfile(exampleDir, 'output');   % folder for the PREP-processed files
 
 %% Make the output directory if needed
 if ~exist(outdir, 'dir')
@@ -34,6 +37,9 @@ fileList = getFileList('FILES', indir);
 for k = 1:length(fileList)
     [~, thisName, ~] = fileparts(fileList{k});
     EEG = pop_loadset(fileList{k});
+    % .fdt files store 32-bit samples, and EEGLAB loads them as single unless
+    % its double-precision option is set. PREP needs double: convert here.
+    EEG.data = double(EEG.data);
     params.name = thisName;
     [EEG, params, computationTimes] = prepPipeline(EEG, params);
     fprintf('Computation times (seconds):\n   %s\n', ...

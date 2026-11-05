@@ -1,1 +1,25 @@
 *.asv
+
+# Personal per-repo Claude Code notes (imports .status/local-environment.md)
+CLAUDE.local.md
+
+# Personal per-repo settings (absolute paths, claudeMdExcludes)
+.claude/settings.local.json
+
+# Real tokens and machine values; .env.example is the committed documentation
+.env
+
+# Working notes, plans, prompts, and decision records. Deliberately NOT
+# committed: these repos are public and .status/ holds half-formed thinking.
+# The consequence is that it lives on one machine only and is absent from
+# fresh clones and from `claude --worktree` worktrees.
+.status/
+
+# Documentation build and its Python toolchain
+docs/_build/
+.venv/
+__pycache__/
+*.egg-info/
+
+# Output of the example scripts
+PrepPipeline/examples/output/

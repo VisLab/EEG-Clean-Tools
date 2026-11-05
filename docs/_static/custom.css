@@ -1,0 +1,267 @@
+/* Custom styles for the PREP pipeline docs - Furo theme */
+
+/* Project name styling below logo */
+.sidebar-brand-text {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    color: #0969da !important;
+    margin-top: 0.5rem !important;
+    text-align: center !important;
+}
+
+html[data-theme="dark"] .sidebar-brand-text,
+body[data-theme="dark"] .sidebar-brand-text {
+    color: #58a6ff !important;
+}
+
+/* Make all heading levels match sidebar title blue color */
+.content h1,
+.content h2,
+.content h3,
+.content h4,
+.content h5,
+.content h6,
+article h1,
+article h2,
+article h3,
+article h4,
+article h5,
+article h6 {
+    color: #0969da !important;
+}
+
+body[data-theme="dark"] .content h1,
+body[data-theme="dark"] .content h2,
+body[data-theme="dark"] .content h3,
+body[data-theme="dark"] .content h4,
+body[data-theme="dark"] .content h5,
+body[data-theme="dark"] .content h6,
+body[data-theme="dark"] article h1,
+body[data-theme="dark"] article h2,
+body[data-theme="dark"] article h3,
+body[data-theme="dark"] article h4,
+body[data-theme="dark"] article h5,
+body[data-theme="dark"] article h6 {
+    color: #58a6ff !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .content h1,
+    body:not([data-theme="light"]) .content h2,
+    body:not([data-theme="light"]) .content h3,
+    body:not([data-theme="light"]) .content h4,
+    body:not([data-theme="light"]) .content h5,
+    body:not([data-theme="light"]) .content h6,
+    body:not([data-theme="light"]) article h1,
+    body:not([data-theme="light"]) article h2,
+    body:not([data-theme="light"]) article h3,
+    body:not([data-theme="light"]) article h4,
+    body:not([data-theme="light"]) article h5,
+    body:not([data-theme="light"]) article h6 {
+        color: #58a6ff !important;
+    }
+}
+
+/* Quick Links sidebar styling - darker gray box with proper padding */
+.sidebar-quicklinks {
+    margin: 1rem 0.75rem 1rem 0.75rem;
+    padding: 0.75rem 1rem;
+    background-color: #e8e8e8;
+    border-radius: 0.25rem;
+    border: 1px solid #d0d0d0;
+}
+
+/* Style RST sidebar directive boxes to match left sidebar styling */
+.sidebar,
+aside.sidebar {
+    background-color: #e8e8e8 !important;
+    border: 1px solid #d0d0d0 !important;
+    border-radius: 0.25rem !important;
+    padding: 0.75rem 1rem !important;
+}
+
+body[data-theme="dark"] .sidebar,
+body[data-theme="dark"] aside.sidebar {
+    background-color: #0d0d0d !important;
+    border-color: #1a1a1a !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .sidebar,
+    body:not([data-theme="light"]) aside.sidebar {
+        background-color: #0d0d0d !important;
+        border-color: #1a1a1a !important;
+    }
+}
+
+.sidebar p.sidebar-title,
+aside.sidebar p.sidebar-title {
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Dark mode styling for quick links - much darker background */
+body[data-theme="dark"] .sidebar-quicklinks {
+    background-color: #0d0d0d;
+    border-color: #1a1a1a;
+}
+
+/* Auto mode with dark system preference */
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .sidebar-quicklinks {
+        background-color: #0d0d0d;
+        border-color: #1a1a1a;
+    }
+}
+
+.sidebar-quicklinks h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--color-sidebar-link-text);
+    font-size: var(--sidebar-item-font-size);
+    font-weight: 600;
+}
+
+.sidebar-quicklinks ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.sidebar-quicklinks li {
+    margin-bottom: 0.25rem;
+}
+
+.sidebar-quicklinks a {
+    color: var(--color-link) !important;
+    text-decoration: none;
+    font-size: var(--sidebar-item-font-size);
+    display: block;
+    padding: 0.25rem 0;
+    transition: color 0.2s ease;
+}
+
+.sidebar-quicklinks a:hover {
+    color: var(--color-link-hover) !important;
+    text-decoration: underline;
+}
+
+/* External link icon for quick links */
+.sidebar-quicklinks a[target="_blank"]::after {
+    content: " \2197";
+    font-size: 0.7em;
+    opacity: 0.6;
+}
+
+/* Make search field more visible with same background as quick links */
+.sidebar-search-container {
+    margin: 0 0.75rem;
+}
+
+.sidebar-search-container input {
+    background-color: #e8e8e8 !important;
+    border: 1px solid #d0d0d0 !important;
+    color: var(--color-foreground-primary) !important;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.5rem center !important;
+    background-size: 1.2em !important;
+    padding-right: 2.5rem !important;
+}
+
+body[data-theme="dark"] .sidebar-search-container input {
+    background-color: #0d0d0d !important;
+    border: 1px solid #1a1a1a !important;
+    color: #e8e8e8 !important;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23cccccc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+}
+
+/* Auto mode with dark system preference */
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .sidebar-search-container input {
+        background-color: #0d0d0d !important;
+        border: 1px solid #1a1a1a !important;
+        color: #e8e8e8 !important;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23cccccc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+    }
+}
+
+/* Make search icon visible */
+.sidebar-search-container input::placeholder {
+    color: var(--color-foreground-muted) !important;
+    opacity: 1 !important;
+}
+
+body[data-theme="dark"] .sidebar-search-container input::placeholder {
+    color: #999999 !important;
+}
+
+/* Style search icon/button visibility */
+.sidebar-search .icon {
+    color: var(--color-foreground-muted) !important;
+}
+
+body[data-theme="dark"] .sidebar-search .icon {
+    color: #999999 !important;
+}
+
+/* Hide view source and edit buttons in top-right header */
+a.muted-link[href*="_sources"],
+a.muted-link[title*="Edit this page"],
+a.muted-link[title*="View page source"],
+.content-icon-container a[href*="_sources"] {
+    display: none !important;
+}
+
+/* Ensure GitHub repository button shows as icon in top-right header */
+
+/* Target the hijacked link using the class added by JS, OR the href attribute as fallback */
+.content-icon-container a.github-repo-link,
+.content-icon-container a[href*="github.com"]:not([href*="/edit/"]) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2rem !important;
+    height: 2rem !important;
+
+    /* GitHub Icon */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%23666666'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 1.2rem !important;
+
+    color: transparent !important; /* Hide any text */
+    overflow: hidden !important;
+}
+
+/* Hide the original SVG icon inside the link */
+.content-icon-container a.github-repo-link svg,
+.content-icon-container a[href*="github.com"] svg {
+    display: none !important;
+}
+
+/* Dark mode icon color */
+body[data-theme="dark"] .content-icon-container a.github-repo-link,
+body[data-theme="dark"] .content-icon-container a[href*="github.com"]:not([href*="/edit/"]) {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%23cccccc'/%3E%3C/svg%3E") !important;
+}
+
+/* Explicitly hide the edit link via CSS as well */
+.content-icon-container a[href*="/edit/"] {
+    display: none !important;
+}
+
+/* Logo styling - ensure visibility in both light and dark modes */
+.sidebar-brand-text {
+    font-weight: 600;
+}
+
+/* Adjust logo size if needed */
+.sidebar-logo {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-logo img {
+    max-width: 100%;
+    height: auto;
+}
